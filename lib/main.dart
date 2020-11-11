@@ -1,3 +1,12 @@
+/// Example of a combo time series chart with two series rendered as lines, and
+/// a third rendered as points along the top line with a different color.
+///
+/// This example demonstrates a method for drawing points along a line using a
+/// different color from the main series color. The line renderer supports
+/// drawing points with the "includePoints" option, but those points will share
+/// the same color as the line.
+import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -5,113 +14,154 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
-        // This makes the visual density adapt to the platform that you run
-        // the app on. For desktop platforms, the controls will be smaller and
-        // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Tæll mæ ned'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
+
+  MyHomePage({Key key, this.title}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  final List<TimeSeriesSales> data = [TimeSeriesSales(DateTime.now(), 0)];
+  double buffer = 0;
+  double perMille = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _loop();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    final List<charts.Series<TimeSeriesSales, DateTime>> seriesList = [
+      new charts.Series<TimeSeriesSales, DateTime>(
+        id: 'Tablet',
+        colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
+        domainFn: (TimeSeriesSales sales, _) => sales.time,
+        measureFn: (TimeSeriesSales sales, _) => sales.sales,
+        data: data,
+      ),
+    ];
+
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.only(top: 10.0, left: 10.0),
+            width: double.infinity,
+            child: Text(
+              '‰',
+              style: TextStyle(fontSize: 20.0),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+          ),
+          Container(
+            height: 500.0,
+            child: DateTimeComboLinePointChart(
+              seriesList,
+              animate: false,
             ),
-          ],
-        ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            width: double.infinity,
+            child: Text(
+              't',
+              textAlign: TextAlign.end,
+              style: TextStyle(fontSize: 20.0),
+            ),
+          )
+        ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+          tooltip: 'Increment',
+          child: Icon(Icons.local_drink),
+          onPressed: () {
+            buffer += 0.6;
+          }),
     );
   }
+
+  Future<void> _loop() async {
+    Future.delayed(Duration(seconds: 1), () {
+      if (buffer > 0) {
+        perMille += 0.2;
+        buffer -= 0.2;
+      } else if (perMille > 0.1) {
+        perMille -= 0.1;
+      } else {
+        perMille = 0;
+      }
+
+      setState(() {
+        data.add(TimeSeriesSales(DateTime.now(), perMille));
+      });
+    }).then((value) => _loop());
+  }
+
+  Map<DateTime, double> createLineData(double factor) {
+    Map<DateTime, double> data = {};
+
+    for (int c = 50; c > 0; c--) {
+      data[DateTime.now().subtract(Duration(minutes: c))] =
+          c.toDouble() * factor;
+    }
+
+    return data;
+  }
+}
+
+class DateTimeComboLinePointChart extends StatelessWidget {
+  final List<charts.Series> seriesList;
+  final bool animate;
+
+  DateTimeComboLinePointChart(this.seriesList, {this.animate});
+
+  @override
+  Widget build(BuildContext context) {
+    return charts.TimeSeriesChart(
+      seriesList,
+      animate: animate,
+      defaultRenderer: new charts.LineRendererConfig(),
+      customSeriesRenderers: [
+        new charts.PointRendererConfig(customRendererId: 'customPoint')
+      ],
+      dateTimeFactory: const charts.LocalDateTimeFactory(),
+      primaryMeasureAxis: new charts.NumericAxisSpec(
+          tickProviderSpec:
+              new charts.BasicNumericTickProviderSpec(zeroBound: false)),
+      domainAxis: new charts.DateTimeAxisSpec(
+        tickFormatterSpec: new charts.AutoDateTimeTickFormatterSpec(
+          minute: new charts.TimeFormatterSpec(
+              format: 'mm', transitionFormat: 'HH:mm'),
+        ),
+      ),
+    );
+  }
+}
+
+class TimeSeriesSales {
+  final DateTime time;
+  final double sales;
+
+  TimeSeriesSales(this.time, this.sales);
 }
