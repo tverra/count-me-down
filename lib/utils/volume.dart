@@ -25,7 +25,7 @@ class Volume {
   String toString() {
     if (millilitres == null) return null;
     if (millilitres > 1000) {
-      return '$litres} l';
+      return '$litres l';
     } else if (millilitres > 100) {
       return '$decilitres dl';
     } else if (millilitres > 10) {
