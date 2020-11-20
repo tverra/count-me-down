@@ -30,84 +30,83 @@ class _SessionsPageState extends State<SessionsPage> {
               return Center(child: CircularProgressIndicator());
             }
 
-            return SafeArea(
-              child: Stack(
-                children: [
-                  ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 100.0),
-                      itemCount:
-                          snapshot.data != null ? snapshot.data.length : 0,
-                      itemBuilder: (BuildContext context, int index) {
-                        final Session session = snapshot.data[index];
+            return Stack(
+              children: [
+                ListView.builder(
+                    padding: EdgeInsets.only(
+                      bottom: 80.0 + MediaQuery.of(context).padding.bottom,
+                    ),
+                    itemCount: snapshot.data != null ? snapshot.data.length : 0,
+                    itemBuilder: (BuildContext context, int index) {
+                      final Session session = snapshot.data[index];
 
-                        return Container(
-                          padding: EdgeInsets.symmetric(vertical: 4.0),
-                          child: Material(
-                            elevation: 2.0,
-                            child: FlatButton(
-                              onPressed: _isLoading
-                                  ? null
-                                  : () => _openSession(context, session),
-                              child: Container(
-                                width: double.infinity,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 20.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      session.name,
-                                      style: TextStyle(
-                                        fontSize: 17.0,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                      return Container(
+                        padding: EdgeInsets.symmetric(vertical: 4.0),
+                        child: Material(
+                          elevation: 2.0,
+                          child: FlatButton(
+                            onPressed: _isLoading
+                                ? null
+                                : () => _openSession(context, session),
+                            child: Container(
+                              width: double.infinity,
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 20.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    session.name,
+                                    style: TextStyle(
+                                      fontSize: 17.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    Text(
-                                      Utils.formatDatetime(session.startedAt),
-                                      style: TextStyle(
-                                        color: Colors.black45,
-                                      ),
-                                    )
-                                  ],
-                                ),
+                                  ),
+                                  Text(
+                                    Utils.formatDatetime(session.startedAt),
+                                    style: TextStyle(
+                                      color: Colors.black45,
+                                    ),
+                                  )
+                                ],
                               ),
                             ),
                           ),
-                        );
-                      }),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: SafeArea(
-                      top: false,
-                      right: false,
-                      left: false,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10.0, horizontal: 20.0),
-                        child: RaisedButton(
-                          color: Theme.of(context).primaryColor,
-                          child: Container(
-                            padding: const EdgeInsets.all(
-                              15.0,
-                            ),
-                            child: Text(
-                              'Start new session',
-                              style: TextStyle(
-                                color: Utils.getThemeTextColor(context),
-                                fontSize: 17.0,
-                              ),
-                            ),
-                          ),
-                          onPressed: _isLoading
-                              ? null
-                              : () => _createNewSession(context),
                         ),
+                      );
+                    }),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: SafeArea(
+                    top: false,
+                    right: false,
+                    left: false,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 20.0),
+                      child: RaisedButton(
+                        color: Theme.of(context).primaryColor,
+                        child: Container(
+                          padding: const EdgeInsets.all(
+                            15.0,
+                          ),
+                          child: Text(
+                            'Start new session',
+                            style: TextStyle(
+                              color: Utils.getThemeTextColor(context),
+                              fontSize: 17.0,
+                            ),
+                          ),
+                        ),
+                        onPressed: _isLoading
+                            ? null
+                            : () => _createNewSession(context),
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             );
           },
         );
