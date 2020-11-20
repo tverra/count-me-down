@@ -68,19 +68,19 @@ class Utils {
     final StringBuffer buffer = StringBuffer();
 
     if (weekDay) {
-      buffer.write(DateFormat('EEEE ', locale).format(dateTime));
+      buffer.write(DateFormat('EEEE ', locale).format(dateTime.toLocal()));
     }
 
-    buffer.write(dateTime.day);
+    buffer.write(dateTime.toLocal().day);
     buffer.write('. ');
-    buffer.write(DateFormat('MMMM', locale).format(dateTime));
-    if (DateTime.now().year != dateTime.year) {
-      buffer.write(DateFormat(' y', locale).format(dateTime));
+    buffer.write(DateFormat('MMMM', locale).format(dateTime.toLocal()));
+    if (DateTime.now().year != dateTime.toLocal().year) {
+      buffer.write(DateFormat(' y', locale).format(dateTime.toLocal()));
     }
 
     if (timeOfDay) {
       buffer.write(', ');
-      buffer.write(DateFormat('HH:mm', locale).format(dateTime));
+      buffer.write(DateFormat('HH:mm', locale).format(dateTime.toLocal()));
     }
 
     return buffer.toString();
@@ -96,7 +96,7 @@ class Utils {
       http
           .post(preferences.drinkWebHook,
               headers: headers, body: jsonEncode(drink.toMap()))
-          .timeout(Duration.zero);
+          .timeout(Duration(seconds: 10));
     }
   }
 }
