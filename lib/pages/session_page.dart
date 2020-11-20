@@ -55,64 +55,69 @@ class _SessionPageState extends State<SessionPage> {
               final Session session = snapshot.data;
               _session = snapshot.data;
 
-              return SafeArea(
-                child: Stack(
-                  children: [
-                    ListView.builder(
-                        padding: const EdgeInsets.only(bottom: 140.0),
-                        itemCount:
-                            session.drinks != null ? session.drinks.length : 0,
-                        itemBuilder: (BuildContext context, int index) {
-                          final Drink drink = session.drinks[index];
+              return Stack(
+                children: [
+                  ListView.builder(
+                      padding: EdgeInsets.only(
+                        bottom: 140.0 + MediaQuery.of(context).padding.bottom,
+                      ),
+                      itemCount:
+                          session.drinks != null ? session.drinks.length : 0,
+                      itemBuilder: (BuildContext context, int index) {
+                        final Drink drink = session.drinks[index];
 
-                          return GestureDetector(
-                            onTap: () => _editDrink(context, drink),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 4.0),
-                              child: Material(
-                                elevation: 2.0,
-                                child: Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Row(
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            drink.name,
-                                            style: TextStyle(
-                                              fontSize: 17.0,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                        return GestureDetector(
+                          onTap: () => _editDrink(context, drink),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(vertical: 4.0),
+                            child: Material(
+                              elevation: 2.0,
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(20.0),
+                                child: Row(
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          drink.name,
+                                          style: TextStyle(
+                                            fontSize: 17.0,
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                          drink.timestamp != null
-                                              ? Text(
-                                                  Utils.formatDatetime(
-                                                      drink.timestamp),
-                                                  style: TextStyle(
-                                                    color: Colors.black45,
-                                                  ),
-                                                )
-                                              : Container(),
-                                        ],
-                                      ),
-                                      Spacer(),
-                                      FaIcon(
-                                        drink.iconData,
-                                        size: 30.0,
-                                        color: drink.color,
-                                      )
-                                    ],
-                                  ),
+                                        ),
+                                        drink.timestamp != null
+                                            ? Text(
+                                                Utils.formatDatetime(
+                                                    drink.timestamp),
+                                                style: TextStyle(
+                                                  color: Colors.black45,
+                                                ),
+                                              )
+                                            : Container(),
+                                      ],
+                                    ),
+                                    Spacer(),
+                                    FaIcon(
+                                      drink.iconData,
+                                      size: 30.0,
+                                      color: drink.color,
+                                    )
+                                  ],
                                 ),
                               ),
                             ),
-                          );
-                        }),
-                    Align(
-                      alignment: Alignment.bottomCenter,
+                          ),
+                        );
+                      }),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: SafeArea(
+                      top: false,
+                      left: false,
+                      right: false,
                       child: Container(
                         height: 140.0,
                         color: Colors.white.withOpacity(0.9),
@@ -168,8 +173,8 @@ class _SessionPageState extends State<SessionPage> {
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               );
             },
           ),
