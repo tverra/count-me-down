@@ -12,6 +12,7 @@ import 'package:count_me_down/widgets/profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 
 class SessionPage extends StatefulWidget {
@@ -262,6 +263,26 @@ class _Drawer extends StatelessWidget {
             ),
           ),
           Divider(height: 1.0, color: Color.fromRGBO(0, 0, 0, 0.4)),
+          FutureBuilder<PackageInfo>(
+              future: PackageInfo.fromPlatform(),
+              builder:
+                  (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
+                final String version =
+                    snapshot.hasData ? snapshot.data.version : '';
+
+                return Container(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Center(
+                    child: Text(
+                      'version: $version',
+                      style: TextStyle(
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  color: Colors.grey[200],
+                );
+              }),
           ListTile(
             title: Text('Back to start page'),
             onTap: () async {
