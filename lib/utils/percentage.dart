@@ -15,6 +15,6 @@ class Percentage {
   @override
   String toString() {
     if (fraction == null) return null.toString();
-    return '${percentage.toStringAsFixed(0)}%';
+    return '${percentage.toStringAsFixed(1)}%';
   }
 }
