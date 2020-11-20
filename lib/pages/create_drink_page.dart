@@ -109,12 +109,17 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
   Future<void> _submit(BuildContext context) async {
     final Preferences preferences = context.read<Preferences>();
 
+    final String volume = _volumeController.text.replaceAll(',', '.');
+    final String alcoholConcentration =
+        _alcoholConcentrationController.text.replaceAll(',', '.');
+    final double volumeDouble = double.tryParse(volume);
+    final double alcoholDouble = double.tryParse(alcoholConcentration);
+
     if (_addToTemplate) {
       final Drink template = Drink(
         name: _nameController.text,
-        volume: Volume((double.tryParse(_volumeController.text) * 10).toInt()),
-        alcoholConcentration: Percentage.fromPercentage(
-            double.tryParse(_alcoholConcentrationController.text)),
+        volume: Volume((volumeDouble * 10).toInt()),
+        alcoholConcentration: Percentage.fromPercentage(alcoholDouble),
         timestamp: DateTime.now(),
         color: Colors.black,
         drinkType: DrinkTypes.glass_whiskey,
@@ -126,9 +131,8 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
     final Drink drink = Drink(
       sessionId: preferences.activeSessionId,
       name: _nameController.text,
-      volume: Volume((double.tryParse(_volumeController.text) * 10).toInt()),
-      alcoholConcentration: Percentage.fromPercentage(
-          double.tryParse(_alcoholConcentrationController.text)),
+      volume: Volume((volumeDouble * 10).toInt()),
+      alcoholConcentration: Percentage.fromPercentage(alcoholDouble),
       timestamp: DateTime.now(),
       color: Colors.black,
       drinkType: DrinkTypes.glass_whiskey,
