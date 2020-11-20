@@ -57,7 +57,8 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
                         ),
                         TextFormField(
                           controller: _alcoholConcentrationController,
-                          keyboardType: TextInputType.number,
+                          keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
                           decoration: InputDecoration(
                             hintText: 'Alcohol content',
                             helperText: 'Alcohol content in percentage',
@@ -111,7 +112,7 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
     if (_addToTemplate) {
       final Drink template = Drink(
         name: _nameController.text,
-        volume: Volume.exact(centilitres: int.tryParse(_volumeController.text)),
+        volume: Volume((double.tryParse(_volumeController.text) * 10).toInt()),
         alcoholConcentration: Percentage.fromPercentage(
             double.tryParse(_alcoholConcentrationController.text)),
         timestamp: DateTime.now(),
@@ -125,7 +126,7 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
     final Drink drink = Drink(
       sessionId: preferences.activeSessionId,
       name: _nameController.text,
-      volume: Volume.exact(centilitres: int.tryParse(_volumeController.text)),
+      volume: Volume((double.tryParse(_volumeController.text) * 10).toInt()),
       alcoholConcentration: Percentage.fromPercentage(
           double.tryParse(_alcoholConcentrationController.text)),
       timestamp: DateTime.now(),
