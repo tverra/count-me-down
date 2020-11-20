@@ -89,15 +89,22 @@ class _SessionPageState extends State<SessionPage> {
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        drink.timestamp != null
+                                        widget.template
                                             ? Text(
-                                                Utils.formatDatetime(
-                                                    drink.timestamp),
+                                                'vol: ${drink.volume.toString()}, alc: ${drink.alcoholConcentration.toString()}',
                                                 style: TextStyle(
                                                   color: Colors.black45,
                                                 ),
                                               )
-                                            : Container(),
+                                            : drink.timestamp != null
+                                                ? Text(
+                                                    Utils.formatDatetime(
+                                                        drink.timestamp),
+                                                    style: TextStyle(
+                                                      color: Colors.black45,
+                                                    ),
+                                                  )
+                                                : Container(),
                                       ],
                                     ),
                                     Spacer(),
