@@ -24,7 +24,7 @@ void main() {
 
   group('BAC increases when adding drinks', () {
     final Profile _profile = Profile(
-      bodyWeight: Mass.exact(kilos: 75),
+      bodyWeight: Mass.units(kilos: 75),
       bodyWaterPercentage: Percent.fromPercentage(60),
       absorptionTime: Duration(minutes: 30),
       perMilMetabolizedPerHour: 0,
@@ -102,7 +102,7 @@ void main() {
 
   group('BAC is not increased before after absorbing drinks', () {
     final Profile _profile = Profile(
-      bodyWeight: Mass.exact(kilos: 75),
+      bodyWeight: Mass.units(kilos: 75),
       bodyWaterPercentage: Percent.fromPercentage(60),
       absorptionTime: Duration(minutes: 30),
       perMilMetabolizedPerHour: 0,
@@ -202,7 +202,7 @@ void main() {
 
   group('BAC decreases when metabolized', () {
     final Profile _profile = Profile(
-      bodyWeight: Mass.exact(kilos: 75),
+      bodyWeight: Mass.units(kilos: 75),
       bodyWaterPercentage: Percent.fromPercentage(60),
       absorptionTime: Duration.zero,
       perMilMetabolizedPerHour: 0.15,

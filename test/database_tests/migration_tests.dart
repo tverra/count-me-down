@@ -35,7 +35,7 @@ void main() {
     setUp(() {
       _profile = Profile(
         name: 'name',
-        bodyWeight: Mass.exact(kilos: 75),
+        bodyWeight: Mass.units(kilos: 75),
         bodyWaterPercentage: Percent.fromPercentage(60),
         absorptionTime: Duration(minutes: 30),
         perMilMetabolizedPerHour: 0.15,

@@ -10,7 +10,7 @@ class SeedData {
   static final List<Profile> _profiles = <Profile>[
     Profile(
       name: 'Generic profile',
-      bodyWeight: Mass.exact(kilos: 75),
+      bodyWeight: Mass.units(kilos: 75),
       bodyWaterPercentage: Percent.fromPercentage(60),
       absorptionTime: Duration(hours: 1),
       perMilMetabolizedPerHour: 0.15,
