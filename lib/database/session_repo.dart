@@ -58,7 +58,7 @@ class SessionRepo {
 
         if (preloadArgs.contains(Session.relProfile)) {
           profileMap =
-              Preload.extractPreLoadedMap(Session.tableName, sessionMap);
+              Preload.extractPreLoadedMap(Profile.tableName, sessionMap);
         }
         if (preloadArgs.contains(Session.relDrinks)) {
           session.drinks = await DrinkRepo.getDrinks(sessionId: session.id);
@@ -95,7 +95,7 @@ class SessionRepo {
   static Future<List<int>> insertSessions(List<Session> sessions) async {
     final Database db = await _getDb();
 
-    await db.transaction((Transaction txn) async {
+    final List result = await db.transaction((Transaction txn) async {
       final Batch batch = txn.batch();
 
       for (Session session in sessions) {
@@ -104,7 +104,10 @@ class SessionRepo {
       return batch.commit();
     });
 
-    return sessions.map((s) => s.id).toList();
+    for (int i = 0; i < sessions.length; i++) {
+      sessions[i].id = result[i];
+    }
+    return result.toList().cast<int>();
   }
 
   static Future<int> updateSession(Session session,
@@ -120,18 +123,28 @@ class SessionRepo {
     return results.isEmpty ? 0 : results[0];
   }
 
-  static Future<List> updateSessions(List<Session> sessions,
-      {int sessionId,
+  static Future<List<int>> updateSessions(List<Session> sessions,
+      {int profileId,
       bool insertMissing = false,
       bool removeDeleted = false}) async {
     final Database db = await _getDb();
 
-    return db.transaction((Transaction txn) async {
+    final List result = await db.transaction((Transaction txn) async {
       final Batch batch = txn.batch();
       _updateSessions(batch, sessions, insertMissing, removeDeleted,
-          profileId: sessionId);
+          profileId: profileId);
       return batch.commit();
     });
+
+    final List<int> resultList = result.toList().cast<int>();
+
+    for (int i = 0; i < sessions.length; i++) {
+      if (sessions[i].id == null) {
+        sessions[i].id = resultList[i];
+      }
+    }
+
+    return resultList;
   }
 
   static Batch _updateSessions(Batch batch, List<Session> sessions,
