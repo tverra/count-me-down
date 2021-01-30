@@ -1,7 +1,38 @@
 import 'package:count_me_down/utils/utils.dart';
 import 'package:sqflite/sqflite.dart';
 
+class Migration {
+  final int version;
+  final List<String> actions;
+  final List<String> rollback;
+
+  const Migration({this.version, this.actions, this.rollback});
+}
+
 class Migrations {
+  static int get latestVersion {
+    return migrations.length;
+  }
+
+  static Future<void> create(Database db, int version) async {
+    await migrate(db, 0, version);
+  }
+
+  static Future<void> migrate(
+      Database db, int oldVersion, int newVersion) async {
+    await db.transaction((Transaction txn) async {
+      final Batch batch = txn.batch();
+
+      for (int i = oldVersion; i < newVersion; i++) {
+        migrations[i]
+            .actions
+            .forEach((action) => batch.execute(Utils.trimTextBlock(action)));
+      }
+
+      await batch.commit();
+    });
+  }
+
   static const List<Migration> migrations = [
     Migration(
       version: 1,
@@ -39,35 +70,4 @@ class Migrations {
       ],
     )
   ];
-
-  static int get latestVersion {
-    return migrations.length;
-  }
-
-  static Future<void> create(Database db, int version) async {
-    await migrate(db, 0, version);
-  }
-
-  static Future<void> migrate(
-      Database db, int oldVersion, int newVersion) async {
-    await db.transaction((Transaction txn) async {
-      final Batch batch = txn.batch();
-
-      for (int i = oldVersion; i < newVersion; i++) {
-        migrations[i]
-            .actions
-            .forEach((action) => batch.execute(Utils.trimTextBlock(action)));
-      }
-
-      await batch.commit();
-    });
-  }
-}
-
-class Migration {
-  final int version;
-  final List<String> actions;
-  final List<String> rollback;
-
-  const Migration({this.version, this.actions, this.rollback});
 }

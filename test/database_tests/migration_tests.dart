@@ -33,17 +33,17 @@ void main() {
     Map<String, dynamic> _drink;
 
     setUp(() {
-      _session = Session(
-        name: 'name',
-        startedAt: DateTime.now(),
-        endedAt: DateTime.now(),
-      ).toMap(forQuery: true);
       _profile = Profile(
         name: 'name',
         bodyWeight: Mass.exact(kilos: 75),
         bodyWaterPercentage: Percentage.fromPercentage(60),
         absorptionTime: Duration(minutes: 30),
         perMilMetabolizedPerHour: 0.15,
+      ).toMap(forQuery: true);
+      _session = Session(
+        name: 'name',
+        startedAt: DateTime.now(),
+        endedAt: DateTime.now(),
       ).toMap(forQuery: true);
       _drink = Drink(
         name: 'name',
