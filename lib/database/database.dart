@@ -14,7 +14,7 @@ class DBProvider {
   static final DBProvider db = DBProvider._();
   static Database _database;
 
-  Future<Database> _initDB(int version, {bool inMemory}) async {
+  Future<Database> _initDB(int version, {bool inMemory, bool seed}) async {
     final String path = join(await getDatabasesPath(), "count_me_down.db");
     final DatabaseFactory databaseFactory = databaseFactoryFfi;
     Database db;
@@ -43,7 +43,10 @@ class DBProvider {
           print('version: $version');
 
           await Migrations.create(db, version);
-          await SeedData.insertSeedData(db);
+
+          if (seed) {
+            await SeedData.insertSeedData(db);
+          }
         });
 
     if (inMemory) {
@@ -59,11 +62,16 @@ class DBProvider {
     return db;
   }
 
-  Future<Database> getDatabase({int version, bool inMemory = false}) async {
+  Future<Database> getDatabase({
+    int version,
+    bool inMemory = false,
+    bool seed = true,
+  }) async {
     if (_database != null) return _database;
     _database = await _initDB(
       version ?? Migrations.latestVersion,
       inMemory: inMemory,
+      seed: seed,
     );
 
     return _database;
