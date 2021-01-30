@@ -1,7 +1,7 @@
 import 'package:count_me_down/models/profile.dart';
 import 'package:count_me_down/models/session.dart';
 import 'package:count_me_down/utils/mass.dart';
-import 'package:count_me_down/utils/percentage.dart';
+import 'package:count_me_down/utils/percent.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../test_utils.dart';
@@ -52,7 +52,7 @@ void main() {
       expect(profile.name, _profileMap['name']);
       expect(profile.bodyWeight, Mass(_profileMap['body_weight']));
       expect(profile.bodyWaterPercentage,
-          Percentage(_profileMap['body_water_percentage']));
+          Percent(_profileMap['body_water_percentage']));
       expect(profile.absorptionTime,
           Duration(milliseconds: _profileMap['absorption_time']));
       expect(profile.perMilMetabolizedPerHour,
@@ -91,7 +91,7 @@ void main() {
       _profile = Profile(
         name: 'Profile',
         bodyWeight: Mass(75000),
-        bodyWaterPercentage: Percentage(0.6),
+        bodyWaterPercentage: Percent(0.6),
         absorptionTime: Duration(hours: 1),
         perMilMetabolizedPerHour: 0.15,
       )..id = 1;
@@ -150,7 +150,7 @@ void main() {
       _profile = Profile(
         name: 'Profile',
         bodyWeight: Mass(75),
-        bodyWaterPercentage: Percentage(0.6),
+        bodyWaterPercentage: Percent(0.6),
         absorptionTime: Duration(hours: 1),
         perMilMetabolizedPerHour: 0.15,
       )..id = 1;

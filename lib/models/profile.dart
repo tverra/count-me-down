@@ -1,6 +1,6 @@
 import 'package:count_me_down/models/session.dart';
 import 'package:count_me_down/utils/mass.dart';
-import 'package:count_me_down/utils/percentage.dart';
+import 'package:count_me_down/utils/percent.dart';
 
 class Profile {
   static const String tableName = 'profiles';
@@ -16,7 +16,7 @@ class Profile {
   int id;
   String name;
   Mass bodyWeight;
-  Percentage bodyWaterPercentage;
+  Percent bodyWaterPercentage;
   Duration absorptionTime;
   double perMilMetabolizedPerHour;
 
@@ -35,7 +35,7 @@ class Profile {
     name = map[colName];
     bodyWeight = map[colBodyWeight] != null ? Mass(map[colBodyWeight]) : null;
     bodyWaterPercentage = map[colBodyWaterPercentage] != null
-        ? Percentage(map[colBodyWaterPercentage])
+        ? Percent(map[colBodyWaterPercentage])
         : null;
     absorptionTime = map[colAbsorptionTime] != null
         ? Duration(milliseconds: map[colAbsorptionTime])

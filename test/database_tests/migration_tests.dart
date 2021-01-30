@@ -4,7 +4,7 @@ import 'package:count_me_down/models/drink.dart';
 import 'package:count_me_down/models/profile.dart';
 import 'package:count_me_down/models/session.dart';
 import 'package:count_me_down/utils/mass.dart';
-import 'package:count_me_down/utils/percentage.dart';
+import 'package:count_me_down/utils/percent.dart';
 import 'package:count_me_down/utils/volume.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -36,7 +36,7 @@ void main() {
       _profile = Profile(
         name: 'name',
         bodyWeight: Mass.exact(kilos: 75),
-        bodyWaterPercentage: Percentage.fromPercentage(60),
+        bodyWaterPercentage: Percent.fromPercentage(60),
         absorptionTime: Duration(minutes: 30),
         perMilMetabolizedPerHour: 0.15,
       ).toMap(forQuery: true);
@@ -48,7 +48,7 @@ void main() {
       _drink = Drink(
         name: 'name',
         volume: Volume.exact(centilitres: 4),
-        alcoholConcentration: Percentage.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercentage(40.0),
         timestamp: DateTime.now(),
         color: Colors.transparent,
         drinkType: DrinkTypes.beer,

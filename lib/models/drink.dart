@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:count_me_down/extensions.dart';
 import 'package:count_me_down/models/session.dart';
-import 'package:count_me_down/utils/percentage.dart';
+import 'package:count_me_down/utils/percent.dart';
 import 'package:count_me_down/utils/volume.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -36,7 +36,7 @@ class Drink {
   int sessionId;
   String name;
   Volume volume;
-  Percentage alcoholConcentration;
+  Percent alcoholConcentration;
   DateTime timestamp;
   Color color;
   DrinkTypes drinkType;
@@ -59,7 +59,7 @@ class Drink {
     name = map[colName];
     volume = map[colVolume] != null ? Volume(map[colVolume]) : null;
     alcoholConcentration = map[colAlcoholConcentration] != null
-        ? Percentage(map[colAlcoholConcentration])
+        ? Percent(map[colAlcoholConcentration])
         : null;
     if (map[colTimestamp] != null) {
       timestamp = int.tryParse(map[colTimestamp].toString()) != null

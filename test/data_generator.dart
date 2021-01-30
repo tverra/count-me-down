@@ -4,7 +4,7 @@ import 'package:count_me_down/models/drink.dart';
 import 'package:count_me_down/models/profile.dart';
 import 'package:count_me_down/models/session.dart';
 import 'package:count_me_down/utils/mass.dart';
-import 'package:count_me_down/utils/percentage.dart';
+import 'package:count_me_down/utils/percent.dart';
 import 'package:count_me_down/utils/volume.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
@@ -20,7 +20,7 @@ class DataGenerator {
     int id,
     String name,
     Mass bodyWeight,
-    Percentage bodyWaterPercentage,
+    Percent bodyWaterPercentage,
     Duration absorptionTime,
     double perMilMetabolizedPerHour,
   }) async {
@@ -43,14 +43,14 @@ class DataGenerator {
     int id,
     String name,
     Mass bodyWeight,
-    Percentage bodyWaterPercentage,
+    Percent bodyWaterPercentage,
     Duration absorptionTime,
     double perMilMetabolizedPerHour,
   }) {
     final Profile profile = Profile(
       name: name ?? 'Profile',
       bodyWeight: bodyWeight ?? Mass.exact(kilos: 75),
-      bodyWaterPercentage: bodyWaterPercentage ?? Percentage.fromPercentage(60),
+      bodyWaterPercentage: bodyWaterPercentage ?? Percent.fromPercentage(60),
       absorptionTime: absorptionTime ?? Duration(hours: 1),
       perMilMetabolizedPerHour: perMilMetabolizedPerHour ?? 0.15,
     );
@@ -116,7 +116,7 @@ class DataGenerator {
     int sessionId,
     String name,
     Volume volume,
-    Percentage alcoholConcentration,
+    Percent alcoholConcentration,
     DateTime timestamp,
     Color color,
     DrinkTypes drinkType,
@@ -153,7 +153,7 @@ class DataGenerator {
     int sessionId,
     String name,
     Volume volume,
-    Percentage alcoholConcentration,
+    Percent alcoholConcentration,
     DateTime timestamp,
     Color color,
     DrinkTypes drinkType,
@@ -164,7 +164,7 @@ class DataGenerator {
       sessionId: sessionId,
       name: name ?? 'Drink',
       volume: Volume(500),
-      alcoholConcentration: Percentage(0.05),
+      alcoholConcentration: Percent(0.05),
       timestamp: dateTime,
       color: Color(4283215696),
       drinkType: DrinkTypes.beer,

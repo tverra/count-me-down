@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:count_me_down/extensions.dart';
 import 'package:count_me_down/models/drink.dart';
 import 'package:count_me_down/models/session.dart';
-import 'package:count_me_down/utils/percentage.dart';
+import 'package:count_me_down/utils/percent.dart';
 import 'package:count_me_down/utils/volume.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -55,7 +55,7 @@ void main() {
       expect(drink.name, _drinkMap['name']);
       expect(drink.volume, Volume(_drinkMap['volume']));
       expect(drink.alcoholConcentration,
-          Percentage(_drinkMap['alcohol_concentration']));
+          Percent(_drinkMap['alcohol_concentration']));
       expect(drink.timestamp, DateTime.parse(_drinkMap['timestamp']));
       expect(drink.color, Color(_drinkMap['color']));
       expect(drink.drinkType, DrinkTypes.beer);
@@ -135,7 +135,7 @@ void main() {
         sessionId: 1,
         name: 'Drink',
         volume: Volume(500),
-        alcoholConcentration: Percentage(0.05),
+        alcoholConcentration: Percent(0.05),
         timestamp: TestUtils.getDateTime(),
         color: Color(4283215696),
         drinkType: DrinkTypes.beer,
@@ -199,7 +199,7 @@ void main() {
         sessionId: 1,
         name: 'Drink',
         volume: Volume(500),
-        alcoholConcentration: Percentage(0.05),
+        alcoholConcentration: Percent(0.05),
         timestamp: TestUtils.getDateTime(),
         color: Color(4283215696),
         drinkType: DrinkTypes.beer,
@@ -231,7 +231,7 @@ void main() {
     test('drink returns correct alcohol content in grams', () {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
-        alcoholConcentration: Percentage.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercentage(40.0),
         timestamp: MockableDateTime.current,
       );
 
@@ -246,7 +246,7 @@ void main() {
     test('drink returns zero grams after zero duration', () {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
-        alcoholConcentration: Percentage.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercentage(40.0),
         timestamp: MockableDateTime.current,
       );
 
@@ -259,7 +259,7 @@ void main() {
     test('drink returns halve the total after half duration', () {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
-        alcoholConcentration: Percentage.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercentage(40.0),
         timestamp: MockableDateTime.current.subtract(Duration(minutes: 15)),
       );
 
@@ -273,7 +273,7 @@ void main() {
     test('drink returns the whole content after full duration', () {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
-        alcoholConcentration: Percentage.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercentage(40.0),
         timestamp: MockableDateTime.current.subtract(Duration(minutes: 30)),
       );
 
@@ -287,7 +287,7 @@ void main() {
     test('drink returns the whole content after more than full duration', () {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
-        alcoholConcentration: Percentage.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercentage(40.0),
         timestamp: MockableDateTime.current.subtract(Duration(minutes: 60)),
       );
 
@@ -301,7 +301,7 @@ void main() {
     test('drink returns zero grams if drink is dated in the future', () {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
-        alcoholConcentration: Percentage.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercentage(40.0),
         timestamp: MockableDateTime.current.add(Duration(minutes: 15)),
       );
 
@@ -315,7 +315,7 @@ void main() {
     test('drink returns the whole content if absorption time is zero', () {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
-        alcoholConcentration: Percentage.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercentage(40.0),
         timestamp: MockableDateTime.current,
       );
 

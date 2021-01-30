@@ -1,11 +1,11 @@
-class Percentage {
+class Percent {
   final double fraction;
 
-  Percentage(this.fraction);
+  Percent(this.fraction);
 
-  factory Percentage.fromPercentage(double percentage) {
+  factory Percent.fromPercentage(double percentage) {
     if (percentage == null) return null;
-    return Percentage(percentage / 100);
+    return Percent(percentage / 100);
   }
 
   double get percentage {
@@ -20,8 +20,7 @@ class Percentage {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Percentage && fraction == other.fraction;
+      identical(this, other) || other is Percent && fraction == other.fraction;
 
   @override
   int get hashCode => fraction.hashCode;

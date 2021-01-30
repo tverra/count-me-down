@@ -4,7 +4,7 @@ import 'package:count_me_down/models/drink.dart';
 import 'package:count_me_down/models/profile.dart';
 import 'package:count_me_down/models/session.dart';
 import 'package:count_me_down/utils/mass.dart';
-import 'package:count_me_down/utils/percentage.dart';
+import 'package:count_me_down/utils/percent.dart';
 import 'package:count_me_down/utils/volume.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -156,7 +156,7 @@ void main() {
       _session.profile = Profile(
         name: 'Profile',
         bodyWeight: Mass(75),
-        bodyWaterPercentage: Percentage(0.6),
+        bodyWaterPercentage: Percent(0.6),
         absorptionTime: Duration(hours: 1),
         perMilMetabolizedPerHour: 0.15,
       )..id = 1;
@@ -165,7 +165,7 @@ void main() {
           sessionId: 1,
           name: 'Drink',
           volume: Volume(500),
-          alcoholConcentration: Percentage(0.05),
+          alcoholConcentration: Percent(0.05),
           timestamp: TestUtils.getDateTime(),
           color: Color(4283215696),
           drinkType: DrinkTypes.beer,
@@ -174,7 +174,7 @@ void main() {
           sessionId: 1,
           name: 'Drink',
           volume: Volume(500),
-          alcoholConcentration: Percentage(0.05),
+          alcoholConcentration: Percent(0.05),
           timestamp: TestUtils.getDateTime(),
           color: Color(4283215696),
           drinkType: DrinkTypes.beer,
@@ -236,7 +236,7 @@ void main() {
       _session.profile = Profile(
         name: 'Profile',
         bodyWeight: Mass(75),
-        bodyWaterPercentage: Percentage(0.6),
+        bodyWaterPercentage: Percent(0.6),
         absorptionTime: Duration(hours: 1),
         perMilMetabolizedPerHour: 0.15,
       )..id = 1;
@@ -245,7 +245,7 @@ void main() {
           sessionId: 1,
           name: 'Drink',
           volume: Volume(500),
-          alcoholConcentration: Percentage(0.05),
+          alcoholConcentration: Percent(0.05),
           timestamp: TestUtils.getDateTime(),
           color: Color(4283215696),
           drinkType: DrinkTypes.beer,
@@ -254,7 +254,7 @@ void main() {
           sessionId: 1,
           name: 'Drink',
           volume: Volume(500),
-          alcoholConcentration: Percentage(0.05),
+          alcoholConcentration: Percent(0.05),
           timestamp: TestUtils.getDateTime(),
           color: Color(4283215696),
           drinkType: DrinkTypes.beer,
