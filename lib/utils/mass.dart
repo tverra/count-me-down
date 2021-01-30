@@ -20,4 +20,11 @@ class Mass {
     if (grams >= 1000) return '${kilos.toStringAsFixed(1)} kg';
     return '${grams.toStringAsFixed(1)} g';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is Mass && grams == other.grams;
+
+  @override
+  int get hashCode => grams.hashCode;
 }

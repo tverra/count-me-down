@@ -17,4 +17,12 @@ class Percentage {
     if (fraction == null) return null.toString();
     return '${percentage.toStringAsFixed(1)}%';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Percentage && fraction == other.fraction;
+
+  @override
+  int get hashCode => fraction.hashCode;
 }

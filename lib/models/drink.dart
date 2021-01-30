@@ -73,6 +73,7 @@ class Drink {
         map[colDrinkType] != null && _drinkTypes.contains(map[colDrinkType])
             ? DrinkTypes.values[_drinkTypes.indexOf(map[colDrinkType])]
             : null;
+    session = map[relSession] != null ? Session.fromMap(map[relSession]) : null;
   }
 
   static List<String> get columns {
@@ -119,7 +120,7 @@ class Drink {
     map[colId] = id;
     map[colSessionId] = sessionId;
     map[colName] = name;
-    map[colVolume] = volume.millilitres;
+    map[colVolume] = volume != null ? volume.millilitres : null;
     map[colAlcoholConcentration] =
         alcoholConcentration != null ? alcoholConcentration.fraction : null;
     map[colTimestamp] = timestamp != null
@@ -127,8 +128,13 @@ class Drink {
             ? timestamp.millisecondsSinceEpoch
             : timestamp.toIso8601String()
         : null;
-    map[colColor] = color.value;
+    map[colColor] = color != null ? color.value : null;
     map[colDrinkType] = drinkType != null ? _drinkTypes[drinkType.index] : null;
+
+    if (!forQuery) {
+      map[relSession] =
+          session != null ? session.toMap(forQuery: forQuery) : null;
+    }
 
     return map;
   }
@@ -172,11 +178,39 @@ class Drink {
     return Drink.fromMap(toMap());
   }
 
-  @override
-  String toString() {
+  String toDisplayString() {
     return '(${DateFormat('HH:mm').format(timestamp.toLocal())}) '
         '$name ${volume.toString()}';
   }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Drink &&
+          id == other.id &&
+          sessionId == other.sessionId &&
+          name == other.name &&
+          volume == other.volume &&
+          alcoholConcentration == other.alcoholConcentration &&
+          timestamp == other.timestamp &&
+          color == other.color &&
+          drinkType == other.drinkType;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      sessionId.hashCode ^
+      name.hashCode ^
+      volume.hashCode ^
+      alcoholConcentration.hashCode ^
+      timestamp.hashCode ^
+      color.hashCode ^
+      drinkType.hashCode;
 }
 
 enum DrinkTypes {

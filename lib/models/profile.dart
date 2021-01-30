@@ -41,6 +41,9 @@ class Profile {
         ? Duration(milliseconds: map[colAbsorptionTime])
         : null;
     perMilMetabolizedPerHour = map[colPerMilMetabolizedPerHour];
+    sessions = map[relSessions] != null
+        ? map[relSessions].map<Session>((s) => Session.fromMap(s)).toList()
+        : null;
   }
 
   static List<String> get columns {
@@ -62,8 +65,15 @@ class Profile {
     map[colBodyWeight] = bodyWeight != null ? bodyWeight.grams : null;
     map[colBodyWaterPercentage] =
         bodyWaterPercentage != null ? bodyWaterPercentage.fraction : null;
-    map[colAbsorptionTime] = absorptionTime.inMilliseconds;
+    map[colAbsorptionTime] =
+        absorptionTime != null ? absorptionTime.inMilliseconds : null;
     map[colPerMilMetabolizedPerHour] = perMilMetabolizedPerHour;
+
+    if (!forQuery) {
+      map[relSessions] = sessions != null
+          ? sessions.map((s) => s.toMap(forQuery: forQuery)).toList()
+          : null;
+    }
 
     return map;
   }
@@ -85,4 +95,33 @@ class Profile {
           perMilMetabolizedPerHour ?? this.perMilMetabolizedPerHour,
     );
   }
+
+  Profile copy() {
+    return Profile.fromMap(toMap());
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Profile &&
+          id == other.id &&
+          name == other.name &&
+          bodyWeight == other.bodyWeight &&
+          bodyWaterPercentage == other.bodyWaterPercentage &&
+          absorptionTime == other.absorptionTime &&
+          perMilMetabolizedPerHour == other.perMilMetabolizedPerHour;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      name.hashCode ^
+      bodyWeight.hashCode ^
+      bodyWaterPercentage.hashCode ^
+      absorptionTime.hashCode ^
+      perMilMetabolizedPerHour.hashCode;
 }

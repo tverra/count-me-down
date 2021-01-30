@@ -38,13 +38,17 @@ class Session {
               isUtc: true)
           : DateTime.tryParse(map[colStartedAt].toString());
     }
-    if (map[endedAt] != null) {
+    if (map[colEndedAt] != null) {
       endedAt = int.tryParse(map[colEndedAt].toString()) != null
           ? DateTime.fromMillisecondsSinceEpoch(
               int.tryParse(map[colEndedAt].toString()),
               isUtc: true)
           : DateTime.tryParse(map[colEndedAt].toString());
     }
+    profile = map[relProfile] != null ? Profile.fromMap(map[relProfile]) : null;
+    drinks = map[relDrinks] != null
+        ? map[relDrinks].map<Drink>((d) => Drink.fromMap(d)).toList()
+        : null;
   }
 
   static List<String> get columns {
@@ -74,6 +78,41 @@ class Session {
             : endedAt.toIso8601String()
         : null;
 
+    if (!forQuery) {
+      map[relProfile] =
+          profile != null ? profile.toMap(forQuery: forQuery) : null;
+      map[relDrinks] = drinks != null
+          ? drinks.map((d) => d.toMap(forQuery: forQuery)).toList()
+          : null;
+    }
+
     return map;
   }
+
+  Session copy() {
+    return Session.fromMap(toMap());
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Session &&
+          id == other.id &&
+          profileId == other.profileId &&
+          name == other.name &&
+          startedAt == other.startedAt &&
+          endedAt == other.endedAt;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      profileId.hashCode ^
+      name.hashCode ^
+      startedAt.hashCode ^
+      endedAt.hashCode;
 }
