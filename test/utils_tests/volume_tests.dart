@@ -122,4 +122,90 @@ void main() {
       expect(actual, expected);
     });
   });
+
+  group('toString', () {
+    test('returns zero millilitres', () {
+      final Volume volume = Volume(0);
+
+      expect(volume.toString(), '0 ml');
+    });
+
+    test('returns millilitres', () {
+      final Volume volume = Volume(6);
+
+      expect(volume.toString(), '6 ml');
+    });
+
+    test('returns centilitres if exactly 10 millilitres', () {
+      final Volume volume = Volume(10);
+
+      expect(volume.toString(), '1 cl');
+    });
+
+    test('returns centilitres', () {
+      final Volume volume = Volume(60);
+
+      expect(volume.toString(), '6 cl');
+    });
+
+    test('rounds centilitres up', () {
+      final Volume volume = Volume(15);
+
+      expect(volume.toString(), '2 cl');
+    });
+
+    test('rounds centilitres down', () {
+      final Volume volume = Volume(14);
+
+      expect(volume.toString(), '1 cl');
+    });
+
+    test('returns decilitres if exactly 100 millilitres', () {
+      final Volume volume = Volume(100);
+
+      expect(volume.toString(), '1 dl');
+    });
+
+    test('returns decilitres', () {
+      final Volume volume = Volume(600);
+
+      expect(volume.toString(), '6 dl');
+    });
+
+    test('rounds centilitres up', () {
+      final Volume volume = Volume(150);
+
+      expect(volume.toString(), '2 dl');
+    });
+
+    test('rounds centilitres down', () {
+      final Volume volume = Volume(149);
+
+      expect(volume.toString(), '1 dl');
+    });
+
+    test('returns litres if exactly 1000 millilitres', () {
+      final Volume volume = Volume(1000);
+
+      expect(volume.toString(), '1 l');
+    });
+
+    test('returns litres', () {
+      final Volume volume = Volume(6000);
+
+      expect(volume.toString(), '6 l');
+    });
+
+    test('rounds litres up', () {
+      final Volume volume = Volume(1500);
+
+      expect(volume.toString(), '2 l');
+    });
+
+    test('rounds litres down', () {
+      final Volume volume = Volume(1499);
+
+      expect(volume.toString(), '1 l');
+    });
+  });
 }

@@ -23,15 +23,14 @@ class Volume {
 
   @override
   String toString() {
-    if (millilitres == null) return null;
-    if (millilitres > 1000) {
-      return '$litres l';
-    } else if (millilitres > 100) {
-      return '$decilitres dl';
-    } else if (millilitres > 10) {
-      return '$centilitres cl';
+    if (millilitres >= 1000) {
+      return '${litres.toStringAsFixed(0)} l';
+    } else if (millilitres >= 100) {
+      return '${decilitres.toStringAsFixed(0)} dl';
+    } else if (millilitres >= 10) {
+      return '${centilitres.toStringAsFixed(0)} cl';
     } else {
-      return '$millilitres ml';
+      return '${millilitres.toStringAsFixed(0)} ml';
     }
   }
 

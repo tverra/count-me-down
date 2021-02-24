@@ -77,4 +77,42 @@ main() {
       expect(actual, expected);
     });
   });
+
+  group('toString', () {
+    test('returns zero grams', () {
+      final Mass mass = Mass(0);
+
+      expect(mass.toString(), '0 g');
+    });
+
+    test('returns grams if under one kilo', () {
+      final Mass mass = Mass(420);
+
+      expect(mass.toString(), '420 g');
+    });
+
+    test('returns one kilo if exactly one kilo', () {
+      final Mass mass = Mass(1000);
+
+      expect(mass.toString(), '1 kg');
+    });
+
+    test('returns kilos if more than one kilo', () {
+      final Mass mass = Mass(420000);
+
+      expect(mass.toString(), '420 kg');
+    });
+
+    test('rounds up if not exactly one kilo', () {
+      final Mass mass = Mass(2500);
+
+      expect(mass.toString(), '3 kg');
+    });
+
+    test('rounds down if not exactly one kilo', () {
+      final Mass mass = Mass(2499);
+
+      expect(mass.toString(), '2 kg');
+    });
+  });
 }
