@@ -25,7 +25,7 @@ void main() {
   group('BAC increases when adding drinks', () {
     final Profile _profile = Profile(
       bodyWeight: Mass.units(kilos: 75),
-      bodyWaterPercentage: Percent.fromPercentage(60),
+      bodyWaterPercentage: Percent.fromPercent(60),
       absorptionTime: Duration(minutes: 30),
       perMilMetabolizedPerHour: 0,
     );
@@ -56,7 +56,7 @@ void main() {
     test('BAC is correct after one drink', () {
       _alcoholTracker.addDrink(Drink(
         volume: Volume.exact(centilitres: 4),
-        alcoholConcentration: Percent.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercent(40.0),
         timestamp: MockableDateTime.current.subtract(_profile.absorptionTime),
       ));
 
@@ -71,7 +71,7 @@ void main() {
       for (int i = 0; i < 2; i++) {
         _alcoholTracker.addDrink(Drink(
           volume: Volume.exact(centilitres: 4),
-          alcoholConcentration: Percent.fromPercentage(40.0),
+          alcoholConcentration: Percent.fromPercent(40.0),
           timestamp: MockableDateTime.current.subtract(_profile.absorptionTime),
         ));
       }
@@ -87,7 +87,7 @@ void main() {
       for (int i = 0; i < 10; i++) {
         _alcoholTracker.addDrink(Drink(
           volume: Volume.exact(centilitres: 4),
-          alcoholConcentration: Percent.fromPercentage(40.0),
+          alcoholConcentration: Percent.fromPercent(40.0),
           timestamp: MockableDateTime.current.subtract(_profile.absorptionTime),
         ));
       }
@@ -103,7 +103,7 @@ void main() {
   group('BAC is not increased before after absorbing drinks', () {
     final Profile _profile = Profile(
       bodyWeight: Mass.units(kilos: 75),
-      bodyWaterPercentage: Percent.fromPercentage(60),
+      bodyWaterPercentage: Percent.fromPercent(60),
       absorptionTime: Duration(minutes: 30),
       perMilMetabolizedPerHour: 0,
     );
@@ -116,7 +116,7 @@ void main() {
     test('BAC is zero after zero duration', () {
       _alcoholTracker.addDrink(Drink(
         volume: Volume.exact(centilitres: 4),
-        alcoholConcentration: Percent.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercent(40.0),
         timestamp: MockableDateTime.current,
       ));
 
@@ -131,7 +131,7 @@ void main() {
       for (int i = 0; i < 10; i++) {
         _alcoholTracker.addDrink(Drink(
           volume: Volume.exact(centilitres: 4),
-          alcoholConcentration: Percent.fromPercentage(40.0),
+          alcoholConcentration: Percent.fromPercent(40.0),
           timestamp: MockableDateTime.current,
         ));
       }
@@ -149,7 +149,7 @@ void main() {
 
       _alcoholTracker.addDrink(Drink(
         volume: Volume.exact(centilitres: 4),
-        alcoholConcentration: Percent.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercent(40.0),
         timestamp: MockableDateTime.current.subtract(halfDuration),
       ));
 
@@ -167,7 +167,7 @@ void main() {
       for (int i = 0; i < 10; i++) {
         _alcoholTracker.addDrink(Drink(
           volume: Volume.exact(centilitres: 4),
-          alcoholConcentration: Percent.fromPercentage(40.0),
+          alcoholConcentration: Percent.fromPercent(40.0),
           timestamp: MockableDateTime.current.subtract(halfDuration),
         ));
       }
@@ -188,7 +188,7 @@ void main() {
 
       _alcoholTracker.addDrink(Drink(
         volume: Volume.exact(centilitres: 4),
-        alcoholConcentration: Percent.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercent(40.0),
         timestamp: MockableDateTime.current.subtract(_profile.absorptionTime),
       ));
 
@@ -203,7 +203,7 @@ void main() {
   group('BAC decreases when metabolized', () {
     final Profile _profile = Profile(
       bodyWeight: Mass.units(kilos: 75),
-      bodyWaterPercentage: Percent.fromPercentage(60),
+      bodyWaterPercentage: Percent.fromPercent(60),
       absorptionTime: Duration.zero,
       perMilMetabolizedPerHour: 0.15,
     );
@@ -216,7 +216,7 @@ void main() {
     test('BAC has not decreased after zero duration', () {
       _alcoholTracker.addDrink(Drink(
         volume: Volume.exact(centilitres: 4),
-        alcoholConcentration: Percent.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercent(40.0),
         timestamp: MockableDateTime.current,
       ));
 
@@ -231,7 +231,7 @@ void main() {
       for (int i = 0; i < 10; i++) {
         _alcoholTracker.addDrink(Drink(
           volume: Volume.exact(centilitres: 4),
-          alcoholConcentration: Percent.fromPercentage(40.0),
+          alcoholConcentration: Percent.fromPercent(40.0),
           timestamp: MockableDateTime.current,
         ));
       }
@@ -246,7 +246,7 @@ void main() {
     test('BAC decreases with time', () {
       _alcoholTracker.addDrink(Drink(
         volume: Volume.exact(centilitres: 4),
-        alcoholConcentration: Percent.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercent(40.0),
         timestamp: MockableDateTime.current.subtract(Duration(hours: 1)),
       ));
 
@@ -261,7 +261,7 @@ void main() {
       for (int i = 0; i < 10; i++) {
         _alcoholTracker.addDrink(Drink(
           volume: Volume.exact(centilitres: 4),
-          alcoholConcentration: Percent.fromPercentage(40.0),
+          alcoholConcentration: Percent.fromPercent(40.0),
           timestamp: MockableDateTime.current.subtract(Duration(hours: 1)),
         ));
       }
@@ -282,7 +282,7 @@ void main() {
       for (int i = 0; i < 10; i++) {
         _alcoholTracker.addDrink(Drink(
           volume: Volume.exact(centilitres: 4),
-          alcoholConcentration: Percent.fromPercentage(40.0),
+          alcoholConcentration: Percent.fromPercent(40.0),
           timestamp: MockableDateTime.current.subtract(Duration(hours: 1)),
         ));
       }
@@ -298,7 +298,7 @@ void main() {
       for (int i = 0; i < 10; i++) {
         _alcoholTracker.addDrink(Drink(
           volume: Volume.exact(centilitres: 4),
-          alcoholConcentration: Percent.fromPercentage(40.0),
+          alcoholConcentration: Percent.fromPercent(40.0),
           timestamp: MockableDateTime.current.subtract(Duration(hours: 2)),
         ));
       }
@@ -313,7 +313,7 @@ void main() {
     test('BAC reaches zero with time', () {
       _alcoholTracker.addDrink(Drink(
         volume: Volume.exact(centilitres: 4),
-        alcoholConcentration: Percent.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercent(40.0),
         timestamp: MockableDateTime.current.subtract(Duration(hours: 2)),
       ));
 

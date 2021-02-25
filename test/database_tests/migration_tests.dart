@@ -36,7 +36,7 @@ void main() {
       _profile = Profile(
         name: 'name',
         bodyWeight: Mass.units(kilos: 75),
-        bodyWaterPercentage: Percent.fromPercentage(60),
+        bodyWaterPercentage: Percent.fromPercent(60),
         absorptionTime: Duration(minutes: 30),
         perMilMetabolizedPerHour: 0.15,
       ).toMap(forQuery: true);
@@ -48,7 +48,7 @@ void main() {
       _drink = Drink(
         name: 'name',
         volume: Volume.exact(centilitres: 4),
-        alcoholConcentration: Percent.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercent(40.0),
         timestamp: DateTime.now(),
         color: Colors.transparent,
         drinkType: DrinkTypes.beer,

@@ -231,7 +231,7 @@ void main() {
     test('drink returns correct alcohol content in grams', () {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
-        alcoholConcentration: Percent.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercent(40.0),
         timestamp: MockableDateTime.current,
       );
 
@@ -246,7 +246,7 @@ void main() {
     test('drink returns zero grams after zero duration', () {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
-        alcoholConcentration: Percent.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercent(40.0),
         timestamp: MockableDateTime.current,
       );
 
@@ -259,7 +259,7 @@ void main() {
     test('drink returns halve the total after half duration', () {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
-        alcoholConcentration: Percent.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercent(40.0),
         timestamp: MockableDateTime.current.subtract(Duration(minutes: 15)),
       );
 
@@ -273,7 +273,7 @@ void main() {
     test('drink returns the whole content after full duration', () {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
-        alcoholConcentration: Percent.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercent(40.0),
         timestamp: MockableDateTime.current.subtract(Duration(minutes: 30)),
       );
 
@@ -287,7 +287,7 @@ void main() {
     test('drink returns the whole content after more than full duration', () {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
-        alcoholConcentration: Percent.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercent(40.0),
         timestamp: MockableDateTime.current.subtract(Duration(minutes: 60)),
       );
 
@@ -301,7 +301,7 @@ void main() {
     test('drink returns zero grams if drink is dated in the future', () {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
-        alcoholConcentration: Percent.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercent(40.0),
         timestamp: MockableDateTime.current.add(Duration(minutes: 15)),
       );
 
@@ -315,7 +315,7 @@ void main() {
     test('drink returns the whole content if absorption time is zero', () {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
-        alcoholConcentration: Percent.fromPercentage(40.0),
+        alcoholConcentration: Percent.fromPercent(40.0),
         timestamp: MockableDateTime.current,
       );
 

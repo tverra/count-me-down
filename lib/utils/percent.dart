@@ -3,19 +3,24 @@ class Percent {
 
   Percent(this.fraction);
 
-  factory Percent.fromPercentage(double percentage) {
-    if (percentage == null) return null;
-    return Percent(percentage / 100);
+  factory Percent.fromPercent(double percent) {
+    return Percent(percent / 100);
   }
 
-  double get percentage {
+  double get percent {
     return fraction * 100;
+  }
+
+  double get perMil {
+    return fraction * 1000;
   }
 
   @override
   String toString() {
-    if (fraction == null) return null.toString();
-    return '${percentage.toStringAsFixed(1)}%';
+    if (fraction >= 0.01 || fraction == 0.0) {
+      return '${percent.toStringAsFixed(0)}%';
+    }
+    return '${perMil.toStringAsFixed(0)}‰';
   }
 
   @override

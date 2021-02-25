@@ -11,7 +11,7 @@ class SeedData {
     Profile(
       name: 'Generic profile',
       bodyWeight: Mass.units(kilos: 75),
-      bodyWaterPercentage: Percent.fromPercentage(60),
+      bodyWaterPercentage: Percent.fromPercent(60),
       absorptionTime: Duration(hours: 1),
       perMilMetabolizedPerHour: 0.15,
     ),
@@ -20,21 +20,21 @@ class SeedData {
     Drink(
       name: 'Shot',
       volume: Volume.exact(centilitres: 4),
-      alcoholConcentration: Percent.fromPercentage(40.0),
+      alcoholConcentration: Percent.fromPercent(40.0),
       color: Colors.green[800],
       drinkType: DrinkTypes.glass_whiskey,
     ),
     Drink(
       name: 'Beer',
       volume: Volume.exact(decilitres: 5),
-      alcoholConcentration: Percent.fromPercentage(4.7),
+      alcoholConcentration: Percent.fromPercent(4.7),
       color: Colors.orangeAccent,
       drinkType: DrinkTypes.beer,
     ),
     Drink(
       name: 'Wine',
       volume: Volume.exact(centilitres: 15),
-      alcoholConcentration: Percent.fromPercentage(12.5),
+      alcoholConcentration: Percent.fromPercent(12.5),
       color: Colors.red[600],
       drinkType: DrinkTypes.wine_glass,
     ),

@@ -50,7 +50,7 @@ class DataGenerator {
     final Profile profile = Profile(
       name: name ?? 'Profile',
       bodyWeight: bodyWeight ?? Mass.units(kilos: 75),
-      bodyWaterPercentage: bodyWaterPercentage ?? Percent.fromPercentage(60),
+      bodyWaterPercentage: bodyWaterPercentage ?? Percent.fromPercent(60),
       absorptionTime: absorptionTime ?? Duration(hours: 1),
       perMilMetabolizedPerHour: perMilMetabolizedPerHour ?? 0.15,
     );

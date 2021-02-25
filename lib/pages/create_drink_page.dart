@@ -119,7 +119,7 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
       final Drink template = Drink(
         name: _nameController.text,
         volume: Volume((volumeDouble * 10).toInt()),
-        alcoholConcentration: Percent.fromPercentage(alcoholDouble),
+        alcoholConcentration: Percent.fromPercent(alcoholDouble),
         timestamp: DateTime.now(),
         color: Colors.black,
         drinkType: DrinkTypes.glass_whiskey,
@@ -132,7 +132,7 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
       sessionId: preferences.activeSessionId,
       name: _nameController.text,
       volume: Volume((volumeDouble * 10).toInt()),
-      alcoholConcentration: Percent.fromPercentage(alcoholDouble),
+      alcoholConcentration: Percent.fromPercent(alcoholDouble),
       timestamp: DateTime.now(),
       color: Colors.black,
       drinkType: DrinkTypes.glass_whiskey,
