@@ -80,6 +80,42 @@ void main() {
     });
   });
 
+  group('constructor with negative value', () {
+    Volume _volume;
+
+    setUp(() {
+      _volume = Volume(-1);
+    });
+
+    test('returns correct volume in millilitres', () {
+      final int actual = _volume.millilitres;
+      final int expected = -1;
+
+      expect(actual, expected);
+    });
+
+    test('returns correct volume in centilitres', () {
+      final double actual = _volume.centilitres;
+      final double expected = -0.1;
+
+      expect(actual, expected);
+    });
+
+    test('returns correct volume in decilitres', () {
+      final double actual = _volume.decilitres;
+      final double expected = -0.01;
+
+      expect(actual, expected);
+    });
+
+    test('returns correct volume in litres', () {
+      final double actual = _volume.litres;
+      final double expected = -0.001;
+
+      expect(actual, expected);
+    });
+  });
+
   group('exact volume', () {
     test('litres is added', () {
       final Volume volume = Volume.exact(litres: 560);
@@ -121,6 +157,15 @@ void main() {
 
       expect(actual, expected);
     });
+
+    test('negative values are added', () {
+      final Volume volume = Volume.exact(
+          litres: -560, decilitres: -560, centilitres: -560, millilitres: -560);
+      final int actual = volume.millilitres;
+      final int expected = -622160;
+
+      expect(actual, expected);
+    });
   });
 
   group('toString', () {
@@ -134,6 +179,12 @@ void main() {
       final Volume volume = Volume(6);
 
       expect(volume.toString(), '6 ml');
+    });
+
+    test('returns negative millilitres', () {
+      final Volume volume = Volume(-6);
+
+      expect(volume.toString(), '-6 ml');
     });
 
     test('returns centilitres if exactly 10 millilitres', () {
@@ -160,6 +211,12 @@ void main() {
       expect(volume.toString(), '1 cl');
     });
 
+    test('returns negative centilitres', () {
+      final Volume volume = Volume(-60);
+
+      expect(volume.toString(), '-6 cl');
+    });
+
     test('returns decilitres if exactly 100 millilitres', () {
       final Volume volume = Volume(100);
 
@@ -172,16 +229,22 @@ void main() {
       expect(volume.toString(), '6 dl');
     });
 
-    test('rounds centilitres up', () {
+    test('rounds decilitres up', () {
       final Volume volume = Volume(150);
 
       expect(volume.toString(), '2 dl');
     });
 
-    test('rounds centilitres down', () {
+    test('rounds decilitres down', () {
       final Volume volume = Volume(149);
 
       expect(volume.toString(), '1 dl');
+    });
+
+    test('returns negative decilitres', () {
+      final Volume volume = Volume(-600);
+
+      expect(volume.toString(), '-6 dl');
     });
 
     test('returns litres if exactly 1000 millilitres', () {
@@ -206,6 +269,12 @@ void main() {
       final Volume volume = Volume(1499);
 
       expect(volume.toString(), '1 l');
+    });
+
+    test('returns negative litres', () {
+      final Volume volume = Volume(-6000);
+
+      expect(volume.toString(), '-6 l');
     });
   });
 }

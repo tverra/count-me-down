@@ -16,7 +16,9 @@ class Mass {
 
   @override
   String toString() {
-    if (grams >= 1000) return '${kilos.toStringAsFixed(0)} kg';
+    if (grams >= 1000 || grams <= -1000) {
+      return '${kilos.toStringAsFixed(0)} kg';
+    }
     return '${grams.toStringAsFixed(0)} g';
   }
 

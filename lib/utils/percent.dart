@@ -17,7 +17,7 @@ class Percent {
 
   @override
   String toString() {
-    if (fraction >= 0.01 || fraction == 0.0) {
+    if (fraction >= 0.01 || fraction <= -0.01 || fraction == 0.0) {
       return '${percent.toStringAsFixed(0)}%';
     }
     return '${perMil.toStringAsFixed(0)}‰';

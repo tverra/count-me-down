@@ -39,6 +39,12 @@ main() {
       expect(percent.fraction, 0.3333333333333333);
     });
 
+    test('returns negative fraction', () {
+      final Percent percent = Percent(-0.5);
+
+      expect(percent.fraction, -0.5);
+    });
+
     test('returns correct percent', () {
       final Percent percent = Percent(0.5);
       
@@ -66,7 +72,13 @@ main() {
     test('returns 16 decimal points as percent', () {
       final Percent percent = Percent(1.0 / 3);
 
-      expect(percent.fraction, 0.3333333333333333);
+      expect(percent.percent, 33.33333333333333);
+    });
+
+    test('returns negative percent', () {
+      final Percent percent = Percent(-0.5);
+
+      expect(percent.percent, -50);
     });
 
     test('returns correct per mil', () {
@@ -96,7 +108,13 @@ main() {
     test('returns 16 decimal points as per mil', () {
       final Percent percent = Percent(1.0 / 3);
 
-      expect(percent.fraction, 0.3333333333333333);
+      expect(percent.perMil, 333.3333333333333333);
+    });
+
+    test('returns negative per mil', () {
+      final Percent percent = Percent(-0.5);
+
+      expect(percent.perMil, -500);
     });
   });
 
@@ -131,6 +149,12 @@ main() {
       expect(percent.fraction, 0.03333333333333333);
     });
 
+    test('returns negative fraction', () {
+      final Percent percent = Percent.fromPercent(-50);
+
+      expect(percent.fraction, -0.5);
+    });
+
     test('returns correct percent', () {
       final Percent percent = Percent.fromPercent(50);
 
@@ -158,7 +182,13 @@ main() {
     test('returns 16 decimal points as percent', () {
       final Percent percent = Percent.fromPercent(10.0 / 3);
 
-      expect(percent.fraction, 0.03333333333333333);
+      expect(percent.percent, 3.3333333333333335);
+    });
+
+    test('returns negative percent', () {
+      final Percent percent = Percent.fromPercent(-50);
+
+      expect(percent.percent, -50);
     });
 
     test('returns correct per mil', () {
@@ -190,6 +220,12 @@ main() {
 
       expect(percent.perMil, 33.333333333333336);
     });
+
+    test('returns negative per mil', () {
+      final Percent percent = Percent.fromPercent(-50);
+
+      expect(percent.perMil, -500);
+    });
   });
 
   group('toString', () {
@@ -217,10 +253,22 @@ main() {
       expect(percent.toString(), '1%');
     });
 
+    test('returns negative percent', () {
+      final Percent percent = Percent(-0.1);
+
+      expect(percent.toString(), '-10%');
+    });
+
     test('returns per mil if less than one percent', () {
       final Percent percent = Percent(0.009);
 
       expect(percent.toString(), '9‰');
+    });
+
+    test('returns negative per mil', () {
+      final Percent percent = Percent(-0.001);
+
+      expect(percent.toString(), '-1‰');
     });
   });
 }
