@@ -31,8 +31,10 @@ class EditSessionPage extends StatelessWidget {
 
                 return Container(
                   width: double.infinity,
-                  child: RaisedButton(
-                    color: Theme.of(context).primaryColor,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).primaryColor,
+                    ),
                     onPressed: () => _deleteSession(context, session),
                     child: Container(
                       padding: const EdgeInsets.all(15.0),

@@ -11,7 +11,7 @@ class MenuElement extends StatelessWidget {
     return Material(
       elevation: 2.0,
       color: onPressed == null ? Colors.grey[200] : null,
-      child: FlatButton(
+      child: TextButton(
         onPressed: onPressed,
         child: Container(
           width: double.infinity,

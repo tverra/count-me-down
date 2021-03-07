@@ -42,7 +42,10 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                   SizedBox(height: 40.0),
                   Container(
                     width: double.infinity,
-                    child: RaisedButton(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Theme.of(context).primaryColor,
+                      ),
                       child: Container(
                         padding: const EdgeInsets.all(
                           15.0,
@@ -55,7 +58,6 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                           ),
                         ),
                       ),
-                      color: Theme.of(context).primaryColor,
                       onPressed: () => _createNewSession(context),
                     ),
                   )

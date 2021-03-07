@@ -76,8 +76,10 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
                           },
                         ),
                         SizedBox(height: 40.0),
-                        RaisedButton(
-                          color: Theme.of(context).primaryColor,
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: Theme.of(context).primaryColor,
+                          ),
                           onPressed: _isLoading ? null : () => _submit(context),
                           child: Container(
                             width: double.infinity,
