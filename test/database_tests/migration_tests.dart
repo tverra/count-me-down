@@ -24,7 +24,7 @@ void main() {
 
   setUp(() async {
     _db = await DBProvider.db
-        .getDatabase(version: Migrations.latestVersion, inMemory: true);
+        .getDatabase(version: Migrations().latestVersion, inMemory: true);
   });
 
   group('Latest version', () {

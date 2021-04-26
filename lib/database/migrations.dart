@@ -10,16 +10,19 @@ class Migration {
 }
 
 class Migrations {
-  static int get latestVersion {
+  final List<Migration> migrations;
+
+  Migrations({this.migrations = appMigrations});
+
+  int get latestVersion {
     return migrations.length;
   }
 
-  static Future<void> create(Database db, int version) async {
+  Future<void> create(Database db, int version) async {
     await migrate(db, 0, version);
   }
 
-  static Future<void> migrate(
-      Database db, int oldVersion, int newVersion) async {
+  Future<void> migrate(Database db, int oldVersion, int newVersion) async {
     await db.transaction((Transaction txn) async {
       final Batch batch = txn.batch();
 
@@ -33,7 +36,7 @@ class Migrations {
     });
   }
 
-  static const List<Migration> migrations = [
+  static const List<Migration> appMigrations = [
     Migration(
       version: 1,
       actions: [

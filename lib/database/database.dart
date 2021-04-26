@@ -13,6 +13,7 @@ class DBProvider {
 
   static final DBProvider db = DBProvider._();
   static Database _database;
+  final Migrations _migrations = Migrations();
 
   Future<Database> _initDB(int version, {bool inMemory, bool seed}) async {
     final String path = join(await getDatabasesPath(), "count_me_down.db");
@@ -29,7 +30,7 @@ class DBProvider {
           print('old version: $oldVersion');
           print('new version: $newVersion');
 
-          await Migrations.migrate(db, oldVersion, newVersion);
+          await _migrations.migrate(db, oldVersion, newVersion);
         },
         onDowngrade: (Database db, int oldVersion, int newVersion) async {
           debugPrint("Downgrading to version ${newVersion.toString()}");
@@ -37,12 +38,12 @@ class DBProvider {
           print('old version: $oldVersion');
           print('new version: $newVersion');
 
-          await Migrations.migrate(db, oldVersion, newVersion);
+          await _migrations.migrate(db, oldVersion, newVersion);
         },
         onCreate: (Database db, int version) async {
           print('version: $version');
 
-          await Migrations.create(db, version);
+          await _migrations.create(db, version);
 
           if (seed) {
             await SeedData.insertSeedData(db);
@@ -69,7 +70,7 @@ class DBProvider {
   }) async {
     if (_database != null) return _database;
     _database = await _initDB(
-      version ?? Migrations.latestVersion,
+      version ?? _migrations.latestVersion,
       inMemory: inMemory,
       seed: seed,
     );
