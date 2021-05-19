@@ -1,5 +1,5 @@
 import 'package:count_me_down/database/database.dart';
-import 'package:count_me_down/database/migrations.dart';
+import 'package:count_me_down/database/migrations/migration.dart';
 import 'package:count_me_down/models/drink.dart';
 import 'package:count_me_down/models/profile.dart';
 import 'package:count_me_down/models/session.dart';

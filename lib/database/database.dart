@@ -1,4 +1,4 @@
-import 'package:count_me_down/database/migrations.dart';
+import 'package:count_me_down/database/migrations/migration.dart';
 import 'package:count_me_down/database/seed_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +30,11 @@ class DBProvider {
           print('old version: $oldVersion');
           print('new version: $newVersion');
 
-          await _migrations.migrate(db, oldVersion, newVersion);
+          await _migrations.migrate(
+            db: db,
+            oldVersion: oldVersion,
+            newVersion: newVersion,
+          );
         },
         onDowngrade: (Database db, int oldVersion, int newVersion) async {
           debugPrint("Downgrading to version ${newVersion.toString()}");
@@ -38,7 +42,11 @@ class DBProvider {
           print('old version: $oldVersion');
           print('new version: $newVersion');
 
-          await _migrations.migrate(db, oldVersion, newVersion);
+          await _migrations.migrate(
+            db: db,
+            oldVersion: oldVersion,
+            newVersion: newVersion,
+          );
         },
         onCreate: (Database db, int version) async {
           print('version: $version');
