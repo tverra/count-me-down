@@ -47,7 +47,7 @@ main() {
 
     test('returns correct percent', () {
       final Percent percent = Percent(0.5);
-      
+
       expect(percent.percent, 50);
     });
 
