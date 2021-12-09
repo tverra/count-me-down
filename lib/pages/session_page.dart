@@ -221,7 +221,7 @@ class _SessionPageState extends State<SessionPage> {
     newDrink.timestamp = DateTime.now();
 
     await DrinkRepo.insertDrink(newDrink);
-    Utils.drinkWebHook(context, newDrink);
+    Utils.drinkWebHook(context);
     setState(() {});
   }
 
