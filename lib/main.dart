@@ -1,5 +1,7 @@
 import 'package:count_me_down/models/preferences.dart';
 import 'package:count_me_down/pages/create_session_page.dart';
+import 'package:count_me_down/pages/profile_page.dart';
+import 'package:count_me_down/pages/scoreboard_page.dart';
 import 'package:count_me_down/pages/session_page.dart';
 import 'package:count_me_down/pages/sessions_page.dart';
 import 'package:count_me_down/pages/settings_page.dart';
@@ -42,6 +44,8 @@ class CountMeDownApp extends StatelessWidget {
           '/settings': (_) => SettingsPage(),
           '/sessions': (_) => SessionsPage(),
           '/sessions/createSession': (_) => CreateSessionPage(),
+          '/scoreboard': (_) => ScoreboardPage(),
+          '/profile': (_) => ProfilePage(),
           'session': (_) => SessionPage(),
         },
         onGenerateRoute: (RouteSettings settings) {
