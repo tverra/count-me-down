@@ -1,10 +1,14 @@
 import 'dart:convert';
 
+import 'package:count_me_down/database/drink_repo.dart';
+import 'package:count_me_down/database/profile_repo.dart';
 import 'package:count_me_down/models/drink.dart';
 import 'package:count_me_down/models/preferences.dart';
+import 'package:count_me_down/models/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 
 class Utils {
@@ -86,16 +90,36 @@ class Utils {
     return buffer.toString();
   }
 
-  static Future<void> drinkWebHook(BuildContext context, Drink drink) async {
+  static Future<void> drinkWebHook(BuildContext context) async {
     final Preferences preferences = context.read<Preferences>();
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
     if (preferences.drinkWebHook != null && preferences.drinkWebHook != '') {
       final Map<String, String> headers = <String, String>{};
+      final Map<String, dynamic> body = <String, dynamic>{};
+
       headers.putIfAbsent('Content-Type', () => 'application/json');
+      headers.putIfAbsent('x-api-version', () => '2');
+      headers.putIfAbsent('x-app-version',
+          () => '${packageInfo.version}+${packageInfo.buildNumber}');
+
+      final List<Drink> drinks = await DrinkRepo.getDrinks(
+        sessionId: preferences.activeSessionId,
+      );
+      final Profile profile = await ProfileRepo.getProfile(
+        preferences.activeProfileId,
+      );
+
+      body.putIfAbsent('drinks', () => drinks.map((d) => d.toMap()).toList());
+      body.putIfAbsent(
+          'profile', () => profile != null ? profile.toMap() : null);
 
       http
-          .post(preferences.drinkWebHook,
-              headers: headers, body: jsonEncode(drink.toMap()))
+          .post(
+            preferences.drinkWebHook,
+            headers: headers,
+            body: jsonEncode(body),
+          )
           .timeout(Duration(seconds: 10));
     }
   }
