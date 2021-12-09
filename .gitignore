@@ -30,6 +30,7 @@
 .pub-cache/
 .pub/
 /build/
+/.fvm/flutter_sdk
 /.fvm/flutter_sdk/
 
 # Web related
