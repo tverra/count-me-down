@@ -5,6 +5,7 @@ import 'package:count_me_down/models/session.dart';
 import 'package:count_me_down/pages/create_drink_page.dart';
 import 'package:count_me_down/pages/edit_drink_page.dart';
 import 'package:count_me_down/pages/edit_session_page.dart';
+import 'package:count_me_down/pages/scoreboard_page.dart';
 import 'package:count_me_down/pages/start_page.dart';
 import 'package:count_me_down/utils/snack_bar_helper.dart';
 import 'package:count_me_down/utils/utils.dart';
@@ -346,6 +347,19 @@ class _Drawer extends StatelessWidget {
               );
             },
             leading: Icon(Icons.edit),
+          ),
+          Divider(height: 1.0),
+          ListTile(
+            title: Text('Scoreboard'),
+            enabled: enabled,
+            onTap: () async {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) {
+                  return ScoreboardPage();
+                }),
+              );
+            },
+            leading: Icon(Icons.leaderboard),
           ),
           Divider(height: 1.0),
         ],
