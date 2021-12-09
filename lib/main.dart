@@ -30,7 +30,10 @@ class CountMeDownApp extends StatelessWidget {
 
     return MaterialApp(
         theme: ThemeData(
-          primaryColor: Color.fromRGBO(11, 38, 16, 1),
+          // Tyrkisk pepper blå
+          primaryColor: Color.fromRGBO(1, 12, 142, 1),
+          // Jäger grønn
+          // primaryColor: Color.fromRGBO(11, 38, 16, 1),
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         initialRoute: preferences.activeSessionId == null ? '/' : 'session',
