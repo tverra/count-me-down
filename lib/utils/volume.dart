@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class Volume {
   final int millilitres;
 
@@ -23,15 +25,17 @@ class Volume {
 
   @override
   String toString() {
+    final NumberFormat format = NumberFormat('#.##', 'nb_NO');
+
     if (millilitres == null) return null;
     if (millilitres > 1000) {
-      return '$litres l';
+      return '${format.format(litres)} L';
     } else if (millilitres > 100) {
-      return '$decilitres dl';
+      return '${format.format(decilitres)} dL';
     } else if (millilitres > 10) {
-      return '$centilitres cl';
+      return '${format.format(centilitres)} cL';
     } else {
-      return '$millilitres ml';
+      return '${format.format(millilitres)} mL';
     }
   }
 }
