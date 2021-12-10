@@ -174,8 +174,8 @@ class Drink {
 
   @override
   String toString() {
-    return '(${DateFormat('HH:mm').format(timestamp.toLocal())}) '
-        '$name ${volume.toString()}';
+    return '${DateFormat('HH:mm').format(timestamp.toLocal())} '
+        '(${volume.toString()}) - $name';
   }
 }
 

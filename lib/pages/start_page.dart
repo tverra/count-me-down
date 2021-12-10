@@ -1,3 +1,4 @@
+import 'package:count_me_down/pages/profile_page.dart';
 import 'package:count_me_down/pages/sessions_page.dart';
 import 'package:count_me_down/pages/settings_page.dart';
 import 'package:count_me_down/widgets/menu_element.dart';
@@ -26,7 +27,10 @@ class StartPage extends StatelessWidget {
             ),
             SliverToBoxAdapter(
               child: MenuElement(
-                text: 'Profiles',
+                text: 'Profile',
+                onPressed: () {
+                  Navigator.of(context).pushNamed(ProfilePage.routeName);
+                },
               ),
             ),
             SliverToBoxAdapter(

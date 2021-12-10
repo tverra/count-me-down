@@ -139,7 +139,7 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
     );
 
     await DrinkRepo.insertDrink(drink);
-    Utils.drinkWebHook(context, drink);
+    Utils.drinkWebHook(context);
 
     if (widget.onCreateDrink != null) {
       widget.onCreateDrink();
