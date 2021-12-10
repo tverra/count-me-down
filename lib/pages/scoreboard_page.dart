@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class ScoreboardPage extends StatefulWidget {
+  static const routeName = '/scoreboard';
+
   ScoreboardPage();
 
   @override
