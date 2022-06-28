@@ -57,6 +57,16 @@ class Profile {
     ];
   }
 
+  static String getGender(double bodyWaterPercentage) {
+    if (bodyWaterPercentage == 70.0) {
+      return 'Male';
+    } else if (bodyWaterPercentage == 60.0) {
+      return 'Female';
+    } else {
+      return 'Average';
+    }
+  }
+
   Map<String, dynamic> toMap({bool forQuery = false}) {
     final Map<String, dynamic> map = <String, dynamic>{};
 

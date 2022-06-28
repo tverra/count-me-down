@@ -43,6 +43,8 @@ class EditDrinkPage extends StatelessWidget {
   Future<void> _deleteDrink(BuildContext context) async {
     await DrinkRepo.deleteDrink(drink);
 
+    Utils.drinkWebHook(context);
+
     if (onEditDrink != null) {
       onEditDrink();
     }

@@ -178,14 +178,10 @@ class Drink {
     return Drink.fromMap(toMap());
   }
 
-  String toDisplayString() {
-    return '(${DateFormat('HH:mm').format(timestamp.toLocal())}) '
-        '$name ${volume.toString()}';
-  }
-
   @override
   String toString() {
-    return toMap().toString();
+    return '${DateFormat('HH:mm').format(timestamp.toLocal())} '
+        '(${volume.toString()}) - $name';
   }
 
   @override
