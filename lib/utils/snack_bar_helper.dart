@@ -17,7 +17,7 @@ class SnackBarHelper {
     _lastSnackBar = SnackBarData(message, type);
     _isShown = true;
 
-    Scaffold.of(context)
+    ScaffoldMessenger.of(context)
       ..removeCurrentSnackBar()
       ..showSnackBar(get(context, message, type, extraInfo))
           .closed
@@ -28,7 +28,7 @@ class SnackBarHelper {
 
   void hide(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Scaffold.of(context).removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
     });
   }
 

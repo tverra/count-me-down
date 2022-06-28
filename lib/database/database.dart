@@ -1,4 +1,4 @@
-import 'package:count_me_down/database/migrations.dart';
+import 'package:count_me_down/database/migrations/migration.dart';
 import 'package:count_me_down/database/seed_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +13,9 @@ class DBProvider {
 
   static final DBProvider db = DBProvider._();
   static Database _database;
+  final Migrations _migrations = Migrations();
 
-  Future<Database> _initDB(int version, {bool inMemory}) async {
+  Future<Database> _initDB(int version, {bool inMemory, bool seed}) async {
     final String path = join(await getDatabasesPath(), "count_me_down.db");
     final DatabaseFactory databaseFactory = databaseFactoryFfi;
     Database db;
@@ -29,7 +30,11 @@ class DBProvider {
           print('old version: $oldVersion');
           print('new version: $newVersion');
 
-          await Migrations.migrate(db, oldVersion, newVersion);
+          await _migrations.migrate(
+            db: db,
+            oldVersion: oldVersion,
+            newVersion: newVersion,
+          );
         },
         onDowngrade: (Database db, int oldVersion, int newVersion) async {
           debugPrint("Downgrading to version ${newVersion.toString()}");
@@ -37,13 +42,20 @@ class DBProvider {
           print('old version: $oldVersion');
           print('new version: $newVersion');
 
-          await Migrations.migrate(db, oldVersion, newVersion);
+          await _migrations.migrate(
+            db: db,
+            oldVersion: oldVersion,
+            newVersion: newVersion,
+          );
         },
         onCreate: (Database db, int version) async {
           print('version: $version');
 
-          await Migrations.create(db, version);
-          await SeedData.insertSeedData(db);
+          await _migrations.create(db, version);
+
+          if (seed) {
+            await SeedData.insertSeedData(db);
+          }
         });
 
     if (inMemory) {
@@ -59,11 +71,16 @@ class DBProvider {
     return db;
   }
 
-  Future<Database> getDatabase({int version, bool inMemory = false}) async {
+  Future<Database> getDatabase({
+    int version,
+    bool inMemory = false,
+    bool seed = true,
+  }) async {
     if (_database != null) return _database;
     _database = await _initDB(
-      version ?? Migrations.latestVersion,
+      version ?? _migrations.latestVersion,
       inMemory: inMemory,
+      seed: seed,
     );
 
     return _database;

@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:count_me_down/extensions.dart';
 import 'package:count_me_down/models/session.dart';
-import 'package:count_me_down/utils/percentage.dart';
+import 'package:count_me_down/utils/percent.dart';
 import 'package:count_me_down/utils/volume.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -36,7 +36,7 @@ class Drink {
   int sessionId;
   String name;
   Volume volume;
-  Percentage alcoholConcentration;
+  Percent alcoholConcentration;
   DateTime timestamp;
   Color color;
   DrinkTypes drinkType;
@@ -59,7 +59,7 @@ class Drink {
     name = map[colName];
     volume = map[colVolume] != null ? Volume(map[colVolume]) : null;
     alcoholConcentration = map[colAlcoholConcentration] != null
-        ? Percentage(map[colAlcoholConcentration])
+        ? Percent(map[colAlcoholConcentration])
         : null;
     if (map[colTimestamp] != null) {
       timestamp = int.tryParse(map[colTimestamp].toString()) != null
@@ -73,6 +73,7 @@ class Drink {
         map[colDrinkType] != null && _drinkTypes.contains(map[colDrinkType])
             ? DrinkTypes.values[_drinkTypes.indexOf(map[colDrinkType])]
             : null;
+    session = map[relSession] != null ? Session.fromMap(map[relSession]) : null;
   }
 
   static List<String> get columns {
@@ -119,7 +120,7 @@ class Drink {
     map[colId] = id;
     map[colSessionId] = sessionId;
     map[colName] = name;
-    map[colVolume] = volume.millilitres;
+    map[colVolume] = volume != null ? volume.millilitres : null;
     map[colAlcoholConcentration] =
         alcoholConcentration != null ? alcoholConcentration.fraction : null;
     map[colTimestamp] = timestamp != null
@@ -127,8 +128,13 @@ class Drink {
             ? timestamp.millisecondsSinceEpoch
             : timestamp.toIso8601String()
         : null;
-    map[colColor] = color.value;
+    map[colColor] = color != null ? color.value : null;
     map[colDrinkType] = drinkType != null ? _drinkTypes[drinkType.index] : null;
+
+    if (!forQuery) {
+      map[relSession] =
+          session != null ? session.toMap(forQuery: forQuery) : null;
+    }
 
     return map;
   }
@@ -177,6 +183,30 @@ class Drink {
     return '${DateFormat('HH:mm').format(timestamp.toLocal())} '
         '(${volume.toString()}) - $name';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Drink &&
+          id == other.id &&
+          sessionId == other.sessionId &&
+          name == other.name &&
+          volume == other.volume &&
+          alcoholConcentration == other.alcoholConcentration &&
+          timestamp == other.timestamp &&
+          color == other.color &&
+          drinkType == other.drinkType;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      sessionId.hashCode ^
+      name.hashCode ^
+      volume.hashCode ^
+      alcoholConcentration.hashCode ^
+      timestamp.hashCode ^
+      color.hashCode ^
+      drinkType.hashCode;
 }
 
 enum DrinkTypes {

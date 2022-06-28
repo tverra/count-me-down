@@ -38,4 +38,12 @@ class Volume {
       return '${format.format(millilitres)} mL';
     }
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Volume && millilitres == other.millilitres;
+
+  @override
+  int get hashCode => millilitres.hashCode;
 }

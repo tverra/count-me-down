@@ -38,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final List<charts.Series<TimeSeriesSales, DateTime>> seriesList = [
-      new charts.Series<TimeSeriesSales, DateTime>(
+      charts.Series<TimeSeriesSales, DateTime>(
         id: 'Tablet',
         colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
         domainFn: (TimeSeriesSales sales, _) => sales.time,
@@ -129,18 +129,18 @@ class DateTimeComboLinePointChart extends StatelessWidget {
     return charts.TimeSeriesChart(
       seriesList,
       animate: animate,
-      defaultRenderer: new charts.LineRendererConfig(),
+      defaultRenderer: charts.LineRendererConfig(),
       customSeriesRenderers: [
-        new charts.PointRendererConfig(customRendererId: 'customPoint')
+        charts.PointRendererConfig(customRendererId: 'customPoint')
       ],
       dateTimeFactory: const charts.LocalDateTimeFactory(),
-      primaryMeasureAxis: new charts.NumericAxisSpec(
+      primaryMeasureAxis: charts.NumericAxisSpec(
           tickProviderSpec:
-              new charts.BasicNumericTickProviderSpec(zeroBound: false)),
-      domainAxis: new charts.DateTimeAxisSpec(
-        tickFormatterSpec: new charts.AutoDateTimeTickFormatterSpec(
-          minute: new charts.TimeFormatterSpec(
-              format: 'mm', transitionFormat: 'HH:mm'),
+              charts.BasicNumericTickProviderSpec(zeroBound: false)),
+      domainAxis: charts.DateTimeAxisSpec(
+        tickFormatterSpec: charts.AutoDateTimeTickFormatterSpec(
+          minute:
+              charts.TimeFormatterSpec(format: 'mm', transitionFormat: 'HH:mm'),
         ),
       ),
     );

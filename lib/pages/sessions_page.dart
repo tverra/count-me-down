@@ -44,7 +44,7 @@ class _SessionsPageState extends State<SessionsPage> {
                         padding: EdgeInsets.symmetric(vertical: 4.0),
                         child: Material(
                           elevation: 2.0,
-                          child: FlatButton(
+                          child: TextButton(
                             onPressed: _isLoading
                                 ? null
                                 : () => _openSession(context, session),
@@ -85,8 +85,10 @@ class _SessionsPageState extends State<SessionsPage> {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(
                           vertical: 10.0, horizontal: 20.0),
-                      child: RaisedButton(
-                        color: Theme.of(context).primaryColor,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Theme.of(context).primaryColor,
+                        ),
                         child: Container(
                           padding: const EdgeInsets.all(
                             15.0,

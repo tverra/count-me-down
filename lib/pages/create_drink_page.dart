@@ -1,7 +1,7 @@
 import 'package:count_me_down/database/db_repo.dart';
 import 'package:count_me_down/models/drink.dart';
 import 'package:count_me_down/models/preferences.dart';
-import 'package:count_me_down/utils/percentage.dart';
+import 'package:count_me_down/utils/percent.dart';
 import 'package:count_me_down/utils/utils.dart';
 import 'package:count_me_down/utils/volume.dart';
 import 'package:flutter/material.dart';
@@ -76,8 +76,10 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
                           },
                         ),
                         SizedBox(height: 40.0),
-                        RaisedButton(
-                          color: Theme.of(context).primaryColor,
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: Theme.of(context).primaryColor,
+                          ),
                           onPressed: _isLoading ? null : () => _submit(context),
                           child: Container(
                             width: double.infinity,
@@ -119,7 +121,7 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
       final Drink template = Drink(
         name: _nameController.text,
         volume: Volume((volumeDouble * 10).toInt()),
-        alcoholConcentration: Percentage.fromPercentage(alcoholDouble),
+        alcoholConcentration: Percent.fromPercent(alcoholDouble),
         timestamp: DateTime.now(),
         color: Colors.black,
         drinkType: DrinkTypes.glass_whiskey,
@@ -132,7 +134,7 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
       sessionId: preferences.activeSessionId,
       name: _nameController.text,
       volume: Volume((volumeDouble * 10).toInt()),
-      alcoholConcentration: Percentage.fromPercentage(alcoholDouble),
+      alcoholConcentration: Percent.fromPercent(alcoholDouble),
       timestamp: DateTime.now(),
       color: Colors.black,
       drinkType: DrinkTypes.glass_whiskey,

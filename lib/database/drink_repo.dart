@@ -13,14 +13,6 @@ class DrinkRepo {
     return drinks.isEmpty ? null : drinks.single;
   }
 
-  static Future<List<Drink>> getDrinkTemplates(
-      {List<String> preloadArgs}) async {
-    final Where where =
-        Where(table: Drink.tableName, col: Drink.colSessionId, val: null);
-
-    return _getDrinks(where, preloadArgs);
-  }
-
   static Future<List<Drink>> getDrinks(
       {int sessionId, List<String> preloadArgs}) async {
     final Where where = Where();
@@ -28,6 +20,14 @@ class DrinkRepo {
     if (sessionId != null) {
       where.addEquals(Drink.colSessionId, sessionId, table: Drink.tableName);
     }
+
+    return _getDrinks(where, preloadArgs);
+  }
+
+  static Future<List<Drink>> getDrinkTemplates(
+      {List<String> preloadArgs}) async {
+    final Where where =
+        Where(table: Drink.tableName, col: Drink.colSessionId, val: null);
 
     return _getDrinks(where, preloadArgs);
   }
@@ -55,21 +55,20 @@ class DrinkRepo {
         await db.rawQuery(query.sql, query.args);
 
     final List<Drink> drinks = <Drink>[];
-    for (Map<String, dynamic> profileMap in res) {
-      final Drink profile = Drink.fromMap(profileMap);
+    for (Map<String, dynamic> drinkMap in res) {
+      final Drink drink = Drink.fromMap(drinkMap);
 
       if (preloadArgs != null) {
         Map<String, dynamic> sessionMap;
 
         if (preloadArgs.contains(Drink.relSession)) {
-          sessionMap =
-              Preload.extractPreLoadedMap(Session.tableName, sessionMap);
+          sessionMap = Preload.extractPreLoadedMap(Session.tableName, drinkMap);
 
-          profile.session =
+          drink.session =
               sessionMap != null ? Session.fromMap(sessionMap) : null;
         }
       }
-      drinks.add(profile);
+      drinks.add(drink);
     }
     return drinks;
   }
@@ -96,7 +95,7 @@ class DrinkRepo {
   static Future<List<int>> insertDrinks(List<Drink> drinks) async {
     final Database db = await _getDb();
 
-    await db.transaction((Transaction txn) async {
+    final List result = await db.transaction((Transaction txn) async {
       final Batch batch = txn.batch();
 
       for (Drink drink in drinks) {
@@ -105,7 +104,10 @@ class DrinkRepo {
       return batch.commit();
     });
 
-    return drinks.map((d) => d.id).toList();
+    for (int i = 0; i < drinks.length; i++) {
+      drinks[i].id = result[i];
+    }
+    return result.toList().cast<int>();
   }
 
   static Future<int> updateDrink(Drink drink,
@@ -121,18 +123,28 @@ class DrinkRepo {
     return results.isEmpty ? 0 : results[0];
   }
 
-  static Future<List> updateDrinks(List<Drink> drinks,
+  static Future<List<int>> updateDrinks(List<Drink> drinks,
       {int sessionId,
       bool insertMissing = false,
       bool removeDeleted = false}) async {
     final Database db = await _getDb();
 
-    return db.transaction((Transaction txn) async {
+    final List result = await db.transaction((Transaction txn) async {
       final Batch batch = txn.batch();
       _updateDrinks(batch, drinks, insertMissing, removeDeleted,
           sessionId: sessionId);
       return batch.commit();
     });
+
+    final List<int> resultList = result.toList().cast<int>();
+
+    for (int i = 0; i < drinks.length; i++) {
+      if (drinks[i].id == null) {
+        drinks[i].id = resultList[i];
+      }
+    }
+
+    return resultList;
   }
 
   static Batch _updateDrinks(
@@ -191,7 +203,7 @@ class DrinkRepo {
     return _deleteDrinks(where);
   }
 
-  Future<int> deleteDrinks({int sessionId}) async {
+  static Future<int> deleteDrinks({int sessionId}) async {
     final Where where = Where();
 
     if (sessionId != null) {
