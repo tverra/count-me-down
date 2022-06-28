@@ -1,8 +1,8 @@
-import 'package:count_me_down/database/db_repo.dart';
+import 'package:count_me_down/database/db_repos.dart';
 import 'package:count_me_down/models/preferences.dart';
 import 'package:count_me_down/models/session.dart';
 import 'package:count_me_down/pages/start_page.dart';
-import 'package:count_me_down/utils/utils.dart';
+import 'package:count_me_down/utils/utils.dart' as utils;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,16 +18,17 @@ class EditSessionPage extends StatelessWidget {
       body: Container(
         padding: const EdgeInsets.all(20.0),
         child: Center(
-          child: FutureBuilder<Session>(
+          child: FutureBuilder<Session?>(
               future: _getSession(context),
-              builder: (BuildContext context, AsyncSnapshot<Session> snapshot) {
+              builder:
+                  (BuildContext context, AsyncSnapshot<Session?> snapshot) {
                 if (!snapshot.hasData) {
                   return Center(
                     child: CircularProgressIndicator(),
                   );
                 }
 
-                final Session session = snapshot.data;
+                final Session? session = snapshot.data;
 
                 return Container(
                   width: double.infinity,
@@ -35,13 +36,15 @@ class EditSessionPage extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       primary: Theme.of(context).primaryColor,
                     ),
-                    onPressed: () => _deleteSession(context, session),
+                    onPressed: session != null
+                        ? () => _deleteSession(context, session)
+                        : null,
                     child: Container(
                       padding: const EdgeInsets.all(15.0),
                       child: Text(
                         'Delete session',
                         style: TextStyle(
-                            color: Utils.getThemeTextColor(context),
+                            color: utils.getThemeTextColor(context),
                             fontSize: 18.0),
                       ),
                     ),
@@ -53,13 +56,13 @@ class EditSessionPage extends StatelessWidget {
     );
   }
 
-  Future<Session> _getSession(BuildContext context) async {
+  Future<Session?> _getSession(BuildContext context) async {
     final Preferences preferences = context.watch<Preferences>();
-    return await SessionRepo.getSession(preferences.activeSessionId);
+    return getSession(preferences.activeSessionId ?? 0);
   }
 
   Future<void> _deleteSession(BuildContext context, Session session) async {
-    await SessionRepo.deleteSession(session);
+    await deleteSession(session);
     Navigator.of(context)
         .pushNamedAndRemoveUntil(StartPage.routeName, (route) => false);
   }

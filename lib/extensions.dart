@@ -1,8 +1,11 @@
 extension MockableDateTime on DateTime {
-  static DateTime mockTime;
+  static DateTime? mockTime;
+
   static DateTime get current {
-    if (mockTime != null)
-      return mockTime;
+    final DateTime? time = mockTime;
+
+    if (time != null)
+      return time;
     else
       return DateTime.now();
   }

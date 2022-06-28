@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MenuElement extends StatelessWidget {
-  final String text;
-  final VoidCallback onPressed;
+  final String? text;
+  final VoidCallback? onPressed;
 
   MenuElement({this.text, this.onPressed});
 

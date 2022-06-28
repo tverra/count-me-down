@@ -15,7 +15,7 @@ class ScoreboardPage extends StatefulWidget {
 }
 
 class _ScoreboardPageState extends State<ScoreboardPage> {
-  Stream _getScoreboardStream;
+  Stream<List<dynamic>>? _getScoreboardStream;
   String _title = 'Scoreboard';
 
   @override
@@ -33,6 +33,8 @@ class _ScoreboardPageState extends State<ScoreboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_getScoreboardStream == null) return CircularProgressIndicator();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_title),
@@ -44,7 +46,7 @@ class _ScoreboardPageState extends State<ScoreboardPage> {
             BuildContext context,
             AsyncSnapshot<List> snapshot,
           ) {
-            final List users = snapshot.data != null ? snapshot.data : null;
+            final List? users = snapshot.data != null ? snapshot.data : null;
 
             return Container(
               width: double.infinity,
@@ -62,7 +64,7 @@ class _ScoreboardPageState extends State<ScoreboardPage> {
 
     for (; mounted && preferences.drinkWebHook != null;) {
       final http.Response response = await http.get(
-        preferences.drinkWebHook,
+        Uri.parse(preferences.drinkWebHook ?? ''),
         headers: headers,
       );
 
@@ -73,7 +75,7 @@ class _ScoreboardPageState extends State<ScoreboardPage> {
           _title = data['title'];
         });
 
-        yield data['scoreboard'];
+        yield data['scoreboard'] as List;
       }
 
       await Future<void>.delayed(Duration(seconds: 30));
@@ -82,12 +84,13 @@ class _ScoreboardPageState extends State<ScoreboardPage> {
 }
 
 class _Scoreboard extends StatelessWidget {
-  final List users;
+  final List? users;
 
-  _Scoreboard({@required this.users});
+  _Scoreboard({required this.users});
 
   @override
   Widget build(BuildContext context) {
+    final List? users = this.users;
     final double screenWidth = MediaQuery.of(context).size.width;
     final double columnWidth =
         (screenWidth / 3) > 100 ? 100 : (screenWidth / 3);

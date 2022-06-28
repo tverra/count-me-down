@@ -1,8 +1,9 @@
 import 'package:count_me_down/models/drink.dart';
 import 'package:count_me_down/models/profile.dart';
+import 'package:count_me_down/utils/data_parser.dart';
 
 class Session {
-  static const String tableName = 'sessions';
+  static const String tableName = 'session';
   static const String colId = 'id';
   static const String colProfileId = 'profile_id';
   static const String colName = 'name';
@@ -11,14 +12,14 @@ class Session {
   static const String relProfile = 'profile';
   static const String relDrinks = 'drinks';
 
-  int id;
-  int profileId;
-  String name;
-  DateTime startedAt;
-  DateTime endedAt;
+  int? id;
+  int? profileId;
+  String? name;
+  DateTime? startedAt;
+  DateTime? endedAt;
 
-  Profile profile;
-  List<Drink> drinks;
+  Profile? profile;
+  List<Drink>? drinks;
 
   Session({
     this.profileId,
@@ -28,23 +29,13 @@ class Session {
   });
 
   Session.fromMap(Map<String, dynamic> map) {
-    id = map[colId];
-    profileId = map[colProfileId];
-    name = map[colName];
-    if (map[colStartedAt] != null) {
-      startedAt = int.tryParse(map[colStartedAt].toString()) != null
-          ? DateTime.fromMillisecondsSinceEpoch(
-              int.tryParse(map[colStartedAt].toString()),
-              isUtc: true)
-          : DateTime.tryParse(map[colStartedAt].toString());
-    }
-    if (map[colEndedAt] != null) {
-      endedAt = int.tryParse(map[colEndedAt].toString()) != null
-          ? DateTime.fromMillisecondsSinceEpoch(
-              int.tryParse(map[colEndedAt].toString()),
-              isUtc: true)
-          : DateTime.tryParse(map[colEndedAt].toString());
-    }
+    final DataParser p = DataParser();
+
+    id = p.tryParseInt(map[colId]);
+    profileId = p.tryParseInt(map[colProfileId]);
+    name = p.tryParseString(map[colName]);
+    startedAt = p.tryParseDateTime(map[colStartedAt]);
+    endedAt = p.tryParseDateTime(map[colEndedAt]);
     profile = map[relProfile] != null ? Profile.fromMap(map[relProfile]) : null;
     drinks = map[relDrinks] != null
         ? map[relDrinks].map<Drink>((d) => Drink.fromMap(d)).toList()
@@ -62,28 +53,20 @@ class Session {
   }
 
   Map<String, dynamic> toMap({bool forQuery = false}) {
-    final Map<String, dynamic> map = <String, dynamic>{};
+    final DataParser p = DataParser(forQuery: forQuery);
 
-    map[colId] = id;
-    map[colProfileId] = profileId;
-    map[colName] = name;
-    map[colStartedAt] = startedAt != null
-        ? forQuery
-            ? startedAt.millisecondsSinceEpoch
-            : startedAt.toIso8601String()
-        : null;
-    map[colEndedAt] = endedAt != null
-        ? forQuery
-            ? endedAt.millisecondsSinceEpoch
-            : endedAt.toIso8601String()
-        : null;
+    final Map<String, dynamic> map = <String, dynamic>{
+      colId: p.serializeInt(id),
+      colProfileId: p.serializeInt(profileId),
+      colName: p.serializeString(name),
+      colStartedAt: p.serializeDateTime(startedAt),
+      colEndedAt: p.serializeDateTime(endedAt),
+    };
 
     if (!forQuery) {
-      map[relProfile] =
-          profile != null ? profile.toMap(forQuery: forQuery) : null;
-      map[relDrinks] = drinks != null
-          ? drinks.map((d) => d.toMap(forQuery: forQuery)).toList()
-          : null;
+      map.putIfAbsent(relProfile, () => profile?.toMap(forQuery: forQuery));
+      map.putIfAbsent(relDrinks,
+          () => drinks?.map((d) => d.toMap(forQuery: forQuery)).toList());
     }
 
     return map;

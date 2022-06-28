@@ -1,9 +1,10 @@
-import 'package:count_me_down/database/db_repo.dart';
+import 'package:count_me_down/database/db_repos.dart';
+import 'package:count_me_down/database/repos/preferences_repo.dart';
 import 'package:count_me_down/models/preferences.dart';
 import 'package:count_me_down/models/session.dart';
 import 'package:count_me_down/pages/create_session_page.dart';
 import 'package:count_me_down/pages/session_page.dart';
-import 'package:count_me_down/utils/utils.dart';
+import 'package:count_me_down/utils/utils.dart' as utils;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -23,10 +24,12 @@ class _SessionsPageState extends State<SessionsPage> {
       appBar: AppBar(title: Text('Sessions')),
       body: Builder(builder: (BuildContext context) {
         return FutureBuilder(
-          future: SessionRepo.getSessions(),
+          future: getSessions(),
           builder:
               (BuildContext context, AsyncSnapshot<List<Session>> snapshot) {
-            if (!snapshot.hasData) {
+            final List<Session>? data = snapshot.data;
+
+            if (data == null) {
               return Center(child: CircularProgressIndicator());
             }
 
@@ -36,9 +39,10 @@ class _SessionsPageState extends State<SessionsPage> {
                     padding: EdgeInsets.only(
                       bottom: 80.0 + MediaQuery.of(context).padding.bottom,
                     ),
-                    itemCount: snapshot.data != null ? snapshot.data.length : 0,
+                    itemCount: data.length,
                     itemBuilder: (BuildContext context, int index) {
-                      final Session session = snapshot.data[index];
+                      final Session session = data[index];
+                      final DateTime? startedAt = session.startedAt;
 
                       return Container(
                         padding: EdgeInsets.symmetric(vertical: 4.0),
@@ -56,18 +60,20 @@ class _SessionsPageState extends State<SessionsPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    session.name,
+                                    session.name ?? '',
                                     style: TextStyle(
                                       fontSize: 17.0,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Text(
-                                    Utils.formatDatetime(session.startedAt),
-                                    style: TextStyle(
-                                      color: Colors.black45,
-                                    ),
-                                  )
+                                  startedAt != null
+                                      ? Text(
+                                          utils.formatDatetime(startedAt),
+                                          style: TextStyle(
+                                            color: Colors.black45,
+                                          ),
+                                        )
+                                      : Container(),
                                 ],
                               ),
                             ),
@@ -96,7 +102,7 @@ class _SessionsPageState extends State<SessionsPage> {
                           child: Text(
                             'Start new session',
                             style: TextStyle(
-                              color: Utils.getThemeTextColor(context),
+                              color: utils.getThemeTextColor(context),
                               fontSize: 17.0,
                             ),
                           ),
@@ -125,7 +131,7 @@ class _SessionsPageState extends State<SessionsPage> {
 
     final Preferences preferences = context.read<Preferences>();
     preferences.activeSessionId = session.id;
-    await preferences.save();
+    await updatePreferences(preferences);
 
     Navigator.of(context)
         .pushNamedAndRemoveUntil(SessionPage.routeName, (route) => false);

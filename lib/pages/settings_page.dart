@@ -1,5 +1,6 @@
+import 'package:count_me_down/database/repos/preferences_repo.dart';
 import 'package:count_me_down/models/preferences.dart';
-import 'package:count_me_down/utils/utils.dart';
+import 'package:count_me_down/utils/utils.dart' as utils;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,7 +12,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  TextEditingController _drinkHookController;
+  TextEditingController? _drinkHookController;
   bool _isLoading = false;
 
   @override
@@ -53,7 +54,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       style: TextStyle(
                         fontSize: 17.0,
                         fontWeight: FontWeight.bold,
-                        color: Utils.getThemeTextColor(context),
+                        color: utils.getThemeTextColor(context),
                       ),
                     ),
                   ),
@@ -74,8 +75,8 @@ class _SettingsPageState extends State<SettingsPage> {
     }
 
     final Preferences preferences = context.read<Preferences>();
-    preferences.drinkWebHook = _drinkHookController.text;
-    await preferences.save();
+    preferences.drinkWebHook = _drinkHookController?.text;
+    await updatePreferences(preferences);
 
     Navigator.of(context).pop();
   }

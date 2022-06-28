@@ -1,12 +1,16 @@
 import 'package:count_me_down/models/drink.dart';
+import 'package:count_me_down/models/preferences.dart';
 import 'package:count_me_down/models/profile.dart';
 import 'package:count_me_down/utils/mass.dart';
 import 'package:count_me_down/utils/percent.dart';
 import 'package:count_me_down/utils/volume.dart';
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:idb_sqflite/idb_sqflite.dart' as idb;
+import 'package:sqflite/sqflite.dart' as sqf;
 
 class SeedData {
+  static final Preferences _preferences = Preferences();
+
   static final List<Profile> _profiles = <Profile>[
     Profile(
       name: 'Generic profile',
@@ -40,18 +44,24 @@ class SeedData {
     ),
   ];
 
-  static Future<void> insertSeedData(Database db) async {
-    await db.transaction((Transaction txn) async {
-      final Batch batch = txn.batch();
+  static Future<void> insertSqfSeedData(sqf.Database db) async {
+    await db.transaction((sqf.Transaction txn) async {
+      final sqf.Batch batch = txn.batch();
+
+      batch.insert(Preferences.tableName, _preferences.toMap(forQuery: true));
 
       _profiles.forEach((profile) {
-        batch.insert('profiles', profile.toMap(forQuery: true));
+        batch.insert(Profile.tableName, profile.toMap(forQuery: true));
       });
       _drinks.forEach((drink) {
-        batch.insert('drinks', drink.toMap(forQuery: true));
+        batch.insert(Drink.tableName, drink.toMap(forQuery: true));
       });
 
       await batch.commit();
     });
+  }
+
+  static Future<void> insertIdbSeedData(idb.Database db) async {
+    throw UnimplementedError();
   }
 }

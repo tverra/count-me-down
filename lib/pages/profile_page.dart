@@ -1,9 +1,9 @@
-import 'package:count_me_down/database/profile_repo.dart';
+import 'package:count_me_down/database/repos/profile_repo.dart';
 import 'package:count_me_down/models/preferences.dart';
 import 'package:count_me_down/models/profile.dart';
 import 'package:count_me_down/pages/start_page.dart';
 import 'package:count_me_down/utils/mass.dart';
-import 'package:count_me_down/utils/percentage.dart';
+import 'package:count_me_down/utils/percent.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -21,7 +21,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _weightController = TextEditingController();
   double _genderValue = 65.0;
-  Future<Profile> _activeProfileFuture;
+  Future<Profile?>? _activeProfileFuture;
 
   @override
   void initState() {
@@ -36,10 +36,10 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         title: Text('Edit profile'),
       ),
-      body: FutureBuilder<Profile>(
+      body: FutureBuilder<Profile?>(
           future: _activeProfileFuture,
-          builder: (BuildContext context, AsyncSnapshot<Profile> snapshot) {
-            final Profile profile = snapshot.data;
+          builder: (BuildContext context, AsyncSnapshot<Profile?> snapshot) {
+            final Profile? profile = snapshot.data;
 
             return Container(
               padding: const EdgeInsets.all(20.0),
@@ -56,8 +56,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       textCapitalization: TextCapitalization.sentences,
                       keyboardType: TextInputType.text,
-                      validator: (String value) {
-                        final String formatted = value.trim();
+                      validator: (String? value) {
+                        final String? formatted =
+                            value != null ? value.trim() : null;
 
                         if (formatted == null || formatted == '') {
                           return 'Invalid value';
@@ -75,10 +76,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       keyboardType: TextInputType.number,
                       maxLength: 4,
-                      validator: (String value) {
-                        final String formatted =
-                            value.trim().replaceAll(',', '.');
-                        final double parsed = double.tryParse(formatted);
+                      validator: (String? value) {
+                        final String? formatted = value != null
+                            ? value.trim().replaceAll(',', '.')
+                            : null;
+                        final double? parsed = double.tryParse(formatted ?? '');
 
                         if (parsed == null || parsed < 0) {
                           return 'Invalid value';
@@ -105,10 +107,12 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: Text(Profile.getGender(value)),
                           );
                         }).toList(),
-                        onChanged: (double newValue) {
-                          setState(() {
-                            _genderValue = newValue;
-                          });
+                        onChanged: (double? newValue) {
+                          if (newValue != null && mounted) {
+                            setState(() {
+                              _genderValue = newValue;
+                            });
+                          }
                         },
                       ),
                     ),
@@ -122,8 +126,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     SizedBox(height: 20.0),
                     Container(
                       width: double.infinity,
-                      child: RaisedButton(
-                        onPressed: () => _onSubmit(profile),
+                      child: ElevatedButton(
+                        onPressed:
+                            profile != null ? () => _onSubmit(profile) : null,
                         child: Text('Save'),
                       ),
                     )
@@ -136,33 +141,45 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _onSubmit(Profile profile) async {
-    if (!_formKey.currentState.validate()) return;
+    if (_formKey.currentState?.validate() != true) return;
 
     profile.name = _nameController.text;
     profile.bodyWeight =
         Mass((double.parse(_weightController.text) * 1000).round());
-    profile.bodyWaterPercentage = Percentage(_genderValue / 100);
+    profile.bodyWaterPercentage = Percent(_genderValue / 100);
 
-    await ProfileRepo.updateProfile(profile);
+    await updateProfile(profile);
 
     Navigator.of(context)
         .pushNamedAndRemoveUntil(StartPage.routeName, (route) => false);
   }
 
-  Future<Profile> _getActiveProfile() async {
+  Future<Profile?> _getActiveProfile() async {
     final Preferences preferences = context.read<Preferences>();
-    final int activeProfileId = preferences.activeProfileId;
-    Profile profile;
+    final int? activeProfileId = preferences.activeProfileId;
+    Profile? profile;
 
     if (activeProfileId == null) {
-      profile = await ProfileRepo.getLatestProfile();
+      profile = await getLatestProfile();
     } else {
-      profile = await ProfileRepo.getProfile(activeProfileId);
+      profile = await getProfile(activeProfileId);
     }
 
-    _nameController.text = profile.name;
-    _weightController.text = profile.bodyWeight.kilos.toString();
-    _genderValue = profile.bodyWaterPercentage.percentage;
+    if (profile != null) {
+      final String? name = profile.name;
+      final Mass? bodyWeight = profile.bodyWeight;
+      final Percent? bodyWaterPercentage = profile.bodyWaterPercentage;
+
+      if (name != null) {
+        _nameController.text = name;
+      }
+      if (bodyWeight != null) {
+        _weightController.text = bodyWeight.kilos.toString();
+      }
+      if (bodyWaterPercentage != null) {
+        _genderValue = bodyWaterPercentage.percent;
+      }
+    }
 
     return profile;
   }

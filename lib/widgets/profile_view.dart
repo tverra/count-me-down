@@ -1,7 +1,7 @@
-import 'package:count_me_down/database/db_repo.dart';
+import 'package:count_me_down/database/db_repos.dart';
 import 'package:count_me_down/models/preferences.dart';
 import 'package:count_me_down/models/profile.dart';
-import 'package:count_me_down/utils/utils.dart';
+import 'package:count_me_down/utils/utils.dart' as utils;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -21,15 +21,17 @@ class ProfileView extends StatelessWidget {
         left: false,
         bottom: false,
         child: FutureBuilder(
-          future: ProfileRepo.getProfile(preferences.activeProfileId),
-          builder: (BuildContext context, AsyncSnapshot<Profile> snapshot) {
+          future: getProfile(preferences.activeProfileId ?? 0),
+          builder: (BuildContext context, AsyncSnapshot<Profile?> snapshot) {
             if (!snapshot.hasData) {
               return Center(
                 child: CircularProgressIndicator(),
               );
             }
 
-            final Profile profile = snapshot.data;
+            final Profile? profile = snapshot.data;
+
+            if (profile == null) return Container();
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,14 +42,14 @@ class ProfileView extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
-                          color: Utils.getThemeTextColor(context),
+                          color: utils.getThemeTextColor(context),
                         ),
                       )
                     : Container(),
                 SizedBox(
                   height: 10.0,
                 ),
-                _textStyle(context, profile.name),
+                _textStyle(context, profile.name ?? ''),
                 SizedBox(
                   height: 5.0,
                 ),
@@ -64,7 +66,7 @@ class ProfileView extends StatelessWidget {
                 _textStyle(
                   context,
                   'Alcohol absorption time: ',
-                  '${Utils.formatDuration(profile.absorptionTime)}',
+                  '${utils.formatDuration(profile.absorptionTime ?? Duration.zero)}',
                 ),
                 _textStyle(
                   context,
@@ -79,13 +81,13 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  Widget _textStyle(BuildContext context, String leading, [String text]) {
+  Widget _textStyle(BuildContext context, String leading, [String? text]) {
     return Row(
       children: [
         Text(
-          leading ?? '',
+          leading,
           style: TextStyle(
-            color: Utils.getThemeTextColor(context),
+            color: utils.getThemeTextColor(context),
             height: 1.5,
             fontWeight: FontWeight.bold,
           ),
@@ -94,7 +96,7 @@ class ProfileView extends StatelessWidget {
         Text(
           text ?? '',
           style: TextStyle(
-            color: Utils.getThemeTextColor(context),
+            color: utils.getThemeTextColor(context),
             height: 1.5,
           ),
         ),

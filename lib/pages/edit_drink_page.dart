@@ -1,13 +1,14 @@
-import 'package:count_me_down/database/db_repo.dart';
 import 'package:count_me_down/models/drink.dart';
-import 'package:count_me_down/utils/utils.dart';
+import 'package:count_me_down/utils/utils.dart' as utils;
 import 'package:flutter/material.dart';
+
+import '../database/repos/drink_repo.dart';
 
 class EditDrinkPage extends StatelessWidget {
   final Drink drink;
-  final VoidCallback onEditDrink;
+  final VoidCallback? onEditDrink;
 
-  EditDrinkPage({@required this.drink, this.onEditDrink});
+  EditDrinkPage({required this.drink, this.onEditDrink});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +31,7 @@ class EditDrinkPage extends StatelessWidget {
                 child: Text(
                   'Delete drink',
                   style: TextStyle(
-                      color: Utils.getThemeTextColor(context), fontSize: 18.0),
+                      color: utils.getThemeTextColor(context), fontSize: 18.0),
                 ),
               ),
             ),
@@ -41,9 +42,10 @@ class EditDrinkPage extends StatelessWidget {
   }
 
   Future<void> _deleteDrink(BuildContext context) async {
-    await DrinkRepo.deleteDrink(drink);
+    final VoidCallback? onEditDrink = this.onEditDrink;
+    await deleteDrink(drink);
 
-    Utils.drinkWebHook(context);
+    utils.drinkWebHook(context);
 
     if (onEditDrink != null) {
       onEditDrink();

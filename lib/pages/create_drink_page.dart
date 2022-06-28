@@ -1,14 +1,14 @@
-import 'package:count_me_down/database/db_repo.dart';
+import 'package:count_me_down/database/db_repos.dart';
 import 'package:count_me_down/models/drink.dart';
 import 'package:count_me_down/models/preferences.dart';
 import 'package:count_me_down/utils/percent.dart';
-import 'package:count_me_down/utils/utils.dart';
+import 'package:count_me_down/utils/utils.dart' as utils;
 import 'package:count_me_down/utils/volume.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CreateDrinkPage extends StatefulWidget {
-  final VoidCallback onCreateDrink;
+  final VoidCallback? onCreateDrink;
 
   CreateDrinkPage({this.onCreateDrink});
 
@@ -69,10 +69,12 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
                           title: Text("Add drink to templates"),
                           contentPadding: const EdgeInsets.all(0),
                           value: _addToTemplate,
-                          onChanged: (bool newValue) {
-                            setState(() {
-                              _addToTemplate = newValue;
-                            });
+                          onChanged: (bool? newValue) {
+                            if (newValue != null && mounted) {
+                              setState(() {
+                                _addToTemplate = newValue;
+                              });
+                            }
                           },
                         ),
                         SizedBox(height: 40.0),
@@ -90,7 +92,7 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
                                 style: TextStyle(
                                   fontSize: 17.0,
                                   fontWeight: FontWeight.bold,
-                                  color: Utils.getThemeTextColor(context),
+                                  color: utils.getThemeTextColor(context),
                                 ),
                               ),
                             ),
@@ -114,8 +116,8 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
     final String volume = _volumeController.text.replaceAll(',', '.');
     final String alcoholConcentration =
         _alcoholConcentrationController.text.replaceAll(',', '.');
-    final double volumeDouble = double.tryParse(volume);
-    final double alcoholDouble = double.tryParse(alcoholConcentration);
+    final double volumeDouble = double.tryParse(volume) ?? 0;
+    final double alcoholDouble = double.tryParse(alcoholConcentration) ?? 0;
 
     if (_addToTemplate) {
       final Drink template = Drink(
@@ -127,7 +129,7 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
         drinkType: DrinkTypes.glass_whiskey,
       );
 
-      await DrinkRepo.insertDrink(template);
+      await insertDrink(template);
     }
 
     final Drink drink = Drink(
@@ -140,11 +142,13 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
       drinkType: DrinkTypes.glass_whiskey,
     );
 
-    await DrinkRepo.insertDrink(drink);
-    Utils.drinkWebHook(context);
+    await insertDrink(drink);
+    utils.drinkWebHook(context);
 
-    if (widget.onCreateDrink != null) {
-      widget.onCreateDrink();
+    final VoidCallback? onCreateDrink = widget.onCreateDrink;
+
+    if (onCreateDrink != null) {
+      onCreateDrink();
     }
     Navigator.of(context).pop();
   }

@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   final String title;
 
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -119,10 +119,10 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class DateTimeComboLinePointChart extends StatelessWidget {
-  final List<charts.Series> seriesList;
+  final List<charts.Series<dynamic, DateTime>> seriesList;
   final bool animate;
 
-  DateTimeComboLinePointChart(this.seriesList, {this.animate});
+  DateTimeComboLinePointChart(this.seriesList, {this.animate = true});
 
   @override
   Widget build(BuildContext context) {

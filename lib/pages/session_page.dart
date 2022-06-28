@@ -1,4 +1,5 @@
-import 'package:count_me_down/database/db_repo.dart';
+import 'package:count_me_down/database/db_repos.dart';
+import 'package:count_me_down/database/repos/preferences_repo.dart';
 import 'package:count_me_down/models/drink.dart';
 import 'package:count_me_down/models/preferences.dart';
 import 'package:count_me_down/models/session.dart';
@@ -8,7 +9,7 @@ import 'package:count_me_down/pages/edit_session_page.dart';
 import 'package:count_me_down/pages/scoreboard_page.dart';
 import 'package:count_me_down/pages/start_page.dart';
 import 'package:count_me_down/utils/snack_bar_helper.dart';
-import 'package:count_me_down/utils/utils.dart';
+import 'package:count_me_down/utils/utils.dart' as utils;
 import 'package:count_me_down/widgets/profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,8 +28,8 @@ class SessionPage extends StatefulWidget {
 }
 
 class _SessionPageState extends State<SessionPage> {
-  Session _session;
-  List<Drink> _templates;
+  Session? _session;
+  List<Drink>? _templates;
 
   @override
   void initState() {
@@ -45,17 +46,19 @@ class _SessionPageState extends State<SessionPage> {
       drawer: _Drawer(enabled: !widget.template),
       body: Builder(builder: (BuildContext context) {
         return Center(
-          child: FutureBuilder<Session>(
+          child: FutureBuilder<Session?>(
             future: widget.template
                 ? _getTemplateSession(context)
                 : _getActiveSession(context),
-            builder: (BuildContext context, AsyncSnapshot<Session> snapshot) {
-              if (!snapshot.hasData) {
+            builder: (BuildContext context, AsyncSnapshot<Session?> snapshot) {
+              final Session? session = snapshot.data;
+              final List<Drink>? drinks = session?.drinks;
+              final List<Drink>? templates = _templates;
+              _session = snapshot.data;
+
+              if (session == null || drinks == null) {
                 return Center(child: CircularProgressIndicator());
               }
-
-              final Session session = snapshot.data;
-              _session = snapshot.data;
 
               return Stack(
                 children: [
@@ -63,10 +66,10 @@ class _SessionPageState extends State<SessionPage> {
                       padding: EdgeInsets.only(
                         bottom: 140.0 + MediaQuery.of(context).padding.bottom,
                       ),
-                      itemCount:
-                          session.drinks != null ? session.drinks.length : 0,
+                      itemCount: drinks.length,
                       itemBuilder: (BuildContext context, int index) {
-                        final Drink drink = session.drinks[index];
+                        final Drink drink = drinks[index];
+                        final DateTime? timestamp = drink.timestamp;
 
                         return GestureDetector(
                           onTap: () => _editDrink(context, drink),
@@ -84,7 +87,7 @@ class _SessionPageState extends State<SessionPage> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          drink.name,
+                                          drink.name ?? '',
                                           style: TextStyle(
                                             fontSize: 17.0,
                                             fontWeight: FontWeight.bold,
@@ -97,10 +100,10 @@ class _SessionPageState extends State<SessionPage> {
                                                   color: Colors.black45,
                                                 ),
                                               )
-                                            : drink.timestamp != null
+                                            : timestamp != null
                                                 ? Text(
-                                                    Utils.formatDatetime(
-                                                        drink.timestamp),
+                                                    utils.formatDatetime(
+                                                        timestamp),
                                                     style: TextStyle(
                                                       color: Colors.black45,
                                                     ),
@@ -135,7 +138,7 @@ class _SessionPageState extends State<SessionPage> {
                           shrinkWrap: true,
                           padding: EdgeInsets.all(20.0),
                           itemCount:
-                              _templates != null ? _templates.length + 1 : 1,
+                              templates != null ? templates.length + 1 : 1,
                           itemBuilder: (BuildContext context, int index) {
                             if (index == 0) {
                               return GestureDetector(
@@ -154,7 +157,9 @@ class _SessionPageState extends State<SessionPage> {
                               );
                             }
 
-                            final Drink drink = _templates[index - 1];
+                            final Drink? drink = templates?[index - 1];
+
+                            if (drink == null) return Container();
 
                             return GestureDetector(
                               onTap: () => _addDrink(context, drink),
@@ -171,9 +176,7 @@ class _SessionPageState extends State<SessionPage> {
                                       size: 60.0,
                                     ),
                                     Spacer(),
-                                    Text(
-                                      drink.name,
-                                    ),
+                                    Text(drink.name ?? ''),
                                   ],
                                 ),
                               ),
@@ -217,33 +220,34 @@ class _SessionPageState extends State<SessionPage> {
 
   Future<void> _addDrink(BuildContext context, Drink drink) async {
     final Drink newDrink = drink.copy();
+
     newDrink.id = null;
-    newDrink.sessionId = _session.id;
+    newDrink.sessionId = _session?.id;
     newDrink.timestamp = DateTime.now();
 
-    await DrinkRepo.insertDrink(newDrink);
-    Utils.drinkWebHook(context);
+    await insertDrink(newDrink);
+    utils.drinkWebHook(context);
     setState(() {});
   }
 
   Future<void> _getTemplates() async {
-    final List<Drink> templates = await DrinkRepo.getDrinkTemplates();
+    final List<Drink> templates = await getDrinkTemplates();
 
     setState(() {
       _templates = templates;
     });
   }
 
-  Future<Session> _getActiveSession(BuildContext context) async {
+  Future<Session?> _getActiveSession(BuildContext context) async {
     final Preferences preferences = context.watch<Preferences>();
 
-    return SessionRepo.getSession(preferences.activeSessionId,
+    return getSession(preferences.activeSessionId ?? 0,
         preloadArgs: [Session.relProfile, Session.relDrinks]);
   }
 
   Future<Session> _getTemplateSession(BuildContext context) async {
     final Session session = Session();
-    session.drinks = await DrinkRepo.getDrinkTemplates();
+    session.drinks = await getDrinkTemplates();
 
     return session;
   }
@@ -275,8 +279,8 @@ class _Drawer extends StatelessWidget {
               future: PackageInfo.fromPlatform(),
               builder:
                   (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
-                final String version =
-                    snapshot.hasData ? snapshot.data.version : '';
+                final PackageInfo? data = snapshot.data;
+                final String version = data != null ? data.version : '';
 
                 return Container(
                   padding: const EdgeInsets.all(4.0),
@@ -296,7 +300,7 @@ class _Drawer extends StatelessWidget {
             onTap: () async {
               final Preferences preferences = context.read<Preferences>();
               preferences.activeSessionId = null;
-              preferences.save();
+              updatePreferences(preferences);
               Navigator.of(context).pushNamedAndRemoveUntil(
                   StartPage.routeName, (route) => false);
             },
@@ -307,12 +311,13 @@ class _Drawer extends StatelessWidget {
             title: Text('Copy drink list'),
             onTap: () async {
               final Preferences preferences = context.read<Preferences>();
-              final Session session = await SessionRepo.getSession(
-                preferences.activeSessionId,
+              final Session? session = await getSession(
+                preferences.activeSessionId ?? 0,
                 preloadArgs: [Session.relDrinks],
               );
               final StringBuffer buffer = StringBuffer();
-              session.drinks.forEach((d) => buffer.write('${d.toString()}\n'));
+              final List<Drink>? drinks = session?.drinks;
+              drinks?.forEach((d) => buffer.write('${d.toString()}\n'));
 
               Clipboard.setData(ClipboardData(text: buffer.toString()))
                   .then((result) {
