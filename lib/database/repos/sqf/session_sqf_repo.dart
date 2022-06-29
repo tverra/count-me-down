@@ -67,7 +67,7 @@ Future<List<Session>> _getSessions(Where where, List<String>? preloadArgs,
   return sessions;
 }
 
-Future<int> insertSession(Session session) async {
+Future<Session> insertSession(Session session) async {
   final Database db = await getSqfDb();
 
   final int id = await db.transaction((Transaction txn) async {
@@ -77,7 +77,7 @@ Future<int> insertSession(Session session) async {
   });
 
   session.id = id;
-  return id;
+  return session;
 }
 
 void _insertSession(Batch batch, Session session) {
@@ -86,7 +86,7 @@ void _insertSession(Batch batch, Session session) {
   batch.rawInsert(insert.sql, insert.args);
 }
 
-Future<List<int>> insertSessions(List<Session> sessions) async {
+Future<List<Session>> insertSessions(List<Session> sessions) async {
   final Database db = await getSqfDb();
 
   final List result = await db.transaction((Transaction txn) async {
@@ -101,10 +101,11 @@ Future<List<int>> insertSessions(List<Session> sessions) async {
   for (int i = 0; i < sessions.length; i++) {
     sessions[i].id = result[i];
   }
-  return result.toList().cast<int>();
+  return sessions;
 }
 
-Future<int> updateSession(Session session, {bool insertMissing = false}) async {
+Future<Session?> updateSession(Session session,
+    {bool insertMissing = false}) async {
   final Database db = await getSqfDb();
 
   final List results = await db.transaction((Transaction txn) async {
@@ -113,10 +114,10 @@ Future<int> updateSession(Session session, {bool insertMissing = false}) async {
     return batch.commit();
   });
 
-  return results.isEmpty ? 0 : results[0];
+  return results[0] == 0 ? null : session;
 }
 
-Future<List<int>> updateSessions(List<Session> sessions,
+Future<List<Session>> updateSessions(List<Session> sessions,
     {int? profileId,
     bool insertMissing = false,
     bool removeDeleted = false}) async {
@@ -137,7 +138,7 @@ Future<List<int>> updateSessions(List<Session> sessions,
     }
   }
 
-  return resultList;
+  return sessions;
 }
 
 Batch _updateSessions(

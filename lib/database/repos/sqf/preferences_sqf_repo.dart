@@ -51,7 +51,7 @@ Future<Preferences> getPreferences({List<String>? preloadArgs}) async {
   return preferences;
 }
 
-Future<int> updatePreferences(Preferences preferences) async {
+Future<Preferences> updatePreferences(Preferences preferences) async {
   final Database db = await getSqfDb();
   final Map<String, dynamic> preferencesMap = preferences.toMap(forQuery: true);
 
@@ -61,5 +61,6 @@ Future<int> updatePreferences(Preferences preferences) async {
       Update(Preferences.tableName, preferencesMap, where: where);
   final int result = await db.rawUpdate(update.sql, update.args);
 
-  return result;
+  preferences.id = result;
+  return preferences;
 }

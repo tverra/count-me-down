@@ -74,7 +74,7 @@ Future<List<Profile>> _getProfiles(Where where, List<String>? preloadArgs,
   return profiles;
 }
 
-Future<int> insertProfile(Profile profile) async {
+Future<Profile> insertProfile(Profile profile) async {
   final Database db = await getSqfDb();
 
   final int id = await db.transaction((Transaction txn) async {
@@ -84,7 +84,7 @@ Future<int> insertProfile(Profile profile) async {
   });
 
   profile.id = id;
-  return id;
+  return profile;
 }
 
 void _insertProfile(Batch batch, Profile profile) {
@@ -93,7 +93,7 @@ void _insertProfile(Batch batch, Profile profile) {
   batch.rawInsert(insert.sql, insert.args);
 }
 
-Future<List<int>> insertProfiles(List<Profile> profiles) async {
+Future<List<Profile>> insertProfiles(List<Profile> profiles) async {
   final Database db = await getSqfDb();
 
   final List result = await db.transaction((Transaction txn) async {
@@ -108,10 +108,11 @@ Future<List<int>> insertProfiles(List<Profile> profiles) async {
   for (int i = 0; i < profiles.length; i++) {
     profiles[i].id = result[i];
   }
-  return result.toList().cast<int>();
+  return profiles;
 }
 
-Future<int> updateProfile(Profile profile, {bool insertMissing = false}) async {
+Future<Profile?> updateProfile(Profile profile,
+    {bool insertMissing = false}) async {
   final Database db = await getSqfDb();
 
   final List results = await db.transaction((Transaction txn) async {
@@ -120,10 +121,10 @@ Future<int> updateProfile(Profile profile, {bool insertMissing = false}) async {
     return batch.commit();
   });
 
-  return results.isEmpty ? 0 : results[0];
+  return results[0] == null ? null : profile;
 }
 
-Future<List<int>> updateProfiles(List<Profile> profiles,
+Future<List<Profile>> updateProfiles(List<Profile> profiles,
     {bool insertMissing = false, bool removeDeleted = false}) async {
   final Database db = await getSqfDb();
 
@@ -141,7 +142,7 @@ Future<List<int>> updateProfiles(List<Profile> profiles,
     }
   }
 
-  return resultList;
+  return profiles;
 }
 
 Batch _updateProfiles(Batch batch, List<Profile> profiles, bool insertMissing,

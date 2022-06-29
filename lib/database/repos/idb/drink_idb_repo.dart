@@ -1,42 +1,223 @@
+import 'package:count_me_down/database/db_utils.dart';
+import 'package:count_me_down/database/repos/idb/session_idb_repo.dart';
 import 'package:count_me_down/models/drink.dart';
+import 'package:count_me_down/models/session.dart';
+import 'package:idb_sqflite/idb_sqflite.dart';
 
-Future<Drink?> getDrink(int id, {List<String>? preloadArgs}) {
-  throw UnimplementedError();
+Future<Drink?> getDrink(int id, {List<String>? preloadArgs}) async {
+  final Database db = await getIdb();
+  final Transaction txn = db.transaction(Drink.tableName, idbModeReadOnly);
+  final ObjectStore store = txn.objectStore(Drink.tableName);
+
+  final Object? res = await store.getObject(id);
+  await txn.completed;
+
+  final Map<String, dynamic>? casted = castIdbResult(res);
+  final Drink? drink = casted == null ? null : Drink.fromMap(casted);
+  Session? session;
+
+  if (drink != null) {
+    if (preloadArgs != null) {
+      if (preloadArgs.contains(Drink.relSession)) {
+        final int? sessionId = drink.sessionId;
+        if (sessionId != null) {
+          session = await getSession(sessionId);
+        }
+      }
+    }
+  }
+
+  drink?.session = session;
+  return drink;
 }
 
-Future<List<Drink>> getDrinks({int? sessionId, List<String>? preloadArgs}) {
-  throw UnimplementedError();
+Future<List<Drink>> getDrinks(
+    {int? sessionId, List<String>? preloadArgs}) async {
+  final Database db = await getIdb();
+  final Transaction txn = db.transaction(Drink.tableName, idbModeReadOnly);
+  final ObjectStore store = txn.objectStore(Drink.tableName);
+
+  final List<Object> res = await store.getAll();
+  await txn.completed;
+
+  final List<Map<String, dynamic>> casted = castIdbResultList(res);
+  final List<Drink> drinks = <Drink>[];
+
+  for (final Map<String, dynamic> drinkMap in casted) {
+    final Drink drink = Drink.fromMap(drinkMap);
+
+    if (sessionId != null && drink.sessionId != sessionId) {
+      continue;
+    }
+
+    Session? session;
+
+    if (preloadArgs != null) {
+      if (preloadArgs.contains(Drink.relSession)) {
+        final int? sessionId = drink.sessionId;
+        if (sessionId != null) {
+          session = await getSession(sessionId);
+        }
+      }
+    }
+
+    drink.session = session;
+    drinks.add(drink);
+  }
+  return drinks;
 }
 
-Future<List<Drink>> getDrinkTemplates({List<String>? preloadArgs}) {
-  throw UnimplementedError();
+Future<List<Drink>> getDrinkTemplates({List<String>? preloadArgs}) async {
+  final Database db = await getIdb();
+  final Transaction txn = db.transaction(Drink.tableName, idbModeReadOnly);
+  final ObjectStore store = txn.objectStore(Drink.tableName);
+
+  final List<Object> res = await store.getAll();
+  await txn.completed;
+
+  final List<Map<String, dynamic>> casted = castIdbResultList(res);
+  final List<Drink> drinks = <Drink>[];
+
+  for (final Map<String, dynamic> drinkMap in casted) {
+    final Drink drink = Drink.fromMap(drinkMap);
+
+    if (drink.sessionId != null) {
+      continue;
+    }
+
+    Session? session;
+
+    if (preloadArgs != null) {
+      if (preloadArgs.contains(Drink.relSession)) {
+        final int? sessionId = drink.sessionId;
+        if (sessionId != null) {
+          session = await getSession(sessionId);
+        }
+      }
+    }
+    drink.session = session;
+    drinks.add(drink);
+  }
+  return drinks;
 }
 
-Future<int> insertDrink(Drink drink) {
-  throw UnimplementedError();
+Future<Drink> insertDrink(Drink drink) async {
+  final Database db = await getIdb();
+  final Transaction txn = db.transaction(Drink.tableName, idbModeReadWrite);
+  final ObjectStore store = txn.objectStore(Drink.tableName);
+
+  await store.put(drink.toMap(forQuery: true), drink.id);
+  await txn.completed;
+
+  return drink;
 }
 
-Future<List<int>> insertDrinks(List<Drink> drinks) {
-  throw UnimplementedError();
+Future<List<Drink>> insertDrinks(List<Drink> drinks) async {
+  final Database db = await getIdb();
+  final Transaction txn = db.transaction(Drink.tableName, idbModeReadWrite);
+  final ObjectStore store = txn.objectStore(Drink.tableName);
+
+  for (final Drink drink in drinks) {
+    await store.put(drink.toMap(forQuery: true), drink.id);
+  }
+  await txn.completed;
+
+  return drinks;
 }
 
-Future<int> updateDrink(Drink drink, {bool insertMissing = false}) {
-  throw UnimplementedError();
+Future<Drink?> updateDrink(Drink drink, {bool insertMissing = false}) async {
+  final Database db = await getIdb();
+  final Transaction txn = db.transaction(Drink.tableName, idbModeReadWrite);
+  final ObjectStore store = txn.objectStore(Drink.tableName);
+  Drink? res;
+
+  if (insertMissing) {
+    await store.put(drink.toMap(forQuery: true), drink.id);
+    res = drink;
+  } else {
+    final List<Object> keys = await store.getAllKeys();
+
+    if (keys.contains(drink.id)) {
+      await store.put(drink.toMap(forQuery: true), drink.id);
+      res = drink;
+    }
+  }
+  await txn.completed;
+  return res;
 }
 
-Future<List<int>> updateDrinks(
+Future<List<Drink>> updateDrinks(
   List<Drink> drinks, {
   int? sessionId,
   bool insertMissing = false,
   bool removeDeleted = false,
-}) {
-  throw UnimplementedError();
+}) async {
+  final List<Drink> existing = await getDrinks(sessionId: sessionId);
+
+  final Database db = await getIdb();
+  final Transaction txn = db.transaction(Drink.tableName, idbModeReadWrite);
+  final ObjectStore store = txn.objectStore(Drink.tableName);
+
+  final List<Drink> res = <Drink>[];
+
+  for (final Drink drink in drinks) {
+    if (insertMissing) {
+      await store.put(drink.toMap(forQuery: true), drink.id);
+      res.add(drink);
+    } else {
+      if (existing.where((Drink c) => c.id == drink.id).isNotEmpty) {
+        await store.put(drink.toMap(forQuery: true), drink.id);
+        res.add(drink);
+      }
+    }
+  }
+
+  if (removeDeleted) {
+    for (final Drink drink in existing) {
+      if (res.where((Drink c) => c.id == drink.id).isEmpty) {
+        final int? drinkId = drink.id;
+
+        if (drinkId != null) await store.delete(drinkId);
+      }
+    }
+  }
+
+  await txn.completed;
+  return res;
 }
 
-Future<int> deleteDrink(Drink drink) {
-  throw UnimplementedError();
+Future<int> deleteDrink(Drink drink) async {
+  final Database db = await getIdb();
+  final Transaction txn = db.transaction(Drink.tableName, idbModeReadWrite);
+  final ObjectStore store = txn.objectStore(Drink.tableName);
+
+  final List<Object> keys = await store.getAllKeys();
+
+  if (!keys.contains(drink.id)) {
+    return 0;
+  }
+
+  final int? drinkId = drink.id;
+
+  if (drinkId != null) await store.delete(drinkId);
+
+  await txn.completed;
+  return 1;
 }
 
-Future<int> deleteDrinks({int? sessionId}) {
-  throw UnimplementedError();
+Future<int> deleteDrinks({int? sessionId}) async {
+  final List<Drink> existing = await getDrinks(sessionId: sessionId);
+
+  final Database db = await getIdb();
+  final Transaction txn = db.transaction(Drink.tableName, idbModeReadWrite);
+  final ObjectStore store = txn.objectStore(Drink.tableName);
+
+  for (final Drink drink in existing) {
+    final int? drinkId = drink.id;
+
+    if (drinkId != null) await store.delete(drinkId);
+  }
+
+  await txn.completed;
+  return existing.length;
 }

@@ -13,7 +13,7 @@ Future<Preferences> getPreferences({List<String>? preloadArgs}) async {
   }
 }
 
-Future<int> updatePreferences(Preferences preferences) async {
+Future<Preferences> updatePreferences(Preferences preferences) async {
   if (useSqfLiteDb) {
     return sqf.updatePreferences(preferences);
   } else {

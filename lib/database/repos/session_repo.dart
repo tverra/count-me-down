@@ -19,7 +19,7 @@ Future<List<Session>> getSessions({int? profileId, List<String>? preloadArgs}) {
   }
 }
 
-Future<int> insertSession(Session session) {
+Future<Session> insertSession(Session session) {
   if (useSqfLiteDb) {
     return sqf.insertSession(session);
   } else {
@@ -27,7 +27,7 @@ Future<int> insertSession(Session session) {
   }
 }
 
-Future<List<int>> insertSessions(List<Session> sessions) {
+Future<List<Session>> insertSessions(List<Session> sessions) {
   if (useSqfLiteDb) {
     return sqf.insertSessions(sessions);
   } else {
@@ -35,7 +35,7 @@ Future<List<int>> insertSessions(List<Session> sessions) {
   }
 }
 
-Future<int> updateSession(Session session, {bool insertMissing = false}) {
+Future<Session?> updateSession(Session session, {bool insertMissing = false}) {
   if (useSqfLiteDb) {
     return sqf.updateSession(session, insertMissing: insertMissing);
   } else {
@@ -43,7 +43,7 @@ Future<int> updateSession(Session session, {bool insertMissing = false}) {
   }
 }
 
-Future<List<int>> updateSessions(List<Session> sessions,
+Future<List<Session>> updateSessions(List<Session> sessions,
     {int? profileId, bool insertMissing = false, bool removeDeleted = false}) {
   if (useSqfLiteDb) {
     return sqf.updateSessions(sessions,

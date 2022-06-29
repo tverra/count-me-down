@@ -69,7 +69,7 @@ Future<List<Drink>> _getDrinks(Where where, List<String>? preloadArgs,
   return drinks;
 }
 
-Future<int> insertDrink(Drink drink) async {
+Future<Drink> insertDrink(Drink drink) async {
   final Database db = await getSqfDb();
 
   final int id = await db.transaction((Transaction txn) async {
@@ -79,7 +79,7 @@ Future<int> insertDrink(Drink drink) async {
   });
 
   drink.id = id;
-  return id;
+  return drink;
 }
 
 void _insertDrink(Batch batch, Drink drink) {
@@ -88,7 +88,7 @@ void _insertDrink(Batch batch, Drink drink) {
   batch.rawInsert(insert.sql, insert.args);
 }
 
-Future<List<int>> insertDrinks(List<Drink> drinks) async {
+Future<List<Drink>> insertDrinks(List<Drink> drinks) async {
   final Database db = await getSqfDb();
 
   final List result = await db.transaction((Transaction txn) async {
@@ -103,10 +103,10 @@ Future<List<int>> insertDrinks(List<Drink> drinks) async {
   for (int i = 0; i < drinks.length; i++) {
     drinks[i].id = result[i];
   }
-  return result.toList().cast<int>();
+  return drinks;
 }
 
-Future<int> updateDrink(Drink drink, {bool insertMissing = false}) async {
+Future<Drink?> updateDrink(Drink drink, {bool insertMissing = false}) async {
   final Database db = await getSqfDb();
 
   final List results = await db.transaction((Transaction txn) async {
@@ -115,10 +115,10 @@ Future<int> updateDrink(Drink drink, {bool insertMissing = false}) async {
     return batch.commit();
   });
 
-  return results.isEmpty ? 0 : results[0];
+  return results[0] == 0 ? null : drink;
 }
 
-Future<List<int>> updateDrinks(List<Drink> drinks,
+Future<List<Drink>> updateDrinks(List<Drink> drinks,
     {int? sessionId,
     bool insertMissing = false,
     bool removeDeleted = false}) async {
@@ -139,7 +139,7 @@ Future<List<int>> updateDrinks(List<Drink> drinks,
     }
   }
 
-  return resultList;
+  return drinks;
 }
 
 Batch _updateDrinks(

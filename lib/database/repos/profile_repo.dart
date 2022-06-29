@@ -27,7 +27,7 @@ Future<List<Profile>> getProfiles({List<String>? preloadArgs}) {
   }
 }
 
-Future<int> insertProfile(Profile profile) {
+Future<Profile> insertProfile(Profile profile) {
   if (useSqfLiteDb) {
     return sqf.insertProfile(profile);
   } else {
@@ -35,7 +35,7 @@ Future<int> insertProfile(Profile profile) {
   }
 }
 
-Future<List<int>> insertProfiles(List<Profile> profiles) {
+Future<List<Profile>> insertProfiles(List<Profile> profiles) {
   if (useSqfLiteDb) {
     return sqf.insertProfiles(profiles);
   } else {
@@ -43,7 +43,7 @@ Future<List<int>> insertProfiles(List<Profile> profiles) {
   }
 }
 
-Future<int> updateProfile(
+Future<Profile?> updateProfile(
   Profile profile, {
   bool insertMissing = false,
 }) {
@@ -54,7 +54,7 @@ Future<int> updateProfile(
   }
 }
 
-Future<List<int>> updateProfiles(
+Future<List<Profile>> updateProfiles(
   List<Profile> profiles, {
   bool insertMissing = false,
   bool removeDeleted = false,

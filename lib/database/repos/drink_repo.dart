@@ -27,7 +27,7 @@ Future<List<Drink>> getDrinkTemplates({List<String>? preloadArgs}) {
   }
 }
 
-Future<int> insertDrink(Drink drink) {
+Future<Drink> insertDrink(Drink drink) {
   if (useSqfLiteDb) {
     return sqf.insertDrink(drink);
   } else {
@@ -35,7 +35,7 @@ Future<int> insertDrink(Drink drink) {
   }
 }
 
-Future<List<int>> insertDrinks(List<Drink> drinks) {
+Future<List<Drink>> insertDrinks(List<Drink> drinks) {
   if (useSqfLiteDb) {
     return sqf.insertDrinks(drinks);
   } else {
@@ -43,7 +43,7 @@ Future<List<int>> insertDrinks(List<Drink> drinks) {
   }
 }
 
-Future<int> updateDrink(Drink drink, {bool insertMissing = false}) {
+Future<Drink?> updateDrink(Drink drink, {bool insertMissing = false}) {
   if (useSqfLiteDb) {
     return sqf.updateDrink(drink, insertMissing: insertMissing);
   } else {
@@ -51,7 +51,7 @@ Future<int> updateDrink(Drink drink, {bool insertMissing = false}) {
   }
 }
 
-Future<List<int>> updateDrinks(
+Future<List<Drink?>> updateDrinks(
   List<Drink> drinks, {
   int? sessionId,
   bool insertMissing = false,
