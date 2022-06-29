@@ -7,7 +7,7 @@ import 'package:count_me_down/utils/percent.dart';
 import 'package:count_me_down/utils/volume.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../test_utils.dart';
+import '../test_utils.dart' as test_utils;
 
 void main() {
   /*test('this is a test', () {
@@ -25,7 +25,7 @@ void main() {
   });
 
   group('fromMap', () {
-    Map<String, dynamic> _drinkMap;
+    late Map<String, dynamic> _drinkMap;
 
     setUp(() {
       _drinkMap = {
@@ -59,7 +59,7 @@ void main() {
       expect(drink.timestamp, DateTime.parse(_drinkMap['timestamp']));
       expect(drink.color, Color(_drinkMap['color']));
       expect(drink.drinkType, DrinkTypes.beer);
-      expect(drink.session.id, _drinkMap['session']['id']);
+      expect(drink.session?.id, _drinkMap['session']['id']);
     });
 
     test('date times can be integers', () {
@@ -128,7 +128,7 @@ void main() {
   });
 
   group('toMap', () {
-    Drink _drink;
+    late Drink _drink;
 
     setUp(() {
       _drink = Drink(
@@ -136,7 +136,7 @@ void main() {
         name: 'Drink',
         volume: Volume(500),
         alcoholConcentration: Percent(0.05),
-        timestamp: TestUtils.getDateTime(),
+        timestamp: test_utils.getDateTime(),
         color: Color(4283215696),
         drinkType: DrinkTypes.beer,
       )..id = 1;
@@ -144,8 +144,8 @@ void main() {
       _drink.session = Session(
         profileId: 1,
         name: 'Session',
-        startedAt: TestUtils.getDateTime(),
-        endedAt: TestUtils.getDateTime(),
+        startedAt: test_utils.getDateTime(),
+        endedAt: test_utils.getDateTime(),
       )..id = 1;
     });
 
@@ -155,19 +155,19 @@ void main() {
       expect(drinkMap['id'], _drink.id);
       expect(drinkMap['session_id'], _drink.sessionId);
       expect(drinkMap['name'], _drink.name);
-      expect(drinkMap['volume'], _drink.volume.millilitres);
+      expect(drinkMap['volume'], _drink.volume?.millilitres);
       expect(drinkMap['alcohol_concentration'],
-          _drink.alcoholConcentration.fraction);
-      expect(drinkMap['timestamp'], _drink.timestamp.toIso8601String());
-      expect(drinkMap['color'], _drink.color.value);
+          _drink.alcoholConcentration?.fraction);
+      expect(drinkMap['timestamp'], _drink.timestamp?.toIso8601String());
+      expect(drinkMap['color'], _drink.color?.value);
       expect(drinkMap['drink_type'], 'beer');
-      expect(drinkMap['session']['id'], _drink.session.id);
+      expect(drinkMap['session']['id'], _drink.session?.id);
     });
 
     test('date times is integers if forQuery', () {
       final Map<String, dynamic> drinkMap = _drink.toMap(forQuery: true);
 
-      expect(drinkMap['timestamp'], _drink.timestamp.millisecondsSinceEpoch);
+      expect(drinkMap['timestamp'], _drink.timestamp?.millisecondsSinceEpoch);
     });
 
     test('drink is parsed if values are null', () {
@@ -192,7 +192,7 @@ void main() {
   });
 
   group('compare', () {
-    Drink _drink;
+    late Drink _drink;
 
     setUp(() {
       _drink = Drink(
@@ -200,7 +200,7 @@ void main() {
         name: 'Drink',
         volume: Volume(500),
         alcoholConcentration: Percent(0.05),
-        timestamp: TestUtils.getDateTime(),
+        timestamp: test_utils.getDateTime(),
         color: Color(4283215696),
         drinkType: DrinkTypes.beer,
       )..id = 1;
@@ -208,8 +208,8 @@ void main() {
       _drink.session = Session(
         profileId: 1,
         name: 'Session',
-        startedAt: TestUtils.getDateTime(),
-        endedAt: TestUtils.getDateTime(),
+        startedAt: test_utils.getDateTime(),
+        endedAt: test_utils.getDateTime(),
       )..id = 1;
     });
 
@@ -221,7 +221,7 @@ void main() {
 
     test('objects are not equal if parameters are equal', () {
       final Drink drink = _drink.copy();
-      drink.id = drink.id + 1;
+      drink.id = drink.id! + 1;
 
       expect(false, _drink == drink);
     });

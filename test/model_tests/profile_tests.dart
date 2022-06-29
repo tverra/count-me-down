@@ -4,7 +4,7 @@ import 'package:count_me_down/utils/mass.dart';
 import 'package:count_me_down/utils/percent.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../test_utils.dart';
+import '../test_utils.dart' as test_utils;
 
 void main() {
   /*test('this is a test', () {
@@ -14,7 +14,7 @@ void main() {
   });*/
 
   group('fromMap', () {
-    Map<String, dynamic> _profileMap;
+    late Map<String, dynamic> _profileMap;
 
     setUp(() {
       _profileMap = {
@@ -57,7 +57,7 @@ void main() {
           Duration(milliseconds: _profileMap['absorption_time']));
       expect(profile.perMilMetabolizedPerHour,
           _profileMap['per_mil_metabolized_per_hour']);
-      expect(profile.sessions.length, 2);
+      expect(profile.sessions?.length, 2);
     });
 
     test('profile is parsed if values are null', () {
@@ -85,7 +85,7 @@ void main() {
   });
 
   group('toMap', () {
-    Profile _profile;
+    late Profile _profile;
 
     setUp(() {
       _profile = Profile(
@@ -100,14 +100,14 @@ void main() {
         Session(
           profileId: 1,
           name: 'Session',
-          startedAt: TestUtils.getDateTime(),
-          endedAt: TestUtils.getDateTime(),
+          startedAt: test_utils.getDateTime(),
+          endedAt: test_utils.getDateTime(),
         )..id = 1,
         Session(
           profileId: 1,
           name: 'Session',
-          startedAt: TestUtils.getDateTime(),
-          endedAt: TestUtils.getDateTime(),
+          startedAt: test_utils.getDateTime(),
+          endedAt: test_utils.getDateTime(),
         )..id = 2
       ];
     });
@@ -117,11 +117,11 @@ void main() {
 
       expect(profileMap['id'], _profile.id);
       expect(profileMap['name'], _profile.name);
-      expect(profileMap['body_weight'], _profile.bodyWeight.grams);
+      expect(profileMap['body_weight'], _profile.bodyWeight?.grams);
       expect(profileMap['body_water_percentage'],
-          _profile.bodyWaterPercentage.fraction);
+          _profile.bodyWaterPercentage?.fraction);
       expect(profileMap['absorption_time'],
-          _profile.absorptionTime.inMilliseconds);
+          _profile.absorptionTime?.inMilliseconds);
       expect(profileMap['sessions'].length, 2);
     });
 
@@ -144,7 +144,7 @@ void main() {
   });
 
   group('compare', () {
-    Profile _profile;
+    late Profile _profile;
 
     setUp(() {
       _profile = Profile(
@@ -159,14 +159,14 @@ void main() {
         Session(
           profileId: 1,
           name: 'Session',
-          startedAt: TestUtils.getDateTime(),
-          endedAt: TestUtils.getDateTime(),
+          startedAt: test_utils.getDateTime(),
+          endedAt: test_utils.getDateTime(),
         )..id = 1,
         Session(
           profileId: 1,
           name: 'Session',
-          startedAt: TestUtils.getDateTime(),
-          endedAt: TestUtils.getDateTime(),
+          startedAt: test_utils.getDateTime(),
+          endedAt: test_utils.getDateTime(),
         )..id = 2
       ];
     });
@@ -179,7 +179,7 @@ void main() {
 
     test('objects are not equal if parameters are equal', () {
       final Profile profile = _profile.copy();
-      profile.id = profile.id + 1;
+      profile.id = profile.id! + 1;
 
       expect(false, _profile == profile);
     });

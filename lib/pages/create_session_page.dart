@@ -1,5 +1,4 @@
 import 'package:count_me_down/database/db_repos.dart';
-import 'package:count_me_down/database/repos/preferences_repo.dart';
 import 'package:count_me_down/models/preferences.dart';
 import 'package:count_me_down/models/session.dart';
 import 'package:count_me_down/pages/session_page.dart';

@@ -61,6 +61,14 @@ class Profile {
     ];
   }
 
+  static List<Profile>? fromMapList(dynamic list) {
+    return (list as List<dynamic>?)
+        ?.map<Profile>(
+          (dynamic profile) => Profile.fromMap(profile as Map<String, dynamic>),
+        )
+        .toList();
+  }
+
   static String getGender(double bodyWaterPercentage) {
     if (bodyWaterPercentage == 70.0) {
       return 'Male';

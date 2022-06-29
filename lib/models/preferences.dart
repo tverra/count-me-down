@@ -46,6 +46,15 @@ class Preferences {
     ];
   }
 
+  static List<Preferences>? fromMapList(dynamic list) {
+    return (list as List<dynamic>?)
+        ?.map<Preferences>(
+          (dynamic preferences) =>
+              Preferences.fromMap(preferences as Map<String, dynamic>),
+        )
+        .toList();
+  }
+
   Map<String, dynamic> toMap({bool forQuery = false}) {
     final DataParser p = DataParser(forQuery: forQuery);
 

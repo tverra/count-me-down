@@ -29,12 +29,12 @@ void main() {
       absorptionTime: Duration(minutes: 30),
       perMilMetabolizedPerHour: 0,
     );
-    AlcoholTracker _alcoholTracker;
-    DateTime _whenAbsorbed;
+    late AlcoholTracker _alcoholTracker;
+    late DateTime _whenAbsorbed;
 
     setUp(() {
       _alcoholTracker = AlcoholTracker(profile: _profile);
-      _whenAbsorbed = MockableDateTime.current.add(_profile.absorptionTime);
+      _whenAbsorbed = MockableDateTime.current.add(_profile.absorptionTime!);
     });
 
     test('BAC is initially zero', () {
@@ -57,7 +57,7 @@ void main() {
       _alcoholTracker.addDrink(Drink(
         volume: Volume.exact(centilitres: 4),
         alcoholConcentration: Percent.fromPercent(40.0),
-        timestamp: MockableDateTime.current.subtract(_profile.absorptionTime),
+        timestamp: MockableDateTime.current.subtract(_profile.absorptionTime!),
       ));
 
       final double actual =
@@ -72,7 +72,8 @@ void main() {
         _alcoholTracker.addDrink(Drink(
           volume: Volume.exact(centilitres: 4),
           alcoholConcentration: Percent.fromPercent(40.0),
-          timestamp: MockableDateTime.current.subtract(_profile.absorptionTime),
+          timestamp:
+              MockableDateTime.current.subtract(_profile.absorptionTime!),
         ));
       }
 
@@ -88,7 +89,8 @@ void main() {
         _alcoholTracker.addDrink(Drink(
           volume: Volume.exact(centilitres: 4),
           alcoholConcentration: Percent.fromPercent(40.0),
-          timestamp: MockableDateTime.current.subtract(_profile.absorptionTime),
+          timestamp:
+              MockableDateTime.current.subtract(_profile.absorptionTime!),
         ));
       }
 
@@ -107,7 +109,7 @@ void main() {
       absorptionTime: Duration(minutes: 30),
       perMilMetabolizedPerHour: 0,
     );
-    AlcoholTracker _alcoholTracker;
+    late AlcoholTracker _alcoholTracker;
 
     setUp(() {
       _alcoholTracker = AlcoholTracker(profile: _profile);
@@ -145,7 +147,7 @@ void main() {
 
     test('BAC is half after half the duration', () {
       final Duration halfDuration =
-          Duration(seconds: _profile.absorptionTime.inSeconds ~/ 2);
+          Duration(seconds: _profile.absorptionTime!.inSeconds ~/ 2);
 
       _alcoholTracker.addDrink(Drink(
         volume: Volume.exact(centilitres: 4),
@@ -162,7 +164,7 @@ void main() {
 
     test('BAC is half after half the duration with 10 drinks', () {
       final Duration halfDuration =
-          Duration(seconds: _profile.absorptionTime.inSeconds ~/ 2);
+          Duration(seconds: _profile.absorptionTime!.inSeconds ~/ 2);
 
       for (int i = 0; i < 10; i++) {
         _alcoholTracker.addDrink(Drink(
@@ -182,14 +184,14 @@ void main() {
     test('BAC is halved if absorption time is doubled', () {
       final Profile slowAbsorptionProfile = _profile.copyWith(
         absorptionTime:
-            Duration(minutes: _profile.absorptionTime.inMinutes * 2),
+            Duration(minutes: _profile.absorptionTime!.inMinutes * 2),
       );
       _alcoholTracker = AlcoholTracker(profile: slowAbsorptionProfile);
 
       _alcoholTracker.addDrink(Drink(
         volume: Volume.exact(centilitres: 4),
         alcoholConcentration: Percent.fromPercent(40.0),
-        timestamp: MockableDateTime.current.subtract(_profile.absorptionTime),
+        timestamp: MockableDateTime.current.subtract(_profile.absorptionTime!),
       ));
 
       final double actual =
@@ -207,7 +209,7 @@ void main() {
       absorptionTime: Duration.zero,
       perMilMetabolizedPerHour: 0.15,
     );
-    AlcoholTracker _alcoholTracker;
+    late AlcoholTracker _alcoholTracker;
 
     setUp(() {
       _alcoholTracker = AlcoholTracker(profile: _profile);

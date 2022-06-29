@@ -52,6 +52,14 @@ class Session {
     ];
   }
 
+  static List<Session>? fromMapList(dynamic list) {
+    return (list as List<dynamic>?)
+        ?.map<Session>(
+          (dynamic session) => Session.fromMap(session as Map<String, dynamic>),
+        )
+        .toList();
+  }
+
   Map<String, dynamic> toMap({bool forQuery = false}) {
     final DataParser p = DataParser(forQuery: forQuery);
 

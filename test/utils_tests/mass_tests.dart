@@ -9,7 +9,7 @@ main() {
   });*/
 
   group('constructor with high value', () {
-    Mass _mass;
+    late Mass _mass;
 
     setUp(() {
       _mass = Mass(100000);
@@ -31,7 +31,7 @@ main() {
   });
 
   group('constructor with low value', () {
-    Mass _mass;
+    late Mass _mass;
 
     setUp(() {
       _mass = Mass(1);
@@ -53,7 +53,7 @@ main() {
   });
 
   group('constructor with negative value', () {
-    Mass _mass;
+    late Mass _mass;
 
     setUp(() {
       _mass = Mass(-10);

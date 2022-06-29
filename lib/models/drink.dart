@@ -84,6 +84,14 @@ class Drink {
     ];
   }
 
+  static List<Drink>? fromMapList(dynamic list) {
+    return (list as List<dynamic>?)
+        ?.map<Drink>(
+          (dynamic drink) => Drink.fromMap(drink as Map<String, dynamic>),
+        )
+        .toList();
+  }
+
   IconData get iconData {
     switch (drinkType) {
       case DrinkTypes.beer:

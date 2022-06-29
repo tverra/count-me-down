@@ -9,7 +9,7 @@ void main() {
   });*/
 
   group('constructor with high value', () {
-    Volume _volume;
+    late Volume _volume;
 
     setUp(() {
       _volume = Volume(1000);
@@ -45,7 +45,7 @@ void main() {
   });
 
   group('constructor with low value', () {
-    Volume _volume;
+    late Volume _volume;
 
     setUp(() {
       _volume = Volume(1);
@@ -81,7 +81,7 @@ void main() {
   });
 
   group('constructor with negative value', () {
-    Volume _volume;
+    late Volume _volume;
 
     setUp(() {
       _volume = Volume(-1);
