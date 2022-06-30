@@ -45,8 +45,12 @@ Future<List<Profile>> getProfiles({List<String>? preloadArgs}) async {
   return _getProfiles(Where(), preloadArgs);
 }
 
-Future<List<Profile>> _getProfiles(Where where, List<String>? preloadArgs,
-    {List<String>? columns, int? limit}) async {
+Future<List<Profile>> _getProfiles(
+  Where where,
+  List<String>? preloadArgs, {
+  List<String>? columns,
+  int? limit,
+}) async {
   final Database db = await getSqfDb();
   final Preload preload = Preload();
 
@@ -61,7 +65,7 @@ Future<List<Profile>> _getProfiles(Where where, List<String>? preloadArgs,
       await db.rawQuery(query.sql, query.args);
 
   final List<Profile> profiles = <Profile>[];
-  for (Map<String, dynamic> profileMap in res) {
+  for (final Map<String, dynamic> profileMap in res) {
     final Profile profile = Profile.fromMap(profileMap);
 
     if (preloadArgs != null) {
@@ -77,84 +81,107 @@ Future<List<Profile>> _getProfiles(Where where, List<String>? preloadArgs,
 Future<Profile> insertProfile(Profile profile) async {
   final Database db = await getSqfDb();
 
-  final int id = await db.transaction((Transaction txn) async {
+  final List<Object?> result = await db.transaction((Transaction txn) async {
     final Batch batch = txn.batch();
     _insertProfile(batch, profile);
-    return (await batch.commit())[0] as int;
+    return batch.commit();
   });
+
+  final int? id = int.tryParse(result[0].toString());
 
   profile.id = id;
   return profile;
 }
 
 void _insertProfile(Batch batch, Profile profile) {
-  final Insert insert = Insert(Profile.tableName, profile.toMap(forQuery: true),
-      conflictAlgorithm: ConflictAlgorithm.replace);
+  final Insert insert = Insert(
+    Profile.tableName,
+    profile.toMap(forQuery: true),
+    conflictAlgorithm: ConflictAlgorithm.replace,
+  );
   batch.rawInsert(insert.sql, insert.args);
 }
 
 Future<List<Profile>> insertProfiles(List<Profile> profiles) async {
   final Database db = await getSqfDb();
 
-  final List result = await db.transaction((Transaction txn) async {
+  final List<Object?> result = await db.transaction((Transaction txn) async {
     final Batch batch = txn.batch();
 
-    for (Profile profile in profiles) {
+    for (final Profile profile in profiles) {
       _insertProfile(batch, profile);
     }
     return batch.commit();
   });
 
   for (int i = 0; i < profiles.length; i++) {
-    profiles[i].id = result[i];
+    final int? id = int.tryParse(result[i].toString());
+    profiles[i].id = id;
   }
   return profiles;
 }
 
-Future<Profile?> updateProfile(Profile profile,
-    {bool insertMissing = false}) async {
+Future<Profile?> updateProfile(
+  Profile profile, {
+  bool insertMissing = false,
+}) async {
   final Database db = await getSqfDb();
 
-  final List results = await db.transaction((Transaction txn) async {
+  final List<Object?> results = await db.transaction((Transaction txn) async {
     final Batch batch = txn.batch();
-    _updateProfiles(batch, [profile], insertMissing, false);
+    _updateProfiles(batch, <Profile>[profile], insertMissing, false);
     return batch.commit();
   });
 
-  return results[0] == null ? null : profile;
+  final int? id = int.tryParse(results[0].toString());
+  profile.id = id;
+
+  return results[0] == 0 ? null : profile;
 }
 
-Future<List<Profile>> updateProfiles(List<Profile> profiles,
-    {bool insertMissing = false, bool removeDeleted = false}) async {
+Future<List<Profile>> updateProfiles(
+  List<Profile> profiles, {
+  bool insertMissing = false,
+  bool removeDeleted = false,
+}) async {
   final Database db = await getSqfDb();
 
-  final List result = await db.transaction((Transaction txn) async {
+  final List<Object?> result = await db.transaction((Transaction txn) async {
     final Batch batch = txn.batch();
     _updateProfiles(batch, profiles, insertMissing, removeDeleted);
     return batch.commit();
   });
 
-  final List<int> resultList = result.toList().cast<int>();
+  final List<Profile> updated = <Profile>[];
 
   for (int i = 0; i < profiles.length; i++) {
-    if (profiles[i].id == null) {
-      profiles[i].id = resultList[i];
+    final int? updatedId = int.tryParse(result[i].toString());
+
+    if (updatedId == 1) {
+      updated.add(profiles[i]);
+    } else if (profiles[i].id == null && updatedId != null && updatedId > 0) {
+      profiles[i].id = updatedId;
+      updated.add(profiles[i]);
     }
   }
 
-  return profiles;
+  return updated;
 }
 
-Batch _updateProfiles(Batch batch, List<Profile> profiles, bool insertMissing,
-    bool removeDeleted) {
-  for (Profile profile in profiles) {
+Batch _updateProfiles(
+  Batch batch,
+  List<Profile> profiles,
+  bool insertMissing,
+  bool removeDeleted,
+) {
+  for (final Profile profile in profiles) {
     final Map<String, dynamic> profileMap = profile.toMap(forQuery: true);
 
     if (insertMissing) {
       final Insert upsert = Insert(
         Profile.tableName,
         profileMap,
-        upsertConflictValues: [Profile.colId],
+        upsertConflictValues: <String>[Profile.colId],
         upsertAction: Update.forUpsert(profileMap),
       );
       batch.rawInsert(upsert.sql, upsert.args);
@@ -169,19 +196,24 @@ Batch _updateProfiles(Batch batch, List<Profile> profiles, bool insertMissing,
   if (removeDeleted) {
     final Where where = Where();
 
-    final Query subQuery = Query(Profile.tableName, columns: [Profile.colId]);
+    final Query subQuery =
+        Query(Profile.tableName, columns: <String>[Profile.colId]);
     where.addSubQuery(Profile.colId, subQuery, table: Profile.tableName);
 
     TempTable? tempTable;
 
-    if (profiles.length > 0) {
-      final List updatedIds = profiles.map((p) => p.id).toList();
+    if (profiles.isNotEmpty) {
+      final List<int?> updatedIds = profiles.map((Profile p) => p.id).toList();
       tempTable = TempTable(Profile.tableName);
       batch.execute(tempTable.createTableSql);
       tempTable.insertValues(batch, updatedIds);
 
-      where.addSubQuery(Profile.colId, tempTable.query,
-          table: Profile.tableName, not: true);
+      where.addSubQuery(
+        Profile.colId,
+        tempTable.query,
+        table: Profile.tableName,
+        not: true,
+      );
     }
 
     final Delete delete = Delete(Profile.tableName, where: where);

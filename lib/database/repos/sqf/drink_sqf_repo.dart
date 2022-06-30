@@ -11,8 +11,10 @@ Future<Drink?> getDrink(int id, {List<String>? preloadArgs}) async {
   return drinks.isEmpty ? null : drinks.single;
 }
 
-Future<List<Drink>> getDrinks(
-    {int? sessionId, List<String>? preloadArgs}) async {
+Future<List<Drink>> getDrinks({
+  int? sessionId,
+  List<String>? preloadArgs,
+}) async {
   final Where where = Where();
 
   if (sessionId != null) {
@@ -29,15 +31,24 @@ Future<List<Drink>> getDrinkTemplates({List<String>? preloadArgs}) async {
   return _getDrinks(where, preloadArgs);
 }
 
-Future<List<Drink>> _getDrinks(Where where, List<String>? preloadArgs,
-    {List<String>? columns, int? limit}) async {
+Future<List<Drink>> _getDrinks(
+  Where where,
+  List<String>? preloadArgs, {
+  List<String>? columns,
+  int? limit,
+}) async {
   final Database db = await getSqfDb();
   final Preload preload = Preload();
 
   if (preloadArgs != null) {
     if (preloadArgs.contains(Drink.relSession)) {
-      preload.add(Session.tableName, Session.colId, Drink.tableName,
-          Drink.colSessionId, Session.columns);
+      preload.add(
+        Session.tableName,
+        Session.colId,
+        Drink.tableName,
+        Drink.colSessionId,
+        Session.columns,
+      );
     }
   }
 
@@ -48,11 +59,12 @@ Future<List<Drink>> _getDrinks(Where where, List<String>? preloadArgs,
     preload: preload,
     limit: limit,
   );
+
   final List<Map<String, dynamic>> res =
       await db.rawQuery(query.sql, query.args);
 
   final List<Drink> drinks = <Drink>[];
-  for (Map<String, dynamic> drinkMap in res) {
+  for (final Map<String, dynamic> drinkMap in res) {
     final Drink drink = Drink.fromMap(drinkMap);
 
     if (preloadArgs != null) {
@@ -72,36 +84,42 @@ Future<List<Drink>> _getDrinks(Where where, List<String>? preloadArgs,
 Future<Drink> insertDrink(Drink drink) async {
   final Database db = await getSqfDb();
 
-  final int id = await db.transaction((Transaction txn) async {
+  final List<Object?> result = await db.transaction((Transaction txn) async {
     final Batch batch = txn.batch();
     _insertDrink(batch, drink);
-    return (await batch.commit())[0] as int;
+    return batch.commit();
   });
+
+  final int? id = int.tryParse(result[0].toString());
 
   drink.id = id;
   return drink;
 }
 
 void _insertDrink(Batch batch, Drink drink) {
-  final Insert insert = Insert(Drink.tableName, drink.toMap(forQuery: true),
-      conflictAlgorithm: ConflictAlgorithm.replace);
+  final Insert insert = Insert(
+    Drink.tableName,
+    drink.toMap(forQuery: true),
+    conflictAlgorithm: ConflictAlgorithm.replace,
+  );
   batch.rawInsert(insert.sql, insert.args);
 }
 
 Future<List<Drink>> insertDrinks(List<Drink> drinks) async {
   final Database db = await getSqfDb();
 
-  final List result = await db.transaction((Transaction txn) async {
+  final List<Object?> result = await db.transaction((Transaction txn) async {
     final Batch batch = txn.batch();
 
-    for (Drink drink in drinks) {
+    for (final Drink drink in drinks) {
       _insertDrink(batch, drink);
     }
     return batch.commit();
   });
 
   for (int i = 0; i < drinks.length; i++) {
-    drinks[i].id = result[i];
+    final int? id = int.tryParse(result[i].toString());
+    drinks[i].id = id;
   }
   return drinks;
 }
@@ -109,33 +127,48 @@ Future<List<Drink>> insertDrinks(List<Drink> drinks) async {
 Future<Drink?> updateDrink(Drink drink, {bool insertMissing = false}) async {
   final Database db = await getSqfDb();
 
-  final List results = await db.transaction((Transaction txn) async {
+  final List<Object?> results = await db.transaction((Transaction txn) async {
     final Batch batch = txn.batch();
-    _updateDrinks(batch, [drink], insertMissing, false);
+    _updateDrinks(batch, <Drink>[drink], insertMissing, false);
     return batch.commit();
   });
+
+  final int? id = int.tryParse(results[0].toString());
+  drink.id = id;
 
   return results[0] == 0 ? null : drink;
 }
 
-Future<List<Drink>> updateDrinks(List<Drink> drinks,
-    {int? sessionId,
-    bool insertMissing = false,
-    bool removeDeleted = false}) async {
+Future<List<Drink>> updateDrinks(
+  List<Drink> drinks, {
+  int? sessionId,
+  bool insertMissing = false,
+  bool removeDeleted = false,
+}) async {
   final Database db = await getSqfDb();
 
-  final List result = await db.transaction((Transaction txn) async {
+  final List<Object?> result = await db.transaction((Transaction txn) async {
     final Batch batch = txn.batch();
-    _updateDrinks(batch, drinks, insertMissing, removeDeleted,
-        sessionId: sessionId);
+    _updateDrinks(
+      batch,
+      drinks,
+      insertMissing,
+      removeDeleted,
+      sessionId: sessionId,
+    );
     return batch.commit();
   });
 
-  final List<int> resultList = result.toList().cast<int>();
+  final List<Drink> updated = <Drink>[];
 
   for (int i = 0; i < drinks.length; i++) {
-    if (drinks[i].id == null) {
-      drinks[i].id = resultList[i];
+    final int? updatedId = int.tryParse(result[i].toString());
+
+    if (updatedId == 1) {
+      updated.add(drinks[i]);
+    } else if (drinks[i].id == null && updatedId != null && updatedId > 0) {
+      drinks[i].id = updatedId;
+      updated.add(drinks[i]);
     }
   }
 
@@ -143,16 +176,20 @@ Future<List<Drink>> updateDrinks(List<Drink> drinks,
 }
 
 Batch _updateDrinks(
-    Batch batch, List<Drink> drinks, bool insertMissing, bool removeDeleted,
-    {int? sessionId}) {
-  for (Drink drink in drinks) {
+  Batch batch,
+  List<Drink> drinks,
+  bool insertMissing,
+  bool removeDeleted, {
+  int? sessionId,
+}) {
+  for (final Drink drink in drinks) {
     final Map<String, dynamic> drinkMap = drink.toMap(forQuery: true);
 
     if (insertMissing) {
       final Insert upsert = Insert(
         Drink.tableName,
         drinkMap,
-        upsertConflictValues: [Drink.colId],
+        upsertConflictValues: <String>[Drink.colId],
         upsertAction: Update.forUpsert(drinkMap),
       );
       batch.rawInsert(upsert.sql, upsert.args);
@@ -170,19 +207,24 @@ Batch _updateDrinks(
     if (sessionId != null) {
       where.addEquals(Drink.colSessionId, sessionId);
     }
-    final Query subQuery = Query(Drink.tableName, columns: [Drink.colId]);
+    final Query subQuery =
+        Query(Drink.tableName, columns: <String>[Drink.colId]);
     where.addSubQuery(Drink.colId, subQuery, table: Drink.tableName);
 
     TempTable? tempTable;
 
-    if (drinks.length > 0) {
-      final List updatedIds = drinks.map((d) => d.id).toList();
+    if (drinks.isNotEmpty) {
+      final List<int?> updatedIds = drinks.map((Drink d) => d.id).toList();
       tempTable = TempTable(Drink.tableName);
       batch.execute(tempTable.createTableSql);
       tempTable.insertValues(batch, updatedIds);
 
-      where.addSubQuery(Drink.colId, tempTable.query,
-          table: Drink.tableName, not: true);
+      where.addSubQuery(
+        Drink.colId,
+        tempTable.query,
+        table: Drink.tableName,
+        not: true,
+      );
     }
 
     final Delete delete = Delete(Drink.tableName, where: where);

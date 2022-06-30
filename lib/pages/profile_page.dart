@@ -8,9 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
-  static const routeName = '/profile';
+  static const String routeName = '/profile';
 
-  ProfilePage();
+  const ProfilePage();
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -34,7 +34,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit profile'),
+        title: const Text('Edit profile'),
       ),
       body: FutureBuilder<Profile?>(
           future: _activeProfileFuture,
@@ -47,18 +47,17 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Form(
                 key: _formKey,
                 child: Column(
-                  children: [
+                  children: <Widget>[
                     TextFormField(
                       controller: _nameController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Profile name',
                         helperText: 'Profile name',
                       ),
                       textCapitalization: TextCapitalization.sentences,
                       keyboardType: TextInputType.text,
                       validator: (String? value) {
-                        final String? formatted =
-                            value != null ? value.trim() : null;
+                        final String? formatted = value?.trim();
 
                         if (formatted == null || formatted == '') {
                           return 'Invalid value';
@@ -66,10 +65,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 20.0),
+                    const SizedBox(height: 20.0),
                     TextFormField(
                       controller: _weightController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Weight (in kilos)',
                         helperText: 'Weight (in kilos)',
                         counterText: '',
@@ -77,9 +76,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       keyboardType: TextInputType.number,
                       maxLength: 4,
                       validator: (String? value) {
-                        final String? formatted = value != null
-                            ? value.trim().replaceAll(',', '.')
-                            : null;
+                        final String? formatted =
+                            value?.trim().replaceAll(',', '.');
                         final double? parsed = double.tryParse(formatted ?? '');
 
                         if (parsed == null || parsed < 0) {
@@ -89,13 +87,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 20.0),
-                    Container(
+                    const SizedBox(height: 20.0),
+                    SizedBox(
                       width: double.infinity,
                       child: DropdownButton<double>(
                         value: _genderValue,
                         dropdownColor: Colors.white,
-                        underline: Divider(
+                        underline: const Divider(
                           thickness: 1,
                           color: Colors.black38,
                         ),
@@ -116,27 +114,27 @@ class _ProfilePageState extends State<ProfilePage> {
                         },
                       ),
                     ),
-                    Container(
+                    const SizedBox(
                       width: double.infinity,
                       child: Text(
                         'Gender',
                         style: TextStyle(color: Colors.black54, fontSize: 12.0),
                       ),
                     ),
-                    SizedBox(height: 20.0),
-                    Container(
+                    const SizedBox(height: 20.0),
+                    SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed:
                             profile != null ? () => _onSubmit(profile) : null,
-                        child: Text('Save'),
+                        child: const Text('Save'),
                       ),
                     )
                   ],
                 ),
               ),
             );
-          }),
+          },),
     );
   }
 
@@ -150,8 +148,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
     await updateProfile(profile);
 
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil(StartPage.routeName, (route) => false);
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      StartPage.routeName,
+      (Route<dynamic> route) => false,
+    );
   }
 
   Future<Profile?> _getActiveProfile() async {

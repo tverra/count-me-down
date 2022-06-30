@@ -4,7 +4,7 @@ class MenuElement extends StatelessWidget {
   final String? text;
   final VoidCallback? onPressed;
 
-  MenuElement({this.text, this.onPressed});
+  const MenuElement({this.text, this.onPressed});
 
   @override
   Widget build(BuildContext context) {

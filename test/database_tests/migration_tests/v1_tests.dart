@@ -1,6 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:count_me_down/database/db_utils.dart';
 import 'package:count_me_down/database/db_utils.dart' as db_utils;
+import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:uuid/uuid.dart';
@@ -41,16 +41,16 @@ void main() {
         'drink_id': drink['id'] as int
       });
 
-      await db_utils.insertInto('drink', drink, drink['id']);
-      await db_utils.insertInto('profile', profile, profile['id']);
-      await db_utils.insertInto('session', session, session['id']);
+      await db_utils.insertInto('drinks', drink, drink['id']);
+      await db_utils.insertInto('profiles', profile, profile['id']);
+      await db_utils.insertInto('sessions', session, session['id']);
 
       final Map<String, dynamic> insertedDrink =
-          (await db_utils.queryFrom('drink')).single;
+          (await db_utils.queryFrom('drinks')).single;
       final Map<String, dynamic> insertedProfile =
-          (await db_utils.queryFrom('profile')).single;
+          (await db_utils.queryFrom('profiles')).single;
       final Map<String, dynamic> insertedSession =
-          (await db_utils.queryFrom('session')).single;
+          (await db_utils.queryFrom('sessions')).single;
 
       expect(drink, insertedDrink);
       expect(profile, insertedProfile);
@@ -63,18 +63,18 @@ void main() {
       final Map<String, dynamic> session = getSession();
 
       final int? drinkId =
-          await db_utils.insertInto('drink', drink, drink['id']) as int?;
+          await db_utils.insertInto('drinks', drink, drink['id']) as int?;
       final int? profileId =
-          await db_utils.insertInto('profile', profile, profile['id']) as int?;
+          await db_utils.insertInto('profiles', profile, profile['id']) as int?;
       final int? sessionId =
-          await db_utils.insertInto('session', session, session['id']) as int?;
+          await db_utils.insertInto('sessions', session, session['id']) as int?;
 
       final Map<String, dynamic> insertedDrink =
-          (await db_utils.queryFrom('drink')).single;
+          (await db_utils.queryFrom('drinks')).single;
       final Map<String, dynamic> insertedProfile =
-          (await db_utils.queryFrom('profile')).single;
+          (await db_utils.queryFrom('profiles')).single;
       final Map<String, dynamic> insertedSession =
-          (await db_utils.queryFrom('session')).single;
+          (await db_utils.queryFrom('sessions')).single;
 
       if (useSqfLiteDb) {
         drink['id'] = drinkId;
@@ -94,10 +94,10 @@ void main() {
       final Map<String, dynamic> drink =
           getDrink(<String, dynamic>{'id': 1, 'name_id': const Uuid().v1()});
 
-      await db_utils.insertInto('drink', drink, drink['id']);
+      await db_utils.insertInto('drinks', drink, drink['id']);
 
       expect(
-        () async => db_utils.insertInto('drink', drink, drink['id']),
+        () async => db_utils.insertInto('drinks', drink, drink['id']),
         throwsA(isA<DatabaseException>()),
       );
     });
@@ -109,10 +109,10 @@ void main() {
       final Map<String, dynamic> drink =
           getDrink(<String, dynamic>{'name_id': 'name_id'});
 
-      await db_utils.insertInto('drink', drink, drink['id']);
+      await db_utils.insertInto('drinks', drink, drink['id']);
 
       expect(
-        () async => db_utils.insertInto('drink', drink, drink['id']),
+        () async => db_utils.insertInto('drinks', drink, drink['id']),
         throwsA(isA<DatabaseException>()),
       );
     });
@@ -124,10 +124,10 @@ void main() {
       final Map<String, dynamic> profile =
           getProfile(<String, dynamic>{'id': 1, 'name_id': const Uuid().v1()});
 
-      await db_utils.insertInto('profile', profile, profile['id']);
+      await db_utils.insertInto('profiles', profile, profile['id']);
 
       expect(
-        () async => db_utils.insertInto('profile', profile, profile['id']),
+        () async => db_utils.insertInto('profiles', profile, profile['id']),
         throwsA(isA<DatabaseException>()),
       );
     });
@@ -139,10 +139,10 @@ void main() {
       final Map<String, dynamic> profile =
           getProfile(<String, dynamic>{'name_id': 'name_id'});
 
-      await db_utils.insertInto('profile', profile, profile['id']);
+      await db_utils.insertInto('profiles', profile, profile['id']);
 
       expect(
-        () async => db_utils.insertInto('profile', profile, profile['id']),
+        () async => db_utils.insertInto('profiles', profile, profile['id']),
         throwsA(isA<DatabaseException>()),
       );
     });
@@ -155,11 +155,11 @@ void main() {
       final Map<String, dynamic> profile = getProfile();
 
       final int? drinkId =
-          await db_utils.insertInto('drink', drink, drink['id']) as int?;
+          await db_utils.insertInto('drinks', drink, drink['id']) as int?;
       profile['drink_id'] = drinkId! + 1;
 
       expect(
-        () async => db_utils.insertInto('profile', profile, profile['id']),
+        () async => db_utils.insertInto('profiles', profile, profile['id']),
         throwsA(isA<DatabaseException>()),
       );
     });
@@ -172,15 +172,15 @@ void main() {
       final Map<String, dynamic> profile = getProfile();
 
       final int? drinkId =
-          await db_utils.insertInto('drink', drink, drink['id']) as int?;
+          await db_utils.insertInto('drinks', drink, drink['id']) as int?;
       profile['drink_id'] = drinkId;
-      await db_utils.insertInto('profile', profile, profile['id']);
+      await db_utils.insertInto('profiles', profile, profile['id']);
 
-      List<Map<String, dynamic>> profiles = await db_utils.queryFrom('profile');
+      List<Map<String, dynamic>> profiles = await db_utils.queryFrom('profiles');
       expect(profiles.length, 1);
 
-      await db_utils.deleteFrom('drink', drinkId);
-      profiles = await db_utils.queryFrom('profile');
+      await db_utils.deleteFrom('drinks', drinkId);
+      profiles = await db_utils.queryFrom('profiles');
       expect(profiles.length, 0);
     });
 
@@ -189,12 +189,12 @@ void main() {
       final Map<String, dynamic> profile = getProfile();
 
       final int? drinkId =
-          await db_utils.insertInto('drink', drink, drink['id']) as int?;
+          await db_utils.insertInto('drinks', drink, drink['id']) as int?;
       profile['drink_id'] = drinkId;
       final int? profileId =
-          await db_utils.insertInto('profile', profile, profile['id']) as int?;
+          await db_utils.insertInto('profiles', profile, profile['id']) as int?;
 
-      final int res = await db_utils.deleteFrom('profile', profileId);
+      final int res = await db_utils.deleteFrom('profiles', profileId);
 
       expect(res, 1);
     });
@@ -202,14 +202,15 @@ void main() {
     test('session id is unique', () async {
       // Not supported on indexed db
       if (!useSqfLiteDb) return;
+      if (!useSqfLiteDb) return;
 
       final Map<String, dynamic> session =
           getSession(<String, dynamic>{'id': 1});
 
-      await db_utils.insertInto('session', session, session['id']);
+      await db_utils.insertInto('sessions', session, session['id']);
 
       expect(
-        () async => db_utils.insertInto('session', session, session['id']),
+        () async => db_utils.insertInto('sessions', session, session['id']),
         throwsA(isA<DatabaseException>()),
       );
     });
@@ -269,8 +270,8 @@ Map<String, dynamic> getProfile([Map<String, dynamic>? values]) {
     'background_color': values?['background_color'],
   };
 
-  if (values?['drink'] != null) {
-    profile.putIfAbsent('drink', () => values?['drink']);
+  if (values?['drinks'] != null) {
+    profile.putIfAbsent('drinks', () => values?['drinks']);
   }
 
   return profile;
@@ -305,11 +306,11 @@ Map<String, dynamic> getSession([Map<String, dynamic>? values]) {
     'type': values?['type'],
   };
 
-  if (values?['profile'] != null) {
-    session.putIfAbsent('profile', () => values?['profile']);
+  if (values?['profiles'] != null) {
+    session.putIfAbsent('profiles', () => values?['profiles']);
   }
-  if (values?['drink'] != null) {
-    session.putIfAbsent('drink', () => values?['drink']);
+  if (values?['drinks'] != null) {
+    session.putIfAbsent('drinks', () => values?['drinks']);
   }
 
   return session;

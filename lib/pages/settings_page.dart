@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SettingsPage extends StatefulWidget {
-  static const routeName = '/settings';
+  static const String routeName = '/settings';
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -18,28 +18,26 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final Preferences preferences = context.watch<Preferences>();
-    if (_drinkHookController == null) {
-      _drinkHookController =
-          TextEditingController(text: preferences.drinkWebHook);
-    }
+    _drinkHookController ??=
+        TextEditingController(text: preferences.drinkWebHook);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: const Text('Settings'),
       ),
       body: Container(
         padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
           child: Column(
-            children: [
+            children: <Widget>[
               TextFormField(
                 controller: _drinkHookController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Drink webhook',
                   helperText: 'POST-request for when adding drinks',
                 ),
               ),
-              SizedBox(height: 40.0),
+              const SizedBox(height: 40.0),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   primary: Theme.of(context).primaryColor,
@@ -78,6 +76,8 @@ class _SettingsPageState extends State<SettingsPage> {
     preferences.drinkWebHook = _drinkHookController?.text;
     await updatePreferences(preferences);
 
-    Navigator.of(context).pop();
+    setState(() {
+      Navigator.of(context).pop();
+    });
   }
 }

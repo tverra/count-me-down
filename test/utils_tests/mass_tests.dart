@@ -1,7 +1,7 @@
 import 'package:count_me_down/utils/mass.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-main() {
+void main() {
   /*test('test ', () {
     final int actual = 42;
     final int expected = 69;
@@ -17,14 +17,14 @@ main() {
 
     test('returns correct mass in grams', () {
       final int actual = _mass.grams;
-      final int expected = 100000;
+      const int expected = 100000;
 
       expect(actual, expected);
     });
 
     test('returns correct mass in kilos', () {
       final double actual = _mass.kilos;
-      final double expected = 100.0;
+      const double expected = 100.0;
 
       expect(actual, expected);
     });
@@ -39,14 +39,14 @@ main() {
 
     test('returns correct mass in grams', () {
       final int actual = _mass.grams;
-      final int expected = 1;
+      const int expected = 1;
 
       expect(actual, expected);
     });
 
     test('returns correct mass in kilos', () {
       final double actual = _mass.kilos;
-      final double expected = 0.001;
+      const double expected = 0.001;
 
       expect(actual, expected);
     });
@@ -61,14 +61,14 @@ main() {
 
     test('returns correct mass in grams', () {
       final int actual = _mass.grams;
-      final int expected = -10;
+      const int expected = -10;
 
       expect(actual, expected);
     });
 
     test('returns correct mass in kilos', () {
       final double actual = _mass.kilos;
-      final double expected = -0.01;
+      const double expected = -0.01;
 
       expect(actual, expected);
     });
@@ -78,7 +78,7 @@ main() {
     test('kilos is added', () {
       final Mass mass = Mass.units(kilos: 560);
       final int actual = mass.grams;
-      final int expected = 560000;
+      const int expected = 560000;
 
       expect(actual, expected);
     });
@@ -86,7 +86,7 @@ main() {
     test('grams is added', () {
       final Mass mass = Mass.units(grams: 560);
       final int actual = mass.grams;
-      final int expected = 560;
+      const int expected = 560;
 
       expect(actual, expected);
     });
@@ -94,7 +94,7 @@ main() {
     test('different units are added', () {
       final Mass mass = Mass.units(kilos: 560, grams: 560);
       final int actual = mass.grams;
-      final int expected = 560560;
+      const int expected = 560560;
 
       expect(actual, expected);
     });
@@ -102,7 +102,7 @@ main() {
     test('negative value is added', () {
       final Mass mass = Mass.units(kilos: -560, grams: -560);
       final int actual = mass.grams;
-      final int expected = -560560;
+      const int expected = -560560;
 
       expect(actual, expected);
     });

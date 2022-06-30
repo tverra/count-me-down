@@ -7,13 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class EditSessionPage extends StatelessWidget {
-  EditSessionPage();
+  const EditSessionPage();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit session'),
+        title: const Text('Edit session'),
       ),
       body: Container(
         padding: const EdgeInsets.all(20.0),
@@ -23,14 +23,14 @@ class EditSessionPage extends StatelessWidget {
               builder:
                   (BuildContext context, AsyncSnapshot<Session?> snapshot) {
                 if (!snapshot.hasData) {
-                  return Center(
+                  return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
 
                 final Session? session = snapshot.data;
 
-                return Container(
+                return SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -45,12 +45,12 @@ class EditSessionPage extends StatelessWidget {
                         'Delete session',
                         style: TextStyle(
                             color: utils.getThemeTextColor(context),
-                            fontSize: 18.0),
+                            fontSize: 18.0,),
                       ),
                     ),
                   ),
                 );
-              }),
+              },),
         ),
       ),
     );
@@ -63,7 +63,9 @@ class EditSessionPage extends StatelessWidget {
 
   Future<void> _deleteSession(BuildContext context, Session session) async {
     await deleteSession(session);
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil(StartPage.routeName, (route) => false);
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      StartPage.routeName,
+      (Route<dynamic> route) => false,
+    );
   }
 }

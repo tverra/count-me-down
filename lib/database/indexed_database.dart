@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:count_me_down/database/migrations.dart';
-import 'package:count_me_down/database/seed_data.dart';
+import 'package:count_me_down/database/seed_data.dart' as seed_data;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
@@ -48,7 +48,7 @@ class IdbProvider {
 
           if (seed) {
             debugPrint('Seeding database');
-            await SeedData.insertIdbSeedData(db);
+            await seed_data.insertIdbSeedData(db);
           }
         } else {
           debugPrint('Upgrading database to version ${event.newVersion}');

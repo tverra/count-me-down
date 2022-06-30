@@ -4,9 +4,10 @@ extension MockableDateTime on DateTime {
   static DateTime get current {
     final DateTime? time = mockTime;
 
-    if (time != null)
+    if (time != null) {
       return time;
-    else
+    } else {
       return DateTime.now();
+    }
   }
 }

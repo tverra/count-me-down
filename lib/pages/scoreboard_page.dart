@@ -6,9 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class ScoreboardPage extends StatefulWidget {
-  static const routeName = '/scoreboard';
+  static const String routeName = '/scoreboard';
 
-  ScoreboardPage();
+  const ScoreboardPage();
 
   @override
   _ScoreboardPageState createState() => _ScoreboardPageState();
@@ -33,30 +33,32 @@ class _ScoreboardPageState extends State<ScoreboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_getScoreboardStream == null) return CircularProgressIndicator();
+    if (_getScoreboardStream == null) return const CircularProgressIndicator();
 
     return Scaffold(
       appBar: AppBar(
         title: Text(_title),
       ),
-      body: StreamBuilder<List>(
-          initialData: [],
-          stream: _getScoreboardStream,
-          builder: (
-            BuildContext context,
-            AsyncSnapshot<List> snapshot,
-          ) {
-            final List? users = snapshot.data != null ? snapshot.data : null;
+      body: StreamBuilder<List<dynamic>>(
+        initialData: const <dynamic>[],
+        stream: _getScoreboardStream,
+        builder: (
+          BuildContext context,
+          AsyncSnapshot<List<dynamic>> snapshot,
+        ) {
+          final List<Map<String, dynamic>>? users =
+              snapshot.data as List<Map<String, dynamic>>?;
 
-            return Container(
-              width: double.infinity,
-              child: _Scoreboard(users: users),
-            );
-          }),
+          return SizedBox(
+            width: double.infinity,
+            child: _Scoreboard(users: users),
+          );
+        },
+      ),
     );
   }
 
-  Stream<List> _getScoreboard() async* {
+  Stream<List<dynamic>> _getScoreboard() async* {
     final Preferences preferences = context.read<Preferences>();
     final Map<String, String> headers = <String, String>{
       'Accept': 'application/json',
@@ -69,62 +71,64 @@ class _ScoreboardPageState extends State<ScoreboardPage> {
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
+        final Map<String, dynamic> data =
+            jsonDecode(response.body) as Map<String, dynamic>;
 
         setState(() {
-          _title = data['title'];
+          _title = data['title'] as String;
         });
 
-        yield data['scoreboard'] as List;
+        yield data['scoreboard'] as List<dynamic>;
       }
 
-      await Future<void>.delayed(Duration(seconds: 30));
+      await Future<void>.delayed(const Duration(seconds: 30));
     }
   }
 }
 
 class _Scoreboard extends StatelessWidget {
-  final List? users;
+  final List<Map<String, dynamic>>? users;
 
-  _Scoreboard({required this.users});
+  const _Scoreboard({required this.users});
 
   @override
   Widget build(BuildContext context) {
-    final List? users = this.users;
+    final List<Map<String, dynamic>>? users = this.users;
     final double screenWidth = MediaQuery.of(context).size.width;
     final double columnWidth =
         (screenWidth / 3) > 100 ? 100 : (screenWidth / 3);
 
     final List<Widget> rows = users != null
-        ? users.map((user) {
+        ? users.map((Map<String, dynamic> user) {
             final StringBuffer buffer = StringBuffer();
-            final Map<String, dynamic> units = user['units'];
+            final Map<String, dynamic> units =
+                user['units'] as Map<String, dynamic>;
 
             for (int i = 0; i < units.length; i++) {
               if (i > 0) buffer.write(', ');
 
-              buffer.write(units.keys.elementAt(i) +
-                  ' (' +
-                  units[units.keys.elementAt(i)].toString() +
-                  ')');
+              buffer.write(
+                '${units.keys.elementAt(i)} '
+                '(${units[units.keys.elementAt(i)].toString()} )',
+              );
             }
 
             return Column(
-              children: [
+              children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Row(
                     children: <Widget>[
                       SizedBox(
                         width: columnWidth,
                         child: Text(
-                          user['username'],
+                          user['username'] as String,
                         ),
                       ),
                       SizedBox(
                         width: columnWidth,
                         child: Text(
-                          user['per_mille'],
+                          user['per_mille'] as String,
                         ),
                       ),
                       Flexible(
@@ -135,23 +139,23 @@ class _Scoreboard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Divider(
+                const Divider(
                   thickness: 1,
                 ),
               ],
             );
           }).toList()
-        : [];
+        : <Widget>[];
 
     return Column(
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.only(top: 10.0, right: 20.0, left: 20.0),
+          padding: const EdgeInsets.only(top: 10.0, right: 20.0, left: 20.0),
           child: Row(
-            children: [
+            children: <Widget>[
               SizedBox(
                 width: columnWidth,
-                child: Text(
+                child: const Text(
                   'Name',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -160,14 +164,14 @@ class _Scoreboard extends StatelessWidget {
               ),
               SizedBox(
                 width: columnWidth,
-                child: Text(
+                child: const Text(
                   'Per mil',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              Text(
+              const Text(
                 'Units',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -176,10 +180,11 @@ class _Scoreboard extends StatelessWidget {
             ],
           ),
         ),
-        Divider(
+        const Divider(
           thickness: 1,
         ),
-      ]..addAll(rows),
+        ...rows,
+      ],
     );
   }
 }

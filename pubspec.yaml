@@ -22,24 +22,24 @@ environment:
   flutter: '>=3.0.0'
 
 dependencies:
+  charts_flutter: ^0.12.0
+  cupertino_icons: ^1.0.0
   flutter:
     sdk: flutter
-
-  cupertino_icons: ^1.0.0
-  charts_flutter: ^0.12.0
+  font_awesome_flutter: ^10.1.0
+  http: ^0.13.0
+  idb_sqflite: ^1.1.0
+  intl: ^0.17.0
+  package_info: ^2.0.2
+  path: ^1.8.0
+  provider: ^6.0.0
   sqflite: ^2.0.0
   sqflite_common_ffi: ^2.1.0
   sqflite_wrapper:
     git:
       url: git@github.com:tverra/sqflite-wrapper.git
       ref: master
-  font_awesome_flutter: ^10.1.0
-  provider: ^6.0.0
-  intl: ^0.17.0
-  http: ^0.13.0
-  package_info: ^2.0.2
   sqlite3_flutter_libs: ^0.5.0
-  idb_sqflite: ^1.1.0
 
 dev_dependencies:
   flutter_test:

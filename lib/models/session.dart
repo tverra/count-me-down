@@ -3,7 +3,7 @@ import 'package:count_me_down/models/profile.dart';
 import 'package:count_me_down/utils/data_parser.dart';
 
 class Session {
-  static const String tableName = 'session';
+  static const String tableName = 'sessions';
   static const String colId = 'id';
   static const String colProfileId = 'profile_id';
   static const String colName = 'name';
@@ -36,9 +36,13 @@ class Session {
     name = p.tryParseString(map[colName]);
     startedAt = p.tryParseDateTime(map[colStartedAt]);
     endedAt = p.tryParseDateTime(map[colEndedAt]);
-    profile = map[relProfile] != null ? Profile.fromMap(map[relProfile]) : null;
+    profile = map[relProfile] != null
+        ? Profile.fromMap(map[relProfile] as Map<String, dynamic>)
+        : null;
     drinks = map[relDrinks] != null
-        ? map[relDrinks].map<Drink>((d) => Drink.fromMap(d)).toList()
+        ? (map[relDrinks] as List<Map<String, dynamic>>)
+            .map<Drink>((Map<String, dynamic> d) => Drink.fromMap(d))
+            .toList()
         : null;
   }
 
@@ -73,8 +77,10 @@ class Session {
 
     if (!forQuery) {
       map.putIfAbsent(relProfile, () => profile?.toMap(forQuery: forQuery));
-      map.putIfAbsent(relDrinks,
-          () => drinks?.map((d) => d.toMap(forQuery: forQuery)).toList());
+      map.putIfAbsent(
+        relDrinks,
+        () => drinks?.map((Drink d) => d.toMap(forQuery: forQuery)).toList(),
+      );
     }
 
     return map;

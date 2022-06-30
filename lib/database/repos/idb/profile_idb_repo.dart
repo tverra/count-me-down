@@ -65,7 +65,13 @@ Future<Profile> insertProfile(Profile profile) async {
   final Transaction txn = db.transaction(Profile.tableName, idbModeReadWrite);
   final ObjectStore store = txn.objectStore(Profile.tableName);
 
-  await store.put(profile.toMap(forQuery: true), profile.id);
+  final Object key = await store.put(profile.toMap(forQuery: true), profile.id);
+
+  if (profile.id == null) {
+    profile.id = key as int;
+    await store.put(profile.toMap(forQuery: true), profile.id);
+  }
+
   await txn.completed;
 
   return profile;
@@ -77,7 +83,13 @@ Future<List<Profile>> insertProfiles(List<Profile> profiles) async {
   final ObjectStore store = txn.objectStore(Profile.tableName);
 
   for (final Profile profile in profiles) {
-    await store.put(profile.toMap(forQuery: true), profile.id);
+    final Object key =
+        await store.put(profile.toMap(forQuery: true), profile.id);
+
+    if (profile.id == null) {
+      profile.id = key as int;
+      await store.put(profile.toMap(forQuery: true), profile.id);
+    }
   }
   await txn.completed;
 
@@ -88,20 +100,33 @@ Future<Profile?> updateProfile(
   Profile profile, {
   bool insertMissing = false,
 }) async {
+  final int? profileId = profile.id;
+  if (profileId != null && profileId <= 0) {
+    return null;
+  }
+
   final Database db = await getIdb();
   final Transaction txn = db.transaction(Profile.tableName, idbModeReadWrite);
   final ObjectStore store = txn.objectStore(Profile.tableName);
-  Profile? res;
+  final Profile res = profile.copy();
 
   if (insertMissing) {
-    await store.put(profile.toMap(forQuery: true), profile.id);
-    res = profile;
-  } else {
-    final List<Object> keys = await store.getAllKeys();
+    final Object key =
+        await store.put(profile.toMap(forQuery: true), profile.id);
+    res.id = key as int;
 
-    if (keys.contains(profile.id)) {
-      await store.put(profile.toMap(forQuery: true), profile.id);
-      res = profile;
+    if (profile.id == null) {
+      await store.put(profile.toMap(forQuery: true), key);
+    }
+  } else {
+    if (profile.id != null) {
+      final List<Object> keys = await store.getAllKeys();
+
+      if (keys.contains(profile.id)) {
+        final Object key =
+            await store.put(profile.toMap(forQuery: true), profile.id);
+        res.id = key as int;
+      }
     }
   }
   await txn.completed;
@@ -122,25 +147,41 @@ Future<List<Profile>> updateProfiles(
   final List<Profile> res = <Profile>[];
 
   for (final Profile profile in profiles) {
+    final Profile copy = profile.copy();
+
     if (insertMissing) {
-      await store.put(profile.toMap(forQuery: true), profile.id);
-      res.add(profile);
+      final Object key =
+          await store.put(profile.toMap(forQuery: true), profile.id);
+      copy.id = key as int;
+
+      if (profile.id == null) {
+        await store.put(copy.toMap(forQuery: true), key);
+      }
+
+      res.add(copy);
     } else {
-      if (existing.where((Profile c) => c.id == profile.id).isNotEmpty) {
-        await store.put(profile.toMap(forQuery: true), profile.id);
-        res.add(profile);
+      if (profile.id != null) {
+        if (existing.where((Profile c) => c.id == profile.id).isNotEmpty) {
+          final Object key =
+              await store.put(profile.toMap(forQuery: true), profile.id);
+          copy.id = key as int;
+          res.add(copy);
+        }
       }
     }
   }
-  await txn.completed;
 
   if (removeDeleted) {
     for (final Profile profile in existing) {
-      if (res.where((Profile c) => c.id == profile.id).isEmpty) {
-        await deleteProfile(profile);
+      final int? id = profile.id;
+
+      if (id != null && res.where((Profile c) => c.id == profile.id).isEmpty) {
+        await store.delete(id);
       }
     }
   }
+
+  await txn.completed;
   return res;
 }
 

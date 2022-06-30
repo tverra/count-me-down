@@ -43,11 +43,14 @@ class AlcoholTracker {
   double consumedAlcoholBetween(DateTime from, DateTime to) {
     double sum = 0.0;
 
-    final List<Drink> relevantDrinks =
-        _drinks.where((drink) => drink.consumedBetween(from, to)).toList();
+    final List<Drink> relevantDrinks = _drinks
+        .where((Drink drink) => drink.consumedBetween(from, to))
+        .toList();
 
-    relevantDrinks.forEach((drink) => sum += drink
-        .currentlyAbsorbedAlcohol(profile.absorptionTime ?? Duration.zero));
+    for (final Drink drink in relevantDrinks) {
+      sum += drink
+        .currentlyAbsorbedAlcohol(profile.absorptionTime ?? Duration.zero);
+    }
 
     return sum;
   }

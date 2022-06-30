@@ -3,13 +3,11 @@ import 'package:count_me_down/database/db_utils.dart';
 import 'package:count_me_down/models/preferences.dart';
 import 'package:count_me_down/models/session.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import '../../test_utils.dart' as test_utils;
-
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../../data_generator.dart' as generator;
 import '../../test_db_utils.dart' as db_utils;
+import '../../test_utils.dart' as test_utils;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -44,7 +42,7 @@ void main() {
       expect(preferences, _preferences);
     });
 
-    test('returns latest row if multiple exists', () async {
+    test('returns first row if multiple exists', () async {
       final List<Preferences> inserted = <Preferences>[];
 
       for (int i = 0; i < 5; i++) {
@@ -54,7 +52,7 @@ void main() {
       }
 
       final Preferences preferences = await getPreferences();
-      expect(preferences, inserted.last);
+      expect(preferences, _preferences);
     });
 
     test('return empty preferences if no rows exists', () async {
@@ -81,6 +79,8 @@ void main() {
     });
 
     test('preloading non-existing session returns null', () async {
+      await test_utils.clearDb();
+
       await generator.insertPreferences(activeSessionId: -1);
 
       final Preferences insertedPreferences = await getPreferences(
@@ -91,6 +91,8 @@ void main() {
     });
 
     test('preloading non-existing profile returns null', () async {
+      await test_utils.clearDb();
+
       await generator.insertPreferences(activeProfileId: -1);
 
       final Preferences insertedPreferences = await getPreferences(
@@ -147,7 +149,7 @@ void main() {
     test('returns the updated row', () async {
       final Session session = await generator.insertSession();
       _preferences.activeSessionId = session.id;
-      final Preferences? result = await updatePreferences(_preferences);
+      final Preferences result = await updatePreferences(_preferences);
 
       expect(result, _preferences);
     });
@@ -155,7 +157,8 @@ void main() {
     test('updating non-existing row inserts row', () async {
       await test_utils.clearDb();
       final Preferences nonInserted = generator.getPreferences();
-      await updatePreferences(nonInserted);
+      final Preferences result = await updatePreferences(nonInserted);
+      nonInserted.id = result.id;
 
       final Preferences updated = await getPreferences();
       expect(updated, nonInserted);

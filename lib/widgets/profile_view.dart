@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 class ProfileView extends StatelessWidget {
   final bool header;
 
-  ProfileView({this.header = true});
+  const ProfileView({this.header = true});
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +20,11 @@ class ProfileView extends StatelessWidget {
         right: false,
         left: false,
         bottom: false,
-        child: FutureBuilder(
+        child: FutureBuilder<Profile?>(
           future: getProfile(preferences.activeProfileId ?? 0),
           builder: (BuildContext context, AsyncSnapshot<Profile?> snapshot) {
             if (!snapshot.hasData) {
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(),
               );
             }
@@ -35,38 +35,36 @@ class ProfileView extends StatelessWidget {
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                header
-                    ? Text(
+              children: <Widget>[
+                if (header) Text(
                         'Current profile:',
                         style: TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
                           color: utils.getThemeTextColor(context),
                         ),
-                      )
-                    : Container(),
-                SizedBox(
+                      ) else Container(),
+                const SizedBox(
                   height: 10.0,
                 ),
                 _textStyle(context, profile.name ?? ''),
-                SizedBox(
+                const SizedBox(
                   height: 5.0,
                 ),
                 _textStyle(
                   context,
                   'Weight: ',
-                  '${profile.bodyWeight.toString()}',
+                  profile.bodyWeight.toString(),
                 ),
                 _textStyle(
                   context,
                   'Body water content: ',
-                  '${profile.bodyWaterPercentage.toString()}',
+                  profile.bodyWaterPercentage.toString(),
                 ),
                 _textStyle(
                   context,
                   'Alcohol absorption time: ',
-                  '${utils.formatDuration(profile.absorptionTime ?? Duration.zero)}',
+                  utils.formatDuration(profile.absorptionTime ?? Duration.zero),
                 ),
                 _textStyle(
                   context,
@@ -83,7 +81,7 @@ class ProfileView extends StatelessWidget {
 
   Widget _textStyle(BuildContext context, String leading, [String? text]) {
     return Row(
-      children: [
+      children: <Widget>[
         Text(
           leading,
           style: TextStyle(
@@ -92,7 +90,7 @@ class ProfileView extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(width: 2.0),
+        const SizedBox(width: 2.0),
         Text(
           text ?? '',
           style: TextStyle(

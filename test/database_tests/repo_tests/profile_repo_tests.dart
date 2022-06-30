@@ -1,15 +1,13 @@
-import 'package:count_me_down/database/db_utils.dart';
 import 'package:count_me_down/database/db_repos.dart';
+import 'package:count_me_down/database/db_utils.dart';
 import 'package:count_me_down/models/profile.dart';
 import 'package:count_me_down/models/session.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import '../../test_utils.dart' as test_utils;
-
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../../data_generator.dart' as generator;
 import '../../test_db_utils.dart' as db_utils;
+import '../../test_utils.dart' as test_utils;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -47,9 +45,9 @@ void main() {
       final Profile profile = generator.getProfile();
       profile.id = null;
       final int? id = (await insertProfile(profile)).id;
-      final Profile? insertedProfile = (await getProfiles()).single;
+      final List<Profile> insertedProfiles = await getProfiles();
       expect(id == null, false);
-      expect(insertedProfile == null, false);
+      expect(insertedProfiles.last.id, id);
     });
 
     test('returns row on given id', () async {
@@ -92,7 +90,7 @@ void main() {
       await generator.insertSession();
 
       for (int i = 0; i < 5; i++) {
-        await generator.insertSession(profileId: _profile.id!);
+        await generator.insertSession(profileId: _profile.id);
       }
 
       final Profile profile = (await getProfile(_profile.id!))!;
@@ -104,7 +102,7 @@ void main() {
       await generator.insertSession();
 
       for (int i = 0; i < 5; i++) {
-        sessions.add(await generator.insertSession(profileId: _profile.id!));
+        sessions.add(await generator.insertSession(profileId: _profile.id));
       }
 
       final Profile profile = (await getProfile(
@@ -209,15 +207,17 @@ void main() {
 
       for (final Profile profile in _profiles) {
         for (int i = 0; i < 5; i++) {
-          sessions.add(await generator.insertSession(profileId: profile.id!));
+          sessions.add(await generator.insertSession(profileId: profile.id));
         }
       }
       final List<Profile> profiles =
           await getProfiles(preloadArgs: <String>[Profile.relSessions]);
 
       for (int i = 0; i < profiles.length; i++) {
-        expect(profiles[i].sessions,
-            sessions.getRange(i * 5, (i + 1) * 5).toList());
+        expect(
+          profiles[i].sessions,
+          sessions.getRange(i * 5, (i + 1) * 5).toList(),
+        );
       }
     });
   });
@@ -252,7 +252,7 @@ void main() {
 
     test('inserting on existing id replaces previous data', () async {
       await insertProfile(_profile);
-      _profile = _profile.copyWith(name: 'test');
+      _profile.name = 'test';
       await insertProfile(_profile);
 
       final Profile profile = (await getProfile(_profile.id!))!;
@@ -308,8 +308,9 @@ void main() {
       final List<Profile> result = await insertProfiles(_profiles);
 
       for (int i = 0; i < result.length; i++) {
-        _profiles[i] = _profiles[i].copyWith(name: 'test');
+        _profiles[i].name = 'test';
       }
+
       await insertProfiles(_profiles);
 
       final List<Profile> profiles = await getProfiles();
@@ -322,7 +323,7 @@ void main() {
         () async {
       final List<Profile> profiles = <Profile>[];
       for (int i = 0; i < 10; i++) {
-        final Profile copy = profiles[i].copy();
+        final Profile copy = _profiles[i].copy();
         copy.id = 1;
         profiles.add(copy);
       }
@@ -346,7 +347,7 @@ void main() {
     });
 
     test('profiles are updated', () async {
-      _profile = _profile.copyWith(name: 'test');
+      _profile.name = 'test';
       await updateProfile(_profile);
 
       final Profile profile = (await getProfile(_profile.id!))!;
@@ -354,7 +355,7 @@ void main() {
     });
 
     test('returns the updated row', () async {
-      _profile = _profile.copyWith(name: 'test');
+      _profile.name = 'test';
       final Profile? result = await updateProfile(_profile);
 
       expect(result, _profile);
@@ -369,7 +370,7 @@ void main() {
     });
 
     test('updates existing row if insertMissing is true', () async {
-      _profile = _profile.copyWith(name: 'test');
+      _profile.name = 'test';
       await updateProfile(_profile, insertMissing: true);
 
       final Profile? profile = await getProfile(_profile.id!);
@@ -379,18 +380,19 @@ void main() {
     test('updating non-existing row inserts row if insertMissing is true',
         () async {
       final Profile nonInserted = generator.getProfile();
-      await updateProfile(nonInserted, insertMissing: true);
+      final Profile? updated =
+          await updateProfile(nonInserted, insertMissing: true);
 
-      final Profile? updated = await getProfile(nonInserted.id!);
-      expect(updated, nonInserted);
+      final Profile? inserted = await getProfile(updated!.id!);
+      expect(inserted, nonInserted);
     });
 
     test('updating non-existing row does nothing if insertMissing is false',
         () async {
-      final Profile nonInserted = generator.getProfile();
+      final Profile nonInserted = generator.getProfile(id: 1000);
       final Profile? result = await updateProfile(nonInserted);
 
-      final Profile? updated = await getProfile(nonInserted.id!);
+      final Profile? updated = await getProfile(1000);
       expect(result, null);
       expect(updated, null);
     });
@@ -401,7 +403,7 @@ void main() {
       _profile.name = 'profile_name_id${_profile.id! + 1}';
       await insertProfile(_profile);
 
-      _profile = _profile.copyWith(name: 'test');
+      _profile.name = 'test';
       await updateProfile(_profile);
 
       final List<Profile> profiles = await getProfiles();
@@ -432,7 +434,9 @@ void main() {
       final List<Profile> toBeUpdated = <Profile>[];
 
       for (final Profile profile in _profiles) {
-        toBeUpdated.add(profile.copyWith(name: 'test'));
+        final Profile copy = profile.copy();
+        copy.name = 'test';
+        toBeUpdated.add(copy);
       }
       await updateProfiles(toBeUpdated);
       final List<Profile> profiles = await getProfiles();
@@ -465,7 +469,7 @@ void main() {
     });
 
     test('the correct row is updated', () async {
-      _profiles[3] = _profiles[3].copyWith(name: 'updated');
+      _profiles[3].name = 'updated';
       await updateProfiles(_profiles);
       final List<Profile> profiles = await getProfiles();
 
@@ -480,7 +484,10 @@ void main() {
       final Profile nonInserted = generator.getProfile();
       _profiles.add(nonInserted);
 
-      await updateProfiles(_profiles, insertMissing: true);
+      final Profile updated =
+          (await updateProfiles(_profiles, insertMissing: true)).single;
+
+      _profiles.last.id = updated.id;
 
       final List<Profile> profiles = await getProfiles();
       expect(profiles, _profiles);
@@ -501,7 +508,9 @@ void main() {
       final List<Profile> toBeUpdated = <Profile>[];
 
       for (final Profile profile in _profiles) {
-        toBeUpdated.add(profile.copyWith(name: 'updated'));
+        final Profile copy = profile.copy();
+        copy.name = 'updated';
+        toBeUpdated.add(copy);
       }
       await updateProfiles(toBeUpdated, insertMissing: true);
       final List<Profile> profiles = await getProfiles();
@@ -535,7 +544,9 @@ void main() {
       final List<Profile> toBeUpdated = <Profile>[];
 
       for (final Profile profile in _profiles) {
-        toBeUpdated.add(profile.copyWith(name: 'updated'));
+        final Profile copy = profile.copy();
+        copy.name = 'updated';
+        toBeUpdated.add(copy);
       }
       await updateProfiles(toBeUpdated, removeDeleted: true);
       final List<Profile> profiles = await getProfiles();
@@ -550,11 +561,13 @@ void main() {
       _profiles.removeAt(6);
       _profiles.add(nonInserted);
 
-      await updateProfiles(
+      final Profile updated = (await updateProfiles(
         _profiles,
         insertMissing: true,
         removeDeleted: true,
-      );
+      )).single;
+
+      _profiles.last.id = updated.id;
 
       final List<Profile> profiles = await getProfiles();
       expect(profiles, _profiles);

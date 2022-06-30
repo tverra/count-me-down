@@ -63,8 +63,12 @@ String formatDuration(Duration duration) {
   return buffer.toString();
 }
 
-String formatDatetime(DateTime dateTime,
-    {BuildContext? context, bool weekDay = false, bool timeOfDay = true}) {
+String formatDatetime(
+  DateTime dateTime, {
+  BuildContext? context,
+  bool weekDay = false,
+  bool timeOfDay = true,
+}) {
   final String? locale =
       context != null ? Localizations.localeOf(context).languageCode : null;
 
@@ -99,8 +103,10 @@ Future<void> drinkWebHook(BuildContext context) async {
 
     headers.putIfAbsent('Content-Type', () => 'application/json');
     headers.putIfAbsent('x-api-version', () => '2');
-    headers.putIfAbsent('x-app-version',
-        () => '${packageInfo.version}+${packageInfo.buildNumber}');
+    headers.putIfAbsent(
+      'x-app-version',
+      () => '${packageInfo.version}+${packageInfo.buildNumber}',
+    );
 
     final List<Drink> drinks = await getDrinks(
       sessionId: preferences.activeSessionId,
@@ -109,8 +115,11 @@ Future<void> drinkWebHook(BuildContext context) async {
       preferences.activeProfileId ?? 0,
     );
 
-    body.putIfAbsent('drinks', () => drinks.map((d) => d.toMap()).toList());
-    body.putIfAbsent('profile', () => profile != null ? profile.toMap() : null);
+    body.putIfAbsent(
+      'drinks',
+      () => drinks.map((Drink d) => d.toMap()).toList(),
+    );
+    body.putIfAbsent('profile', () => profile?.toMap());
 
     http
         .post(
@@ -118,6 +127,15 @@ Future<void> drinkWebHook(BuildContext context) async {
           headers: headers,
           body: jsonEncode(body),
         )
-        .timeout(Duration(seconds: 10));
+        .timeout(const Duration(seconds: 10));
   }
+}
+
+void printInternalErrors(
+  Map<String, dynamic> errors,
+  dynamic error,
+  dynamic stacktrace,
+) {
+  debugPrint('\n${error.toString()}');
+  debugPrint(stacktrace.toString());
 }

@@ -1,15 +1,14 @@
+import 'package:count_me_down/database/db_repos.dart';
 import 'package:count_me_down/database/db_utils.dart';
 import 'package:count_me_down/models/drink.dart';
 import 'package:count_me_down/models/profile.dart';
 import 'package:count_me_down/models/session.dart';
-import 'package:count_me_down/database/db_repos.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../test_utils.dart' as test_utils;
-
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../../data_generator.dart' as generator;
 import '../../test_db_utils.dart' as db_utils;
+import '../../test_utils.dart' as test_utils;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -54,8 +53,10 @@ void main() {
     test('preloading drinks returns null if no sessions exists', () async {
       await test_utils.clearDb();
 
-      final Session? session = await getSession(_session.id!,
-          preloadArgs: <String>[Session.relDrinks]);
+      final Session? session = await getSession(
+        _session.id!,
+        preloadArgs: <String>[Session.relDrinks],
+      );
       expect(session, null);
     });
 
@@ -106,7 +107,7 @@ void main() {
       await generator.insertDrink();
 
       for (int i = 0; i < 5; i++) {
-        await generator.insertDrink(sessionId: _session.id!);
+        await generator.insertDrink(sessionId: _session.id);
       }
 
       final Session session = (await getSession(_session.id!))!;
@@ -118,7 +119,7 @@ void main() {
       await generator.insertDrink();
 
       for (int i = 0; i < 5; i++) {
-        drinks.add(await generator.insertDrink(sessionId: _session.id!));
+        drinks.add(await generator.insertDrink(sessionId: _session.id));
       }
 
       final Session session = (await getSession(
@@ -284,7 +285,7 @@ void main() {
 
       for (final Session session in _sessions) {
         for (int i = 0; i < 5; i++) {
-          drinks.add(await generator.insertDrink(sessionId: session.id!));
+          drinks.add(await generator.insertDrink(sessionId: session.id));
         }
       }
       final List<Session> sessions =
@@ -292,7 +293,9 @@ void main() {
 
       for (int i = 0; i < sessions.length; i++) {
         expect(
-            sessions[i].drinks, drinks.getRange(i * 5, (i + 1) * 5).toList());
+          sessions[i].drinks,
+          drinks.getRange(i * 5, (i + 1) * 5).toList(),
+        );
       }
     });
   });
@@ -320,9 +323,9 @@ void main() {
       final Session session = generator.getSession();
       session.id = null;
       final int? id = (await insertSession(session)).id;
-      final Session? insertedSession = (await getSessions()).single;
+      final List<Session> insertedSessions = await getSessions();
       expect(id == null, false);
-      expect(insertedSession == null, false);
+      expect(insertedSessions.length, 1);
     });
 
     test('correct id is returned after insertion', () async {
@@ -378,7 +381,7 @@ void main() {
       final List<int> expected = <int>[];
 
       for (int i = 0; i < _sessions.length; i++) {
-        _sessions[i].id = 1000 + 1;
+        _sessions[i].id = 1000 + i;
         expected.add(1000 + i);
       }
       final List<Session> updated = await insertSessions(_sessions);
@@ -465,10 +468,10 @@ void main() {
     test('updating non-existing row inserts row if insertMissing is true',
         () async {
       final Session nonInserted = generator.getSession();
-      await updateSession(nonInserted, insertMissing: true);
+      final Session? updated = await updateSession(nonInserted, insertMissing: true);
 
-      final Session? updated = await getSession(nonInserted.id!);
-      expect(updated, nonInserted);
+      final Session? inserted = await getSession(updated!.id!);
+      expect(inserted, nonInserted);
     });
 
     test('updating non-existing row does nothing if insertMissing is false',
@@ -620,8 +623,11 @@ void main() {
         sessions.add(generator.getSession(profileId: profile.id));
       }
       await insertSessions(sessions);
-      await updateSessions(_sessions,
-          profileId: profile.id, removeDeleted: true);
+      await updateSessions(
+        _sessions,
+        profileId: profile.id,
+        removeDeleted: true,
+      );
 
       final List<Session> actual = await getSessions();
       expect(actual, expected);

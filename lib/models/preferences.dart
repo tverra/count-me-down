@@ -3,13 +3,13 @@ import 'package:count_me_down/models/session.dart';
 import 'package:count_me_down/utils/data_parser.dart';
 
 class Preferences {
-  static const tableName = 'preferences';
-  static const colId = 'id';
-  static const colActiveSessionId = 'active_session_id';
-  static const colActiveProfileId = 'active_profile_id';
-  static const colDrinkWebHook = 'drink_web_hook';
-  static const relActiveSession = 'active_session';
-  static const relActiveProfile = 'active_profile';
+  static const String tableName = 'preferences';
+  static const String colId = 'id';
+  static const String colActiveSessionId = 'active_session_id';
+  static const String colActiveProfileId = 'active_profile_id';
+  static const String colDrinkWebHook = 'drink_web_hook';
+  static const String relActiveSession = 'active_session';
+  static const String relActiveProfile = 'active_profile';
 
   int? id;
   int? activeSessionId;
@@ -30,10 +30,10 @@ class Preferences {
     drinkWebHook = p.tryParseString(map[colDrinkWebHook]);
 
     activeSession = map[relActiveSession] != null
-        ? Session.fromMap(map[relActiveSession])
+        ? Session.fromMap(map[relActiveSession] as Map<String, dynamic>)
         : null;
     activeProfile = map[relActiveProfile] != null
-        ? Profile.fromMap(map[relActiveProfile])
+        ? Profile.fromMap(map[relActiveProfile] as Map<String, dynamic>)
         : null;
   }
 
@@ -67,9 +67,13 @@ class Preferences {
 
     if (!forQuery) {
       map.putIfAbsent(
-          relActiveSession, () => activeSession?.toMap(forQuery: forQuery));
+        relActiveSession,
+        () => activeSession?.toMap(forQuery: forQuery),
+      );
       map.putIfAbsent(
-          relActiveProfile, () => activeProfile?.toMap(forQuery: forQuery));
+        relActiveProfile,
+        () => activeProfile?.toMap(forQuery: forQuery),
+      );
     }
 
     return map;

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:count_me_down/database/migrations.dart';
-import 'package:count_me_down/database/seed_data.dart';
+import 'package:count_me_down/database/seed_data.dart' as seed_data;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -61,7 +61,7 @@ class SqfDbProvider {
         await migrations.create(db, version);
 
         if (seed) {
-          await SeedData.insertSqfSeedData(db);
+          await seed_data.insertSqfSeedData(db);
         }
       },
     );

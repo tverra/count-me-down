@@ -36,8 +36,10 @@ Future<Session?> getSession(int id, {List<String>? preloadArgs}) async {
   return session;
 }
 
-Future<List<Session>> getSessions(
-    {int? profileId, List<String>? preloadArgs}) async {
+Future<List<Session>> getSessions({
+  int? profileId,
+  List<String>? preloadArgs,
+}) async {
   final Database db = await getIdb();
   final Transaction txn = db.transaction(Session.tableName, idbModeReadOnly);
   final ObjectStore store = txn.objectStore(Session.tableName);
@@ -82,7 +84,13 @@ Future<Session> insertSession(Session session) async {
   final Transaction txn = db.transaction(Session.tableName, idbModeReadWrite);
   final ObjectStore store = txn.objectStore(Session.tableName);
 
-  await store.put(session.toMap(forQuery: true), session.id);
+  final Object key = await store.put(session.toMap(forQuery: true), session.id);
+
+  if (session.id == null) {
+    session.id = key as int;
+    await store.put(session.toMap(forQuery: true), session.id);
+  }
+
   await txn.completed;
 
   return session;
@@ -94,39 +102,58 @@ Future<List<Session>> insertSessions(List<Session> sessions) async {
   final ObjectStore store = txn.objectStore(Session.tableName);
 
   for (final Session session in sessions) {
-    await store.put(session.toMap(forQuery: true), session.id);
+    final Object key =
+        await store.put(session.toMap(forQuery: true), session.id);
+
+    if (session.id == null) {
+      session.id = key as int;
+      await store.put(session.toMap(forQuery: true), session.id);
+    }
   }
   await txn.completed;
 
   return sessions;
 }
 
-Future<Session?> updateSession(Session session,
-    {bool insertMissing = false}) async {
+Future<Session?> updateSession(
+  Session session, {
+  bool insertMissing = false,
+}) async {
   final Database db = await getIdb();
   final Transaction txn = db.transaction(Session.tableName, idbModeReadWrite);
   final ObjectStore store = txn.objectStore(Session.tableName);
   Session? res;
 
   if (insertMissing) {
-    await store.put(session.toMap(forQuery: true), session.id);
-    res = session;
-  } else {
-    final List<Object> keys = await store.getAllKeys();
+    final Object key =
+        await store.put(session.toMap(forQuery: true), session.id);
+    res = session.copy();
+    res.id = key as int;
 
-    if (keys.contains(session.id)) {
-      await store.put(session.toMap(forQuery: true), session.id);
-      res = session;
+    if (session.id == null) {
+      await store.put(session.toMap(forQuery: true), key);
+    }
+  } else {
+    if (session.id != null) {
+      final List<Object> keys = await store.getAllKeys();
+
+      if (keys.contains(session.id)) {
+        final Object key =
+            await store.put(session.toMap(forQuery: true), session.id);
+        res?.id = key as int;
+      }
     }
   }
   await txn.completed;
   return res;
 }
 
-Future<List<Session>> updateSessions(List<Session> sessions,
-    {int? profileId,
-    bool insertMissing = false,
-    bool removeDeleted = false}) async {
+Future<List<Session>> updateSessions(
+  List<Session> sessions, {
+  int? profileId,
+  bool insertMissing = false,
+  bool removeDeleted = false,
+}) async {
   final List<Session> existing = await getSessions(profileId: profileId);
 
   final Database db = await getIdb();
@@ -136,22 +163,36 @@ Future<List<Session>> updateSessions(List<Session> sessions,
   final List<Session> res = <Session>[];
 
   for (final Session session in sessions) {
+    final Session copy = session.copy();
+
     if (insertMissing) {
-      await store.put(session.toMap(forQuery: true), session.id);
+      final Object key =
+          await store.put(session.toMap(forQuery: true), session.id);
+      copy.id = key as int;
+
+      if (session.id == null) {
+        await store.put(copy.toMap(forQuery: true), key);
+      }
+
       res.add(session);
     } else {
-      if (existing.where((Session c) => c.id == session.id).isNotEmpty) {
-        await store.put(session.toMap(forQuery: true), session.id);
-        res.add(session);
+      if (session.id != null) {
+        if (existing.where((Session c) => c.id == session.id).isNotEmpty) {
+          final Object key =
+              await store.put(session.toMap(forQuery: true), session.id);
+          copy.id = key as int;
+          res.add(copy);
+        }
       }
     }
   }
 
   if (removeDeleted) {
     for (final Session session in existing) {
-      if (res.where((Session c) => c.id == session.id).isEmpty) {
-        final int? sessionId = session.id;
-        if (sessionId != null) await store.delete(sessionId);
+      final int? id = session.id;
+
+      if (id != null && res.where((Session c) => c.id == session.id).isEmpty) {
+        await store.delete(id);
       }
     }
   }

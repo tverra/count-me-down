@@ -9,8 +9,8 @@ import 'package:count_me_down/utils/percent.dart';
 import 'package:count_me_down/utils/volume.dart';
 import 'package:flutter/material.dart';
 
-import 'test_utils.dart' as test_utils;
 import 'test_db_utils.dart' as db_utils;
+import 'test_utils.dart' as test_utils;
 
 Future<Drink> insertDrink({
   int? id,
@@ -27,7 +27,7 @@ Future<Drink> insertDrink({
 
   if (sessionId == null) {
     relSession = session ?? getSession();
-    await db_utils.insertSession(relSession);
+    relSession.id = await db_utils.insertSession(relSession);
   }
 
   final int? relSessionId = relSession?.id ?? sessionId;
@@ -71,7 +71,7 @@ Drink getDrink({
     volume: volume ?? Volume(500),
     alcoholConcentration: alcoholConcentration ?? Percent(0.05),
     timestamp: timestamp ?? dateTime,
-    color: color ?? Color(4283215696),
+    color: color ?? const Color(0xff4caf50),
     drinkType: drinkType ?? DrinkTypes.beer,
   );
   drink.id = id;
@@ -117,7 +117,7 @@ Profile getProfile({
     name: name ?? 'Profile',
     bodyWeight: bodyWeight ?? Mass.units(kilos: 75),
     bodyWaterPercentage: bodyWaterPercentage ?? Percent.fromPercent(60),
-    absorptionTime: absorptionTime ?? Duration(hours: 1),
+    absorptionTime: absorptionTime ?? const Duration(hours: 1),
     perMilMetabolizedPerHour: perMilMetabolizedPerHour ?? 0.15,
   );
   profile.id = id;
@@ -139,7 +139,7 @@ Future<Session> insertSession({
 
   if (profileId == null) {
     relProfile = profile ?? getProfile();
-    await db_utils.insertProfile(relProfile);
+    relProfile.id = await db_utils.insertProfile(relProfile);
   }
 
   final int? relProfileId = relProfile?.id ?? profileId;
@@ -174,7 +174,7 @@ Session getSession({
   final Session session = Session(
     profileId: profileId,
     name: name ?? 'Session',
-    startedAt: startedAt ?? dateTime.subtract(Duration(hours: 1)),
+    startedAt: startedAt ?? dateTime.subtract(const Duration(hours: 1)),
     endedAt: endedAt ?? dateTime,
   );
   session.id = id;
@@ -197,11 +197,11 @@ Future<Preferences> insertPreferences({
 
   if (activeSessionId == null) {
     relSession = relSession ?? getSession();
-    await db_utils.insertSession(relSession);
+    relSession.id = await db_utils.insertSession(relSession);
   }
   if (activeProfileId == null) {
     relProfile = relProfile ?? getProfile();
-    await db_utils.insertProfile(relProfile);
+    relProfile.id = await db_utils.insertProfile(relProfile);
   }
 
   final int? relSessionId = relSession?.id ?? activeSessionId;

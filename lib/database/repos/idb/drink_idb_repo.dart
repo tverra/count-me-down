@@ -31,8 +31,10 @@ Future<Drink?> getDrink(int id, {List<String>? preloadArgs}) async {
   return drink;
 }
 
-Future<List<Drink>> getDrinks(
-    {int? sessionId, List<String>? preloadArgs}) async {
+Future<List<Drink>> getDrinks({
+  int? sessionId,
+  List<String>? preloadArgs,
+}) async {
   final Database db = await getIdb();
   final Transaction txn = db.transaction(Drink.tableName, idbModeReadOnly);
   final ObjectStore store = txn.objectStore(Drink.tableName);
@@ -106,7 +108,13 @@ Future<Drink> insertDrink(Drink drink) async {
   final Transaction txn = db.transaction(Drink.tableName, idbModeReadWrite);
   final ObjectStore store = txn.objectStore(Drink.tableName);
 
-  await store.put(drink.toMap(forQuery: true), drink.id);
+  final Object key = await store.put(drink.toMap(forQuery: true), drink.id);
+
+  if (drink.id == null) {
+    drink.id = key as int;
+    await store.put(drink.toMap(forQuery: true), drink.id);
+  }
+
   await txn.completed;
 
   return drink;
@@ -118,7 +126,12 @@ Future<List<Drink>> insertDrinks(List<Drink> drinks) async {
   final ObjectStore store = txn.objectStore(Drink.tableName);
 
   for (final Drink drink in drinks) {
-    await store.put(drink.toMap(forQuery: true), drink.id);
+    final Object key = await store.put(drink.toMap(forQuery: true), drink.id);
+
+    if (drink.id == null) {
+      drink.id = key as int;
+      await store.put(drink.toMap(forQuery: true), drink.id);
+    }
   }
   await txn.completed;
 
@@ -132,14 +145,22 @@ Future<Drink?> updateDrink(Drink drink, {bool insertMissing = false}) async {
   Drink? res;
 
   if (insertMissing) {
-    await store.put(drink.toMap(forQuery: true), drink.id);
-    res = drink;
-  } else {
-    final List<Object> keys = await store.getAllKeys();
+    final Object key = await store.put(drink.toMap(forQuery: true), drink.id);
+    final Drink res = drink.copy();
+    res.id = key as int;
 
-    if (keys.contains(drink.id)) {
-      await store.put(drink.toMap(forQuery: true), drink.id);
-      res = drink;
+    if (drink.id == null) {
+      await store.put(drink.toMap(forQuery: true), key);
+    }
+  } else {
+    if (drink.id != null) {
+      final List<Object> keys = await store.getAllKeys();
+
+      if (keys.contains(drink.id)) {
+        final Object key =
+            await store.put(drink.toMap(forQuery: true), drink.id);
+        res?.id = key as int;
+      }
     }
   }
   await txn.completed;
@@ -161,13 +182,25 @@ Future<List<Drink>> updateDrinks(
   final List<Drink> res = <Drink>[];
 
   for (final Drink drink in drinks) {
+    final Drink copy = drink.copy();
+
     if (insertMissing) {
-      await store.put(drink.toMap(forQuery: true), drink.id);
+      final Object key = await store.put(drink.toMap(forQuery: true), drink.id);
+      copy.id = key as int;
+
+      if (drink.id == null) {
+        await store.put(drink.toMap(forQuery: true), drink.id);
+      }
+
       res.add(drink);
     } else {
-      if (existing.where((Drink c) => c.id == drink.id).isNotEmpty) {
-        await store.put(drink.toMap(forQuery: true), drink.id);
-        res.add(drink);
+      if (drink.id != null) {
+        if (existing.where((Drink c) => c.id == drink.id).isNotEmpty) {
+          final Object key =
+              await store.put(drink.toMap(forQuery: true), drink.id);
+          copy.id = key as int;
+          res.add(drink);
+        }
       }
     }
   }
@@ -175,9 +208,11 @@ Future<List<Drink>> updateDrinks(
   if (removeDeleted) {
     for (final Drink drink in existing) {
       if (res.where((Drink c) => c.id == drink.id).isEmpty) {
-        final int? drinkId = drink.id;
+        final int? id = drink.id;
 
-        if (drinkId != null) await store.delete(drinkId);
+        if (id != null && res.where((Drink d) => d.id == drink.id).isEmpty) {
+          await store.delete(id);
+        }
       }
     }
   }

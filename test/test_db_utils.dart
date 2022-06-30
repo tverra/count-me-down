@@ -124,6 +124,15 @@ Future<int> insertProfile(Profile profile) async {
         db.transaction(Profile.tableName, idb.idbModeReadWrite);
     final idb.ObjectStore store = txn.objectStore(Profile.tableName);
     res = await store.put(profile.toMap(forQuery: true), profile.id) as int;
+
+    if (profile.id == null) {
+      profile.id = res;
+
+      await store.put(
+        profile.toMap(forQuery: true),
+        res,
+      );
+    }
     await txn.completed;
   }
 
@@ -185,6 +194,15 @@ Future<int> insertSession(Session session) async {
         db.transaction(Session.tableName, idb.idbModeReadWrite);
     final idb.ObjectStore store = txn.objectStore(Session.tableName);
     res = await store.put(session.toMap(forQuery: true), session.id) as int;
+
+    if (session.id == null) {
+      session.id = res;
+
+      await store.put(
+        session.toMap(forQuery: true),
+        res,
+      );
+    }
     await txn.completed;
   }
 
@@ -242,7 +260,9 @@ Future<int> insertPreferences(Preferences preferences) async {
   if (useSqfLiteDb) {
     final sqf.Database db = await getSqfDb();
     res = await db.insert(
-        Preferences.tableName, preferences.toMap(forQuery: true));
+      Preferences.tableName,
+      preferences.toMap(forQuery: true),
+    );
   } else {
     final idb.Database db = await getIdb();
     final idb.Transaction txn =

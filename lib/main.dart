@@ -14,10 +14,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final Preferences preferences = await getPreferences();
 
-  runApp(Provider(
+  runApp(Provider<Preferences>(
     create: (_) => preferences,
     child: CountMeDownApp(),
-  ));
+  ),);
 }
 
 class CountMeDownApp extends StatelessWidget {
@@ -28,23 +28,23 @@ class CountMeDownApp extends StatelessWidget {
     return MaterialApp(
         theme: ThemeData(
           // Hot 'n Sweet blå
-          primaryColor: Color.fromRGBO(1, 12, 142, 1),
+          primaryColor: const Color.fromRGBO(1, 12, 142, 1),
           // Jägermeister grønn
           // primaryColor: Color.fromRGBO(11, 38, 16, 1),
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         initialRoute: preferences.activeSessionId == null ? '/' : 'session',
-        routes: {
+        routes: <String, Widget Function(BuildContext)>{
           '/': (_) => StartPage(),
           '/settings': (_) => SettingsPage(),
           '/sessions': (_) => SessionsPage(),
           '/sessions/createSession': (_) => CreateSessionPage(),
-          '/scoreboard': (_) => ScoreboardPage(),
-          '/profile': (_) => ProfilePage(),
-          'session': (_) => SessionPage(),
+          '/scoreboard': (_) => const ScoreboardPage(),
+          '/profile': (_) => const ProfilePage(),
+          'session': (_) => const SessionPage(),
         },
         onGenerateRoute: (RouteSettings settings) {
           return null;
-        });
+        },);
   }
 }

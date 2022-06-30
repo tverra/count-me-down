@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SessionsPage extends StatefulWidget {
-  static const routeName = '/sessions';
+  static const String routeName = '/sessions';
 
   @override
   _SessionsPageState createState() => _SessionsPageState();
@@ -20,21 +20,22 @@ class _SessionsPageState extends State<SessionsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Sessions')),
-      body: Builder(builder: (BuildContext context) {
-        return FutureBuilder(
-          future: getSessions(),
-          builder:
-              (BuildContext context, AsyncSnapshot<List<Session>> snapshot) {
-            final List<Session>? data = snapshot.data;
+      appBar: AppBar(title: const Text('Sessions')),
+      body: Builder(
+        builder: (BuildContext context) {
+          return FutureBuilder<List<Session>>(
+            future: getSessions(),
+            builder:
+                (BuildContext context, AsyncSnapshot<List<Session>> snapshot) {
+              final List<Session>? data = snapshot.data;
 
-            if (data == null) {
-              return Center(child: CircularProgressIndicator());
-            }
+              if (data == null) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-            return Stack(
-              children: [
-                ListView.builder(
+              return Stack(
+                children: <Widget>[
+                  ListView.builder(
                     padding: EdgeInsets.only(
                       bottom: 80.0 + MediaQuery.of(context).padding.bottom,
                     ),
@@ -44,7 +45,7 @@ class _SessionsPageState extends State<SessionsPage> {
                       final DateTime? startedAt = session.startedAt;
 
                       return Container(
-                        padding: EdgeInsets.symmetric(vertical: 4.0),
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: Material(
                           elevation: 2.0,
                           child: TextButton(
@@ -57,67 +58,72 @@ class _SessionsPageState extends State<SessionsPage> {
                                   const EdgeInsets.symmetric(vertical: 20.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
+                                children: <Widget>[
                                   Text(
                                     session.name ?? '',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 17.0,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  startedAt != null
-                                      ? Text(
-                                          utils.formatDatetime(startedAt),
-                                          style: TextStyle(
-                                            color: Colors.black45,
-                                          ),
-                                        )
-                                      : Container(),
+                                  if (startedAt != null)
+                                    Text(
+                                      utils.formatDatetime(startedAt),
+                                      style: const TextStyle(
+                                        color: Colors.black45,
+                                      ),
+                                    )
+                                  else
+                                    Container(),
                                 ],
                               ),
                             ),
                           ),
                         ),
                       );
-                    }),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SafeArea(
-                    top: false,
-                    right: false,
-                    left: false,
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 20.0),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
+                    },
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: SafeArea(
+                      top: false,
+                      right: false,
+                      left: false,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10.0,
+                          horizontal: 20.0,
                         ),
-                        child: Container(
-                          padding: const EdgeInsets.all(
-                            15.0,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: Theme.of(context).primaryColor,
                           ),
-                          child: Text(
-                            'Start new session',
-                            style: TextStyle(
-                              color: utils.getThemeTextColor(context),
-                              fontSize: 17.0,
+                          onPressed: _isLoading
+                              ? null
+                              : () => _createNewSession(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(
+                              15.0,
+                            ),
+                            child: Text(
+                              'Start new session',
+                              style: TextStyle(
+                                color: utils.getThemeTextColor(context),
+                                fontSize: 17.0,
+                              ),
                             ),
                           ),
                         ),
-                        onPressed: _isLoading
-                            ? null
-                            : () => _createNewSession(context),
                       ),
                     ),
                   ),
-                ),
-              ],
-            );
-          },
-        );
-      }),
+                ],
+              );
+            },
+          );
+        },
+      ),
     );
   }
 
@@ -132,8 +138,12 @@ class _SessionsPageState extends State<SessionsPage> {
     preferences.activeSessionId = session.id;
     await updatePreferences(preferences);
 
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil(SessionPage.routeName, (route) => false);
+    setState(() {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        SessionPage.routeName,
+        (Route<dynamic> route) => false,
+      );
+    });
   }
 
   void _createNewSession(BuildContext context) {

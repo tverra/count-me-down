@@ -1,6 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:count_me_down/database/db_utils.dart';
 import 'package:count_me_down/database/db_utils.dart' as db_utils;
+import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -195,7 +195,9 @@ Map<String, dynamic> getPreferences([Map<String, dynamic>? values]) {
   }
   if (values?['current_session'] != null) {
     preferences.putIfAbsent(
-        'current_session', () => values?['current_session']);
+      'current_session',
+      () => values?['current_session'],
+    );
   }
 
   return preferences;

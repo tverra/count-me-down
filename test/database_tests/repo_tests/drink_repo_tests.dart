@@ -3,13 +3,11 @@ import 'package:count_me_down/database/db_utils.dart';
 import 'package:count_me_down/models/drink.dart';
 import 'package:count_me_down/models/session.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import '../../test_utils.dart' as test_utils;
-
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../../data_generator.dart' as generator;
 import '../../test_db_utils.dart' as db_utils;
+import '../../test_utils.dart' as test_utils;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -121,7 +119,7 @@ void main() {
     });
 
     test('returns empty list if no templates exists', () async {
-      test_utils.clearDb();
+      await test_utils.clearDb();
 
       for (int i = 0; i < 10; i++) {
         await generator.insertDrink();
@@ -209,7 +207,7 @@ void main() {
       final List<Drink> drinks = <Drink>[];
 
       for (int i = 0; i < 5; i++) {
-        final Drink drink = generator.getDrink(sessionId: -1);
+        final Drink drink = generator.getDrink();
         drinks.add(drink);
       }
       await insertDrinks(drinks);
@@ -268,9 +266,9 @@ void main() {
       final Drink drink = generator.getDrink();
       drink.id = null;
       final int? id = (await insertDrink(drink)).id;
-      final Drink? insertedDrink = (await getDrinks()).single;
+      final List<Drink> insertedDrinks = await getDrinks();
       expect(id == null, false);
-      expect(insertedDrink == null, false);
+      expect(insertedDrinks.length, 1);
     });
 
     test('correct id is returned after insertion', () async {
@@ -326,7 +324,7 @@ void main() {
       final List<int> expected = <int>[];
 
       for (int i = 0; i < _drinks.length; i++) {
-        _drinks[i].id = 1000 + 1;
+        _drinks[i].id = 1000 + i;
         expected.add(1000 + i);
       }
       final List<Drink> updated = await insertDrinks(_drinks);
@@ -411,10 +409,10 @@ void main() {
     test('updating non-existing row inserts row if insertMissing is true',
         () async {
       final Drink nonInserted = generator.getDrink();
-      await updateDrink(nonInserted, insertMissing: true);
+      final Drink? updated = await updateDrink(nonInserted, insertMissing: true);
 
-      final Drink? updated = await getDrink(nonInserted.id!);
-      expect(updated, nonInserted);
+      final Drink? inserted = await getDrink(updated!.id!);
+      expect(inserted, nonInserted);
     });
 
     test('updating non-existing row does nothing if insertMissing is false',

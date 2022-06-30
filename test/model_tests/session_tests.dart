@@ -21,14 +21,14 @@ void main() {
     late Map<String, dynamic> _sessionMap;
 
     setUp(() {
-      _sessionMap = {
+      _sessionMap = <String, dynamic>{
         'id': 1,
         'profile_id': 1,
         'name': 'Session',
         'volume': 500,
         'started_at': '2021-01-30T11:55:49.291Z',
         'ended_at': '2021-01-30T12:55:49.291Z',
-        'profile': {
+        'profile': <String, dynamic>{
           'id': 1,
           'name': 'Profile',
           'body_weight': 75,
@@ -36,8 +36,8 @@ void main() {
           'absorption_time': 3600000,
           'per_mil_metabolized_per_hour': 0.15,
         },
-        'drinks': [
-          {
+        'drinks': <Map<String, dynamic>>[
+          <String, dynamic>{
             'id': 1,
             'session_id': 1,
             'name': 'Drink',
@@ -47,7 +47,7 @@ void main() {
             'color': 4283215696,
             'drink_type': 'beer',
           },
-          {
+          <String, dynamic>{
             'id': 2,
             'session_id': 1,
             'name': 'Drink',
@@ -67,9 +67,18 @@ void main() {
       expect(session.id, _sessionMap['id']);
       expect(session.profileId, _sessionMap['profile_id']);
       expect(session.name, _sessionMap['name']);
-      expect(session.startedAt, DateTime.parse(_sessionMap['started_at']));
-      expect(session.endedAt, DateTime.parse(_sessionMap['ended_at']));
-      expect(session.profile!.id, _sessionMap['profile']['id']);
+      expect(
+        session.startedAt,
+        DateTime.parse(_sessionMap['started_at'] as String),
+      );
+      expect(
+        session.endedAt,
+        DateTime.parse(_sessionMap['ended_at'] as String),
+      );
+      expect(
+        session.profile!.id,
+        (_sessionMap['profile'] as Map<String, dynamic>)['id'],
+      );
       expect(session.drinks!.length, 2);
     });
 
@@ -79,11 +88,11 @@ void main() {
       final Session session = Session.fromMap(_sessionMap);
 
       final DateTime startedAt = DateTime.fromMillisecondsSinceEpoch(
-        _sessionMap['started_at'],
+        _sessionMap['started_at'] as int,
         isUtc: true,
       );
       final DateTime endedAt = DateTime.fromMillisecondsSinceEpoch(
-        _sessionMap['ended_at'],
+        _sessionMap['ended_at'] as int,
         isUtc: true,
       );
 
@@ -97,11 +106,11 @@ void main() {
       final Session session = Session.fromMap(_sessionMap);
 
       final DateTime startedAt = DateTime.fromMillisecondsSinceEpoch(
-        int.parse(_sessionMap['started_at']),
+        int.parse(_sessionMap['started_at'] as String),
         isUtc: true,
       );
       final DateTime endedAt = DateTime.fromMillisecondsSinceEpoch(
-        int.parse(_sessionMap['ended_at']),
+        int.parse(_sessionMap['ended_at'] as String),
         isUtc: true,
       );
 
@@ -119,7 +128,7 @@ void main() {
     });
 
     test('session is parsed if values are null', () {
-      final Map<String, dynamic> sessionMap = {
+      final Map<String, dynamic> sessionMap = <String, dynamic>{
         'id': null,
         'profile_id': null,
         'name': null,
@@ -157,7 +166,7 @@ void main() {
         name: 'Profile',
         bodyWeight: Mass(75),
         bodyWaterPercentage: Percent(0.6),
-        absorptionTime: Duration(hours: 1),
+        absorptionTime: const Duration(hours: 1),
         perMilMetabolizedPerHour: 0.15,
       )..id = 1;
       _session.drinks = <Drink>[
@@ -167,7 +176,7 @@ void main() {
           volume: Volume(500),
           alcoholConcentration: Percent(0.05),
           timestamp: test_utils.getDateTime(),
-          color: Color(4283215696),
+          color: const Color(0xff4caf50),
           drinkType: DrinkTypes.beer,
         )..id = 1,
         Drink(
@@ -176,7 +185,7 @@ void main() {
           volume: Volume(500),
           alcoholConcentration: Percent(0.05),
           timestamp: test_utils.getDateTime(),
-          color: Color(4283215696),
+          color: const Color(0xff4caf50),
           drinkType: DrinkTypes.beer,
         )..id = 2,
       ];
@@ -190,15 +199,20 @@ void main() {
       expect(sessionMap['name'], _session.name);
       expect(sessionMap['started_at'], _session.startedAt?.toIso8601String());
       expect(sessionMap['ended_at'], _session.endedAt?.toIso8601String());
-      expect(sessionMap['profile']['id'], _session.profile?.id);
-      expect(sessionMap['drinks'].length, 2);
+      expect(
+        (sessionMap['profile'] as Map<String, dynamic>)['id'],
+        _session.profile?.id,
+      );
+      expect((sessionMap['drinks'] as List<Map<String, dynamic>>).length, 2);
     });
 
     test('date times is integers if forQuery', () {
       final Map<String, dynamic> sessionMap = _session.toMap(forQuery: true);
 
       expect(
-          sessionMap['started_at'], _session.startedAt?.millisecondsSinceEpoch);
+        sessionMap['started_at'],
+        _session.startedAt?.millisecondsSinceEpoch,
+      );
       expect(sessionMap['ended_at'], _session.endedAt?.millisecondsSinceEpoch);
     });
 
@@ -237,7 +251,7 @@ void main() {
         name: 'Profile',
         bodyWeight: Mass(75),
         bodyWaterPercentage: Percent(0.6),
-        absorptionTime: Duration(hours: 1),
+        absorptionTime: const Duration(hours: 1),
         perMilMetabolizedPerHour: 0.15,
       )..id = 1;
       _session.drinks = <Drink>[
@@ -247,7 +261,7 @@ void main() {
           volume: Volume(500),
           alcoholConcentration: Percent(0.05),
           timestamp: test_utils.getDateTime(),
-          color: Color(4283215696),
+          color: const Color(0xff4caf50),
           drinkType: DrinkTypes.beer,
         )..id = 1,
         Drink(
@@ -256,7 +270,7 @@ void main() {
           volume: Volume(500),
           alcoholConcentration: Percent(0.05),
           timestamp: test_utils.getDateTime(),
-          color: Color(4283215696),
+          color: const Color(0xff4caf50),
           drinkType: DrinkTypes.beer,
         )..id = 2,
       ];

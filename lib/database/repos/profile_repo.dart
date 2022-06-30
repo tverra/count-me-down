@@ -60,11 +60,17 @@ Future<List<Profile>> updateProfiles(
   bool removeDeleted = false,
 }) {
   if (useSqfLiteDb) {
-    return sqf.updateProfiles(profiles,
-        insertMissing: insertMissing, removeDeleted: removeDeleted);
+    return sqf.updateProfiles(
+      profiles,
+      insertMissing: insertMissing,
+      removeDeleted: removeDeleted,
+    );
   } else {
-    return idb.updateProfiles(profiles,
-        insertMissing: insertMissing, removeDeleted: removeDeleted);
+    return idb.updateProfiles(
+      profiles,
+      insertMissing: insertMissing,
+      removeDeleted: removeDeleted,
+    );
   }
 }
 

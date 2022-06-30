@@ -43,18 +43,26 @@ Future<Session?> updateSession(Session session, {bool insertMissing = false}) {
   }
 }
 
-Future<List<Session>> updateSessions(List<Session> sessions,
-    {int? profileId, bool insertMissing = false, bool removeDeleted = false}) {
+Future<List<Session>> updateSessions(
+  List<Session> sessions, {
+  int? profileId,
+  bool insertMissing = false,
+  bool removeDeleted = false,
+}) {
   if (useSqfLiteDb) {
-    return sqf.updateSessions(sessions,
-        profileId: profileId,
-        insertMissing: insertMissing,
-        removeDeleted: removeDeleted);
+    return sqf.updateSessions(
+      sessions,
+      profileId: profileId,
+      insertMissing: insertMissing,
+      removeDeleted: removeDeleted,
+    );
   } else {
-    return idb.updateSessions(sessions,
-        profileId: profileId,
-        insertMissing: insertMissing,
-        removeDeleted: removeDeleted);
+    return idb.updateSessions(
+      sessions,
+      profileId: profileId,
+      insertMissing: insertMissing,
+      removeDeleted: removeDeleted,
+    );
   }
 }
 

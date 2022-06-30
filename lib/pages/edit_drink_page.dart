@@ -1,25 +1,24 @@
+import 'package:count_me_down/database/db_repos.dart';
 import 'package:count_me_down/models/drink.dart';
 import 'package:count_me_down/utils/utils.dart' as utils;
 import 'package:flutter/material.dart';
-
-import '../database/repos/drink_repo.dart';
 
 class EditDrinkPage extends StatelessWidget {
   final Drink drink;
   final VoidCallback? onEditDrink;
 
-  EditDrinkPage({required this.drink, this.onEditDrink});
+  const EditDrinkPage({required this.drink, this.onEditDrink});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit drink'),
+        title: const Text('Edit drink'),
       ),
       body: Container(
         padding: const EdgeInsets.all(20.0),
         child: Center(
-          child: Container(
+          child: SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -31,7 +30,7 @@ class EditDrinkPage extends StatelessWidget {
                 child: Text(
                   'Delete drink',
                   style: TextStyle(
-                      color: utils.getThemeTextColor(context), fontSize: 18.0),
+                      color: utils.getThemeTextColor(context), fontSize: 18.0,),
                 ),
               ),
             ),

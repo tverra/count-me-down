@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CreateSessionPage extends StatefulWidget {
-  static const routeName = '/sessions/createSession';
+  static const String routeName = '/sessions/createSession';
 
   @override
   _CreateSessionPageState createState() => _CreateSessionPageState();
@@ -21,7 +21,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Start new session'),
+        title: const Text('Start new session'),
       ),
       body: Builder(builder: (BuildContext context) {
         return Container(
@@ -32,14 +32,14 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
               key: _formKey,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: [
+                children: <Widget>[
                   TextFormField(
                     controller: _nameController,
                     autofocus: true,
-                    decoration: InputDecoration(hintText: 'Session name'),
+                    decoration: const InputDecoration(hintText: 'Session name'),
                   ),
-                  SizedBox(height: 40.0),
-                  Container(
+                  const SizedBox(height: 40.0),
+                  SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -63,9 +63,9 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                 ],
               ),
             ),
-          )),
+          ),),
         );
-      }),
+      },),
     );
   }
 
@@ -92,8 +92,10 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
     preferences.activeSessionId = session.id;
     await updatePreferences(preferences);
 
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil(SessionPage.routeName, (route) => false);
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      SessionPage.routeName,
+      (Route<dynamic> route) => false,
+    );
 
     /*if (mounted) {
       setState(() {

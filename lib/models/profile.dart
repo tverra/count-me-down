@@ -4,7 +4,7 @@ import 'package:count_me_down/utils/mass.dart';
 import 'package:count_me_down/utils/percent.dart';
 
 class Profile {
-  static const String tableName = 'profile';
+  static const String tableName = 'profiles';
   static const String colId = 'id';
   static const String colName = 'name';
   static const String colBodyWeight = 'body_weight';
@@ -36,17 +36,20 @@ class Profile {
 
     id = p.tryParseInt(map[colId]);
     name = p.tryParseString(map[colName]);
-    bodyWeight = map[colBodyWeight] != null ? Mass(map[colBodyWeight]) : null;
+    bodyWeight =
+        map[colBodyWeight] != null ? Mass(map[colBodyWeight] as int) : null;
     bodyWaterPercentage = map[colBodyWaterPercentage] != null
-        ? Percent(map[colBodyWaterPercentage])
+        ? Percent(map[colBodyWaterPercentage] as double)
         : null;
     absorptionTime = map[colAbsorptionTime] != null
-        ? Duration(milliseconds: map[colAbsorptionTime])
+        ? Duration(milliseconds: map[colAbsorptionTime] as int)
         : null;
     perMilMetabolizedPerHour =
         p.tryParseDouble(map[colPerMilMetabolizedPerHour]);
     sessions = map[relSessions] != null
-        ? map[relSessions].map<Session>((s) => Session.fromMap(s)).toList()
+        ? (map[relSessions] as List<Map<String, dynamic>>)
+            .map<Session>((Map<String, dynamic> s) => Session.fromMap(s))
+            .toList()
         : null;
   }
 
@@ -91,8 +94,11 @@ class Profile {
     };
 
     if (!forQuery) {
-      map.putIfAbsent(relSessions,
-          () => sessions?.map((s) => s.toMap(forQuery: forQuery)).toList());
+      map.putIfAbsent(
+        relSessions,
+        () =>
+            sessions?.map((Session s) => s.toMap(forQuery: forQuery)).toList(),
+      );
     }
 
     return map;
