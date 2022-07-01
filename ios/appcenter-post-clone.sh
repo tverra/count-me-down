@@ -7,8 +7,7 @@ set -e
 set -x
 
 cd ..
-git clone https://github.com/flutter/flutter.git
-git checkout 1.22.6
+git clone -b 1.22.6 https://github.com/flutter/flutter.git
 export PATH=$(pwd)/flutter/bin:$PATH
 
 flutter doctor
