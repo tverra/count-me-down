@@ -48,6 +48,7 @@ class CountMeDownApp extends StatelessWidget {
         '/sessions': (_) => SessionsPage(),
         '/sessions/createSession': (_) => CreateSessionPage(),
         '/scoreboard': (_) => const ScoreboardPage(),
+        '/graph': (_) => const GraphPage(),
         '/profile': (_) => const ProfilePage(),
         'session': (_) => const SessionPage(),
       },
