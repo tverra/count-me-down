@@ -38,7 +38,7 @@ dependencies:
   sqflite_wrapper:
     git:
       # url: git@github.com:tverra/sqflite-wrapper.git
-      url: git://github.com/tverra/sqflite-wrapper
+      url: https://github.com/tverra/sqflite-wrapper.git
       ref: master
   sqlite3_flutter_libs: ^0.5.0
 
