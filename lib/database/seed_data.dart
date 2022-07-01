@@ -1,57 +1,132 @@
+import 'package:count_me_down/database/db_utils.dart' as db_utils;
 import 'package:count_me_down/models/drink.dart';
+import 'package:count_me_down/models/preferences.dart';
 import 'package:count_me_down/models/profile.dart';
 import 'package:count_me_down/utils/mass.dart';
 import 'package:count_me_down/utils/percent.dart';
+import 'package:count_me_down/utils/utils.dart' as utils;
 import 'package:count_me_down/utils/volume.dart';
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:idb_sqflite/idb_sqflite.dart' as idb;
+import 'package:sqflite/sqflite.dart' as sqf;
 
-class SeedData {
-  static final List<Profile> _profiles = <Profile>[
-    Profile(
-      name: 'Generic profile',
-      bodyWeight: Mass.units(kilos: 75),
-      bodyWaterPercentage: Percent.fromPercent(60),
-      absorptionTime: Duration(hours: 1),
-      perMilMetabolizedPerHour: 0.15,
-    ),
-  ];
-  static final List<Drink> _drinks = <Drink>[
-    Drink(
-      name: 'Shot',
-      volume: Volume.exact(centilitres: 4),
-      alcoholConcentration: Percent.fromPercent(40.0),
-      color: Colors.green[800],
-      drinkType: DrinkTypes.glass_whiskey,
-    ),
-    Drink(
-      name: 'Beer',
-      volume: Volume.exact(decilitres: 5),
-      alcoholConcentration: Percent.fromPercent(4.7),
-      color: Colors.orangeAccent,
-      drinkType: DrinkTypes.beer,
-    ),
-    Drink(
-      name: 'Wine',
-      volume: Volume.exact(centilitres: 15),
-      alcoholConcentration: Percent.fromPercent(12.5),
-      color: Colors.red[600],
-      drinkType: DrinkTypes.wine_glass,
-    ),
-  ];
+final List<Profile> _profiles = <Profile>[
+  Profile(
+    name: 'Generic profile',
+    bodyWeight: Mass.units(kilos: 75),
+    bodyWaterPercentage: Percent.fromPercent(60),
+    absorptionTime: const Duration(hours: 1),
+    perMilMetabolizedPerHour: 0.15,
+  ),
+];
+final List<Drink> _drinks = <Drink>[
+  Drink(
+    name: 'Shot',
+    volume: Volume.exact(centilitres: 4),
+    alcoholConcentration: Percent.fromPercent(40.0),
+    color: Colors.green[800],
+    drinkType: DrinkTypes.glassWhiskey,
+  ),
+  Drink(
+    name: 'Beer',
+    volume: Volume.exact(decilitres: 5),
+    alcoholConcentration: Percent.fromPercent(4.7),
+    color: Colors.orangeAccent,
+    drinkType: DrinkTypes.beer,
+  ),
+  Drink(
+    name: 'Wine',
+    volume: Volume.exact(centilitres: 15),
+    alcoholConcentration: Percent.fromPercent(12.5),
+    color: Colors.red[600],
+    drinkType: DrinkTypes.wineGlass,
+  ),
+];
+final Preferences _preferences = Preferences();
 
-  static Future<void> insertSeedData(Database db) async {
-    await db.transaction((Transaction txn) async {
-      final Batch batch = txn.batch();
-
-      _profiles.forEach((profile) {
-        batch.insert('profiles', profile.toMap(forQuery: true));
-      });
-      _drinks.forEach((drink) {
-        batch.insert('drinks', drink.toMap(forQuery: true));
-      });
-
-      await batch.commit();
-    });
+Future<void> insertSqfSeedData(sqf.Database db) async {
+  try {
+    await _seedDataToSqf(db);
+  } catch (error, stacktrace) {
+    debugPrint('\nConverting shared preferences to sqlite failed. Reason:');
+    utils.printInternalErrors(<String, dynamic>{}, error, stacktrace);
   }
+}
+
+Future<void> insertIdbSeedData(idb.Database db) async {
+  try {
+    await _seedDataToIdb(db);
+  } catch (error, stacktrace) {
+    debugPrint('\nConverting shared preferences to sqlite failed. Reason:');
+    utils.printInternalErrors(<String, dynamic>{}, error, stacktrace);
+    await db_utils.clearIdb(db);
+  }
+}
+
+Future<void> _seedDataToSqf(sqf.Database db) async {
+  final List<Object?> res = await db.transaction((sqf.Transaction txn) async {
+    final sqf.Batch batch = txn.batch();
+
+    for (final Profile profile in _profiles) {
+      batch.insert(Profile.tableName, profile.toMap(forQuery: true));
+    }
+    for (final Drink drink in _drinks) {
+      batch.insert(Drink.tableName, drink.toMap(forQuery: true));
+    }
+
+    return batch.commit();
+  });
+
+  _preferences.activeProfileId = int.tryParse(res[0].toString());
+
+  await db.insert(Preferences.tableName, _preferences.toMap(forQuery: true));
+}
+
+Future<void> _seedDataToIdb(idb.Database db) async {
+  final List<int> profileRes = <int>[];
+
+  for (final Profile profile in _profiles) {
+    final Object? res = await db_utils.insertIntoIdb(
+      Profile.tableName,
+      profile.toMap(forQuery: true),
+      db: db,
+    );
+
+    profile.id = int.tryParse(res.toString());
+
+    await db_utils.insertIntoIdb(
+      Profile.tableName,
+      profile.toMap(forQuery: true),
+      key: profile.id,
+      db: db,
+    );
+
+    profileRes.add(int.tryParse(res.toString()) ?? 0);
+  }
+  for (final Drink drink in _drinks) {
+    final Object? res = await db_utils.insertIntoIdb(
+      Drink.tableName,
+      drink.toMap(forQuery: true),
+      db: db,
+    );
+
+    drink.id = int.tryParse(res.toString());
+
+    await db_utils.insertIntoIdb(
+      Drink.tableName,
+      drink.toMap(forQuery: true),
+      key: drink.id,
+      db: db,
+    );
+  }
+
+  _preferences.activeProfileId = profileRes[0];
+  _preferences.id = 1;
+
+  await db_utils.insertIntoIdb(
+    Preferences.tableName,
+    _preferences.toMap(forQuery: true),
+    key: _preferences.id,
+    db: db,
+  );
 }

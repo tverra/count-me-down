@@ -5,8 +5,12 @@ class Volume {
 
   Volume(this.millilitres);
 
-  factory Volume.exact(
-      {int litres, int decilitres, int centilitres, int millilitres}) {
+  factory Volume.exact({
+    int? litres,
+    int? decilitres,
+    int? centilitres,
+    int? millilitres,
+  }) {
     int sum = 0;
 
     if (litres != null) sum += litres * 1000;
@@ -27,12 +31,11 @@ class Volume {
   String toString() {
     final NumberFormat format = NumberFormat('#.##', 'nb_NO');
 
-    if (millilitres == null) return null;
-    if (millilitres > 1000) {
+    if (millilitres >= 1000 || millilitres <= -1000) {
       return '${format.format(litres)} L';
-    } else if (millilitres > 100) {
+    } else if (millilitres >= 100 || millilitres <= -100) {
       return '${format.format(decilitres)} dL';
-    } else if (millilitres > 10) {
+    } else if (millilitres >= 10 || millilitres <= -10) {
       return '${format.format(centilitres)} cL';
     } else {
       return '${format.format(millilitres)} mL';

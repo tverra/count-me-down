@@ -1,0 +1,14 @@
+include: package:lint/analysis_options.yaml
+linter:
+  rules:
+    always_specify_types: true
+    avoid_redundant_argument_values: false
+    library_private_types_in_public_api: false
+    overridden_fields: false
+
+analyzer:
+  exclude:
+    - 'lib/generated_plugin_registrant.dart'
+  errors:
+    missing_required_param: error
+    missing_return: error

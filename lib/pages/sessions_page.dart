@@ -1,14 +1,14 @@
-import 'package:count_me_down/database/db_repo.dart';
+import 'package:count_me_down/database/db_repos.dart';
 import 'package:count_me_down/models/preferences.dart';
 import 'package:count_me_down/models/session.dart';
 import 'package:count_me_down/pages/create_session_page.dart';
 import 'package:count_me_down/pages/session_page.dart';
-import 'package:count_me_down/utils/utils.dart';
+import 'package:count_me_down/utils/utils.dart' as utils;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SessionsPage extends StatefulWidget {
-  static const routeName = '/sessions';
+  static const String routeName = '/sessions';
 
   @override
   _SessionsPageState createState() => _SessionsPageState();
@@ -20,28 +20,32 @@ class _SessionsPageState extends State<SessionsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Sessions')),
-      body: Builder(builder: (BuildContext context) {
-        return FutureBuilder(
-          future: SessionRepo.getSessions(),
-          builder:
-              (BuildContext context, AsyncSnapshot<List<Session>> snapshot) {
-            if (!snapshot.hasData) {
-              return Center(child: CircularProgressIndicator());
-            }
+      appBar: AppBar(title: const Text('Sessions')),
+      body: Builder(
+        builder: (BuildContext context) {
+          return FutureBuilder<List<Session>>(
+            future: getSessions(),
+            builder:
+                (BuildContext context, AsyncSnapshot<List<Session>> snapshot) {
+              final List<Session>? data = snapshot.data;
 
-            return Stack(
-              children: [
-                ListView.builder(
+              if (data == null) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              return Stack(
+                children: <Widget>[
+                  ListView.builder(
                     padding: EdgeInsets.only(
                       bottom: 80.0 + MediaQuery.of(context).padding.bottom,
                     ),
-                    itemCount: snapshot.data != null ? snapshot.data.length : 0,
+                    itemCount: data.length,
                     itemBuilder: (BuildContext context, int index) {
-                      final Session session = snapshot.data[index];
+                      final Session session = data[index];
+                      final DateTime? startedAt = session.startedAt;
 
                       return Container(
-                        padding: EdgeInsets.symmetric(vertical: 4.0),
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: Material(
                           elevation: 2.0,
                           child: TextButton(
@@ -54,65 +58,72 @@ class _SessionsPageState extends State<SessionsPage> {
                                   const EdgeInsets.symmetric(vertical: 20.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
+                                children: <Widget>[
                                   Text(
-                                    session.name,
-                                    style: TextStyle(
+                                    session.name ?? '',
+                                    style: const TextStyle(
                                       fontSize: 17.0,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Text(
-                                    Utils.formatDatetime(session.startedAt),
-                                    style: TextStyle(
-                                      color: Colors.black45,
-                                    ),
-                                  )
+                                  if (startedAt != null)
+                                    Text(
+                                      utils.formatDatetime(startedAt),
+                                      style: const TextStyle(
+                                        color: Colors.black45,
+                                      ),
+                                    )
+                                  else
+                                    Container(),
                                 ],
                               ),
                             ),
                           ),
                         ),
                       );
-                    }),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SafeArea(
-                    top: false,
-                    right: false,
-                    left: false,
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 20.0),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
+                    },
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: SafeArea(
+                      top: false,
+                      right: false,
+                      left: false,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10.0,
+                          horizontal: 20.0,
                         ),
-                        child: Container(
-                          padding: const EdgeInsets.all(
-                            15.0,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: Theme.of(context).primaryColor,
                           ),
-                          child: Text(
-                            'Start new session',
-                            style: TextStyle(
-                              color: Utils.getThemeTextColor(context),
-                              fontSize: 17.0,
+                          onPressed: _isLoading
+                              ? null
+                              : () => _createNewSession(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(
+                              15.0,
+                            ),
+                            child: Text(
+                              'Start new session',
+                              style: TextStyle(
+                                color: utils.getThemeTextColor(context),
+                                fontSize: 17.0,
+                              ),
                             ),
                           ),
                         ),
-                        onPressed: _isLoading
-                            ? null
-                            : () => _createNewSession(context),
                       ),
                     ),
                   ),
-                ),
-              ],
-            );
-          },
-        );
-      }),
+                ],
+              );
+            },
+          );
+        },
+      ),
     );
   }
 
@@ -125,10 +136,14 @@ class _SessionsPageState extends State<SessionsPage> {
 
     final Preferences preferences = context.read<Preferences>();
     preferences.activeSessionId = session.id;
-    await preferences.save();
+    await updatePreferences(preferences);
 
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil(SessionPage.routeName, (route) => false);
+    setState(() {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        SessionPage.routeName,
+        (Route<dynamic> route) => false,
+      );
+    });
   }
 
   void _createNewSession(BuildContext context) {

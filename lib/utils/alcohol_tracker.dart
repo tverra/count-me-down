@@ -1,18 +1,24 @@
 import 'package:count_me_down/extensions.dart';
 import 'package:count_me_down/models/drink.dart';
 import 'package:count_me_down/models/profile.dart';
-import 'package:meta/meta.dart';
 
 class AlcoholTracker {
   final List<Drink> _drinks = <Drink>[];
   final Profile profile;
 
   AlcoholTracker({
-    @required this.profile,
+    required this.profile,
   });
 
   DateTime get lastSober {
-    return _drinks.first.timestamp;
+    final Drink? drink = _drinks.isNotEmpty ? _drinks.first : null;
+    final DateTime? timestamp = drink?.timestamp;
+
+    if (drink == null || timestamp == null) {
+      return DateTime.now();
+    }
+
+    return timestamp;
   }
 
   Duration get durationSinceLastSober {
@@ -37,22 +43,27 @@ class AlcoholTracker {
   double consumedAlcoholBetween(DateTime from, DateTime to) {
     double sum = 0.0;
 
-    final List<Drink> relevantDrinks =
-        _drinks.where((drink) => drink.consumedBetween(from, to)).toList();
+    final List<Drink> relevantDrinks = _drinks
+        .where((Drink drink) => drink.consumedBetween(from, to))
+        .toList();
 
-    relevantDrinks.forEach((drink) =>
-        sum += drink.currentlyAbsorbedAlcohol(profile.absorptionTime));
+    for (final Drink drink in relevantDrinks) {
+      sum += drink
+          .currentlyAbsorbedAlcohol(profile.absorptionTime ?? Duration.zero);
+    }
 
     return sum;
   }
 
   double _totalBloodAlcoholPerMil(DateTime timestamp) {
     return (consumedAlcoholBetween(lastSober, timestamp) /
-            (profile.bodyWeight.grams * profile.bodyWaterPercentage.fraction)) *
+            ((profile.bodyWeight?.grams ?? 0) *
+                (profile.bodyWaterPercentage?.fraction ?? 0))) *
         1000;
   }
 
   double _metabolizedAlcoholPerMil(DateTime timestamp) {
-    return profile.perMilMetabolizedPerHour * durationSinceLastSober.inHours;
+    return (profile.perMilMetabolizedPerHour ?? 0) *
+        durationSinceLastSober.inHours;
   }
 }

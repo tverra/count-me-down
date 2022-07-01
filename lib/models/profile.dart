@@ -1,4 +1,5 @@
 import 'package:count_me_down/models/session.dart';
+import 'package:count_me_down/utils/data_parser.dart';
 import 'package:count_me_down/utils/mass.dart';
 import 'package:count_me_down/utils/percent.dart';
 
@@ -13,14 +14,14 @@ class Profile {
       'per_mil_metabolized_per_hour';
   static const String relSessions = 'sessions';
 
-  int id;
-  String name;
-  Mass bodyWeight;
-  Percent bodyWaterPercentage;
-  Duration absorptionTime;
-  double perMilMetabolizedPerHour;
+  int? id;
+  String? name;
+  Mass? bodyWeight;
+  Percent? bodyWaterPercentage;
+  Duration? absorptionTime;
+  double? perMilMetabolizedPerHour;
 
-  List<Session> sessions;
+  List<Session>? sessions;
 
   Profile({
     this.name,
@@ -31,18 +32,24 @@ class Profile {
   });
 
   Profile.fromMap(Map<String, dynamic> map) {
-    id = map[colId];
-    name = map[colName];
-    bodyWeight = map[colBodyWeight] != null ? Mass(map[colBodyWeight]) : null;
+    final DataParser p = DataParser();
+
+    id = p.tryParseInt(map[colId]);
+    name = p.tryParseString(map[colName]);
+    bodyWeight =
+        map[colBodyWeight] != null ? Mass(map[colBodyWeight] as int) : null;
     bodyWaterPercentage = map[colBodyWaterPercentage] != null
-        ? Percent(map[colBodyWaterPercentage])
+        ? Percent(map[colBodyWaterPercentage] as double)
         : null;
     absorptionTime = map[colAbsorptionTime] != null
-        ? Duration(milliseconds: map[colAbsorptionTime])
+        ? Duration(milliseconds: map[colAbsorptionTime] as int)
         : null;
-    perMilMetabolizedPerHour = map[colPerMilMetabolizedPerHour];
+    perMilMetabolizedPerHour =
+        p.tryParseDouble(map[colPerMilMetabolizedPerHour]);
     sessions = map[relSessions] != null
-        ? map[relSessions].map<Session>((s) => Session.fromMap(s)).toList()
+        ? (map[relSessions] as List<Map<String, dynamic>>)
+            .map<Session>((Map<String, dynamic> s) => Session.fromMap(s))
+            .toList()
         : null;
   }
 
@@ -57,6 +64,14 @@ class Profile {
     ];
   }
 
+  static List<Profile>? fromMapList(dynamic list) {
+    return (list as List<dynamic>?)
+        ?.map<Profile>(
+          (dynamic profile) => Profile.fromMap(profile as Map<String, dynamic>),
+        )
+        .toList();
+  }
+
   static String getGender(double bodyWaterPercentage) {
     if (bodyWaterPercentage == 70.0) {
       return 'Male';
@@ -68,33 +83,34 @@ class Profile {
   }
 
   Map<String, dynamic> toMap({bool forQuery = false}) {
-    final Map<String, dynamic> map = <String, dynamic>{};
-
-    map[colId] = id;
-    map[colName] = name;
-    map[colBodyWeight] = bodyWeight != null ? bodyWeight.grams : null;
-    map[colBodyWaterPercentage] =
-        bodyWaterPercentage != null ? bodyWaterPercentage.fraction : null;
-    map[colAbsorptionTime] =
-        absorptionTime != null ? absorptionTime.inMilliseconds : null;
-    map[colPerMilMetabolizedPerHour] = perMilMetabolizedPerHour;
+    final DataParser p = DataParser(forQuery: forQuery);
+    final Map<String, dynamic> map = <String, dynamic>{
+      colId: p.serializeInt(id),
+      colName: p.serializeString(name),
+      colBodyWeight: bodyWeight?.grams,
+      colBodyWaterPercentage: bodyWaterPercentage?.fraction,
+      colAbsorptionTime: absorptionTime?.inMilliseconds,
+      colPerMilMetabolizedPerHour: perMilMetabolizedPerHour,
+    };
 
     if (!forQuery) {
-      map[relSessions] = sessions != null
-          ? sessions.map((s) => s.toMap(forQuery: forQuery)).toList()
-          : null;
+      map.putIfAbsent(
+        relSessions,
+        () =>
+            sessions?.map((Session s) => s.toMap(forQuery: forQuery)).toList(),
+      );
     }
 
     return map;
   }
 
   Profile copyWith({
-    int sessionId,
-    String name,
-    double bodyWeight,
-    double bodyWaterPercentage,
-    Duration absorptionTime,
-    double perMilMetabolizedPerHour,
+    int? sessionId,
+    String? name,
+    Mass? bodyWeight,
+    Percent? bodyWaterPercentage,
+    Duration? absorptionTime,
+    double? perMilMetabolizedPerHour,
   }) {
     return Profile(
       name: name ?? this.name,

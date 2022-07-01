@@ -3,7 +3,7 @@ class Mass {
 
   Mass(this.grams);
 
-  factory Mass.units({int kilos, int grams}) {
+  factory Mass.units({int? kilos, int? grams}) {
     int sum = 0;
 
     if (kilos != null) sum += kilos * 1000;

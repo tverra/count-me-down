@@ -8,7 +8,7 @@ import 'package:count_me_down/utils/percent.dart';
 import 'package:count_me_down/utils/volume.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../test_utils.dart';
+import '../test_utils.dart' as test_utils;
 
 void main() {
   /*test('this is a test', () {
@@ -18,17 +18,17 @@ void main() {
   });*/
 
   group('fromMap', () {
-    Map<String, dynamic> _sessionMap;
+    late Map<String, dynamic> _sessionMap;
 
     setUp(() {
-      _sessionMap = {
+      _sessionMap = <String, dynamic>{
         'id': 1,
         'profile_id': 1,
         'name': 'Session',
         'volume': 500,
         'started_at': '2021-01-30T11:55:49.291Z',
         'ended_at': '2021-01-30T12:55:49.291Z',
-        'profile': {
+        'profile': <String, dynamic>{
           'id': 1,
           'name': 'Profile',
           'body_weight': 75,
@@ -36,8 +36,8 @@ void main() {
           'absorption_time': 3600000,
           'per_mil_metabolized_per_hour': 0.15,
         },
-        'drinks': [
-          {
+        'drinks': <Map<String, dynamic>>[
+          <String, dynamic>{
             'id': 1,
             'session_id': 1,
             'name': 'Drink',
@@ -47,7 +47,7 @@ void main() {
             'color': 4283215696,
             'drink_type': 'beer',
           },
-          {
+          <String, dynamic>{
             'id': 2,
             'session_id': 1,
             'name': 'Drink',
@@ -67,10 +67,19 @@ void main() {
       expect(session.id, _sessionMap['id']);
       expect(session.profileId, _sessionMap['profile_id']);
       expect(session.name, _sessionMap['name']);
-      expect(session.startedAt, DateTime.parse(_sessionMap['started_at']));
-      expect(session.endedAt, DateTime.parse(_sessionMap['ended_at']));
-      expect(session.profile.id, _sessionMap['profile']['id']);
-      expect(session.drinks.length, 2);
+      expect(
+        session.startedAt,
+        DateTime.parse(_sessionMap['started_at'] as String),
+      );
+      expect(
+        session.endedAt,
+        DateTime.parse(_sessionMap['ended_at'] as String),
+      );
+      expect(
+        session.profile!.id,
+        (_sessionMap['profile'] as Map<String, dynamic>)['id'],
+      );
+      expect(session.drinks!.length, 2);
     });
 
     test('date times can be integers', () {
@@ -79,11 +88,11 @@ void main() {
       final Session session = Session.fromMap(_sessionMap);
 
       final DateTime startedAt = DateTime.fromMillisecondsSinceEpoch(
-        _sessionMap['started_at'],
+        _sessionMap['started_at'] as int,
         isUtc: true,
       );
       final DateTime endedAt = DateTime.fromMillisecondsSinceEpoch(
-        _sessionMap['ended_at'],
+        _sessionMap['ended_at'] as int,
         isUtc: true,
       );
 
@@ -97,11 +106,11 @@ void main() {
       final Session session = Session.fromMap(_sessionMap);
 
       final DateTime startedAt = DateTime.fromMillisecondsSinceEpoch(
-        int.parse(_sessionMap['started_at']),
+        int.parse(_sessionMap['started_at'] as String),
         isUtc: true,
       );
       final DateTime endedAt = DateTime.fromMillisecondsSinceEpoch(
-        int.parse(_sessionMap['ended_at']),
+        int.parse(_sessionMap['ended_at'] as String),
         isUtc: true,
       );
 
@@ -119,7 +128,7 @@ void main() {
     });
 
     test('session is parsed if values are null', () {
-      final Map<String, dynamic> sessionMap = {
+      final Map<String, dynamic> sessionMap = <String, dynamic>{
         'id': null,
         'profile_id': null,
         'name': null,
@@ -143,21 +152,21 @@ void main() {
   });
 
   group('toMap', () {
-    Session _session;
+    late Session _session;
 
     setUp(() {
       _session = Session(
         profileId: 1,
         name: 'Session',
-        startedAt: TestUtils.getDateTime(),
-        endedAt: TestUtils.getDateTime(),
+        startedAt: test_utils.getDateTime(),
+        endedAt: test_utils.getDateTime(),
       )..id = 1;
 
       _session.profile = Profile(
         name: 'Profile',
         bodyWeight: Mass(75),
         bodyWaterPercentage: Percent(0.6),
-        absorptionTime: Duration(hours: 1),
+        absorptionTime: const Duration(hours: 1),
         perMilMetabolizedPerHour: 0.15,
       )..id = 1;
       _session.drinks = <Drink>[
@@ -166,8 +175,8 @@ void main() {
           name: 'Drink',
           volume: Volume(500),
           alcoholConcentration: Percent(0.05),
-          timestamp: TestUtils.getDateTime(),
-          color: Color(4283215696),
+          timestamp: test_utils.getDateTime(),
+          color: const Color(0xff4caf50),
           drinkType: DrinkTypes.beer,
         )..id = 1,
         Drink(
@@ -175,8 +184,8 @@ void main() {
           name: 'Drink',
           volume: Volume(500),
           alcoholConcentration: Percent(0.05),
-          timestamp: TestUtils.getDateTime(),
-          color: Color(4283215696),
+          timestamp: test_utils.getDateTime(),
+          color: const Color(0xff4caf50),
           drinkType: DrinkTypes.beer,
         )..id = 2,
       ];
@@ -188,18 +197,23 @@ void main() {
       expect(sessionMap['id'], _session.id);
       expect(sessionMap['profile_id'], _session.profileId);
       expect(sessionMap['name'], _session.name);
-      expect(sessionMap['started_at'], _session.startedAt.toIso8601String());
-      expect(sessionMap['ended_at'], _session.endedAt.toIso8601String());
-      expect(sessionMap['profile']['id'], _session.profile.id);
-      expect(sessionMap['drinks'].length, 2);
+      expect(sessionMap['started_at'], _session.startedAt?.toIso8601String());
+      expect(sessionMap['ended_at'], _session.endedAt?.toIso8601String());
+      expect(
+        (sessionMap['profile'] as Map<String, dynamic>)['id'],
+        _session.profile?.id,
+      );
+      expect((sessionMap['drinks'] as List<Map<String, dynamic>>).length, 2);
     });
 
     test('date times is integers if forQuery', () {
       final Map<String, dynamic> sessionMap = _session.toMap(forQuery: true);
 
       expect(
-          sessionMap['started_at'], _session.startedAt.millisecondsSinceEpoch);
-      expect(sessionMap['ended_at'], _session.endedAt.millisecondsSinceEpoch);
+        sessionMap['started_at'],
+        _session.startedAt?.millisecondsSinceEpoch,
+      );
+      expect(sessionMap['ended_at'], _session.endedAt?.millisecondsSinceEpoch);
     });
 
     test('session is parsed if values are null', () {
@@ -223,21 +237,21 @@ void main() {
   });
 
   group('compare', () {
-    Session _session;
+    late Session _session;
 
     setUp(() {
       _session = Session(
         profileId: 1,
         name: 'Session',
-        startedAt: TestUtils.getDateTime(),
-        endedAt: TestUtils.getDateTime(),
+        startedAt: test_utils.getDateTime(),
+        endedAt: test_utils.getDateTime(),
       )..id = 1;
 
       _session.profile = Profile(
         name: 'Profile',
         bodyWeight: Mass(75),
         bodyWaterPercentage: Percent(0.6),
-        absorptionTime: Duration(hours: 1),
+        absorptionTime: const Duration(hours: 1),
         perMilMetabolizedPerHour: 0.15,
       )..id = 1;
       _session.drinks = <Drink>[
@@ -246,8 +260,8 @@ void main() {
           name: 'Drink',
           volume: Volume(500),
           alcoholConcentration: Percent(0.05),
-          timestamp: TestUtils.getDateTime(),
-          color: Color(4283215696),
+          timestamp: test_utils.getDateTime(),
+          color: const Color(0xff4caf50),
           drinkType: DrinkTypes.beer,
         )..id = 1,
         Drink(
@@ -255,8 +269,8 @@ void main() {
           name: 'Drink',
           volume: Volume(500),
           alcoholConcentration: Percent(0.05),
-          timestamp: TestUtils.getDateTime(),
-          color: Color(4283215696),
+          timestamp: test_utils.getDateTime(),
+          color: const Color(0xff4caf50),
           drinkType: DrinkTypes.beer,
         )..id = 2,
       ];
@@ -270,7 +284,7 @@ void main() {
 
     test('objects are not equal if parameters are equal', () {
       final Session session = _session.copy();
-      session.id = session.id + 1;
+      session.id = session.id! + 1;
 
       expect(false, _session == session);
     });

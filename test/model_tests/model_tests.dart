@@ -1,9 +1,9 @@
-import 'drink_tests.dart' as drinkTests;
-import 'profile_tests.dart' as profileTests;
-import 'session_tests.dart' as sessionTests;
+import 'drink_tests.dart' as drink_tests;
+import 'profile_tests.dart' as profile_tests;
+import 'session_tests.dart' as session_tests;
 
-main() {
-  drinkTests.main();
-  profileTests.main();
-  sessionTests.main();
+void main() {
+  drink_tests.main();
+  profile_tests.main();
+  session_tests.main();
 }

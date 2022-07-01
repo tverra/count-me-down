@@ -36,7 +36,7 @@ def isAppCenterBuild = System.getenv('APPCENTER_BUILD_ID') ? true : false
 
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 32
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -51,7 +51,7 @@ android {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "no.tverra.count_me_down"
         minSdkVersion 16
-        targetSdkVersion 29
+        targetSdkVersion 32
         versionCode buildNumber.toInteger()
         versionName flutterVersionName
     }

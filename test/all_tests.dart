@@ -1,9 +1,9 @@
-import 'database_tests/database_tests.dart' as databaseTests;
-import 'model_tests/model_tests.dart' as modelTests;
-import 'utils_tests/utils_tests.dart' as utilsTests;
+import 'database_tests/database_tests.dart' as database_tests;
+import 'model_tests/model_tests.dart' as model_tests;
+import 'utils_tests/utils_tests.dart' as utils_tests;
 
-main() {
-  databaseTests.main();
-  modelTests.main();
-  utilsTests.main();
+void main() {
+  database_tests.main();
+  model_tests.main();
+  utils_tests.main();
 }

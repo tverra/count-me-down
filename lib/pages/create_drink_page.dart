@@ -1,34 +1,34 @@
-import 'package:count_me_down/database/db_repo.dart';
+import 'package:count_me_down/database/db_repos.dart';
 import 'package:count_me_down/models/drink.dart';
 import 'package:count_me_down/models/preferences.dart';
 import 'package:count_me_down/utils/percent.dart';
-import 'package:count_me_down/utils/utils.dart';
+import 'package:count_me_down/utils/utils.dart' as utils;
 import 'package:count_me_down/utils/volume.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CreateDrinkPage extends StatefulWidget {
-  final VoidCallback onCreateDrink;
+  final VoidCallback? onCreateDrink;
 
-  CreateDrinkPage({this.onCreateDrink});
+  const CreateDrinkPage({this.onCreateDrink});
 
   @override
   _CreateDrinkPageState createState() => _CreateDrinkPageState();
 }
 
 class _CreateDrinkPageState extends State<CreateDrinkPage> {
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _volumeController = TextEditingController();
-  TextEditingController _alcoholConcentrationController =
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _volumeController = TextEditingController();
+  final TextEditingController _alcoholConcentrationController =
       TextEditingController();
-  bool _isLoading = false;
+  final bool _isLoading = false;
   bool _addToTemplate = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add drink'),
+        title: const Text('Add drink'),
       ),
       body: Builder(
         builder: (BuildContext context) {
@@ -39,43 +39,46 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
                 child: SingleChildScrollView(
                   child: Form(
                     child: Column(
-                      children: [
+                      children: <Widget>[
                         TextFormField(
                           controller: _nameController,
-                          decoration: InputDecoration(
-                              hintText: 'Name',
-                              helperText: 'The name of the drink'),
+                          decoration: const InputDecoration(
+                            hintText: 'Name',
+                            helperText: 'The name of the drink',
+                          ),
                         ),
                         TextFormField(
                           controller: _volumeController,
-                          keyboardType:
-                              TextInputType.numberWithOptions(decimal: true),
-                          decoration: InputDecoration(
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          decoration: const InputDecoration(
                             hintText: 'Volume',
                             helperText: 'Volume in centilitres',
                           ),
                         ),
                         TextFormField(
                           controller: _alcoholConcentrationController,
-                          keyboardType:
-                              TextInputType.numberWithOptions(decimal: true),
-                          decoration: InputDecoration(
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          decoration: const InputDecoration(
                             hintText: 'Alcohol content',
                             helperText: 'Alcohol content in percentage',
                           ),
                         ),
-                        SizedBox(height: 20.0),
+                        const SizedBox(height: 20.0),
                         CheckboxListTile(
-                          title: Text("Add drink to templates"),
-                          contentPadding: const EdgeInsets.all(0),
+                          title: const Text("Add drink to templates"),
+                          contentPadding: EdgeInsets.zero,
                           value: _addToTemplate,
-                          onChanged: (bool newValue) {
-                            setState(() {
-                              _addToTemplate = newValue;
-                            });
+                          onChanged: (bool? newValue) {
+                            if (newValue != null && mounted) {
+                              setState(() {
+                                _addToTemplate = newValue;
+                              });
+                            }
                           },
                         ),
-                        SizedBox(height: 40.0),
+                        const SizedBox(height: 40.0),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             primary: Theme.of(context).primaryColor,
@@ -90,7 +93,7 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
                                 style: TextStyle(
                                   fontSize: 17.0,
                                   fontWeight: FontWeight.bold,
-                                  color: Utils.getThemeTextColor(context),
+                                  color: utils.getThemeTextColor(context),
                                 ),
                               ),
                             ),
@@ -114,8 +117,8 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
     final String volume = _volumeController.text.replaceAll(',', '.');
     final String alcoholConcentration =
         _alcoholConcentrationController.text.replaceAll(',', '.');
-    final double volumeDouble = double.tryParse(volume);
-    final double alcoholDouble = double.tryParse(alcoholConcentration);
+    final double volumeDouble = double.tryParse(volume) ?? 0;
+    final double alcoholDouble = double.tryParse(alcoholConcentration) ?? 0;
 
     if (_addToTemplate) {
       final Drink template = Drink(
@@ -124,10 +127,10 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
         alcoholConcentration: Percent.fromPercent(alcoholDouble),
         timestamp: DateTime.now(),
         color: Colors.black,
-        drinkType: DrinkTypes.glass_whiskey,
+        drinkType: DrinkTypes.glassWhiskey,
       );
 
-      await DrinkRepo.insertDrink(template);
+      await insertDrink(template);
     }
 
     final Drink drink = Drink(
@@ -137,14 +140,16 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
       alcoholConcentration: Percent.fromPercent(alcoholDouble),
       timestamp: DateTime.now(),
       color: Colors.black,
-      drinkType: DrinkTypes.glass_whiskey,
+      drinkType: DrinkTypes.glassWhiskey,
     );
 
-    await DrinkRepo.insertDrink(drink);
-    Utils.drinkWebHook(context);
+    await insertDrink(drink);
+    utils.drinkWebHook(context);
 
-    if (widget.onCreateDrink != null) {
-      widget.onCreateDrink();
+    final VoidCallback? onCreateDrink = widget.onCreateDrink;
+
+    if (onCreateDrink != null) {
+      onCreateDrink();
     }
     Navigator.of(context).pop();
   }

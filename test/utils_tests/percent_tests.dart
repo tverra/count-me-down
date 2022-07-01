@@ -1,7 +1,7 @@
 import 'package:count_me_down/utils/percent.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-main() {
+void main() {
   /*test('test ', () {
     final int actual = 42;
     final int expected = 69;

@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Tæll me ned'),
+      home: const MyHomePage(title: 'Tæll me ned'),
     );
   }
 }
@@ -18,14 +18,16 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   final String title;
 
-  MyHomePage({Key key, this.title}) : super(key: key);
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<TimeSeriesSales> data = [TimeSeriesSales(DateTime.now(), 0)];
+  final List<TimeSeriesSales> data = <TimeSeriesSales>[
+    TimeSeriesSales(DateTime.now(), 0)
+  ];
   double buffer = 0;
   double perMille = 0;
 
@@ -37,7 +39,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final List<charts.Series<TimeSeriesSales, DateTime>> seriesList = [
+    final List<charts.Series<TimeSeriesSales, DateTime>> seriesList =
+        <charts.Series<TimeSeriesSales, DateTime>>[
       charts.Series<TimeSeriesSales, DateTime>(
         id: 'Tablet',
         colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
@@ -53,16 +56,16 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
+        children: <Widget>[
           Container(
             padding: const EdgeInsets.only(top: 10.0, left: 10.0),
             width: double.infinity,
-            child: Text(
+            child: const Text(
               '‰',
               style: TextStyle(fontSize: 20.0),
             ),
           ),
-          Container(
+          SizedBox(
             height: 500.0,
             child: DateTimeComboLinePointChart(
               seriesList,
@@ -72,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             width: double.infinity,
-            child: Text(
+            child: const Text(
               't',
               textAlign: TextAlign.end,
               style: TextStyle(fontSize: 20.0),
@@ -81,16 +84,17 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-          tooltip: 'Increment',
-          child: Icon(Icons.local_drink),
-          onPressed: () {
-            buffer += 0.6;
-          }),
+        tooltip: 'Increment',
+        child: const Icon(Icons.local_drink),
+        onPressed: () {
+          buffer += 0.6;
+        },
+      ),
     );
   }
 
   Future<void> _loop() async {
-    Future.delayed(Duration(seconds: 1), () {
+    Future<void>.delayed(const Duration(seconds: 1), () {
       if (buffer > 0) {
         perMille += 0.2;
         buffer -= 0.2;
@@ -103,11 +107,11 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         data.add(TimeSeriesSales(DateTime.now(), perMille));
       });
-    }).then((value) => _loop());
+    }).then((_) => _loop());
   }
 
   Map<DateTime, double> createLineData(double factor) {
-    Map<DateTime, double> data = {};
+    final Map<DateTime, double> data = <DateTime, double>{};
 
     for (int c = 50; c > 0; c--) {
       data[DateTime.now().subtract(Duration(minutes: c))] =
@@ -119,25 +123,25 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class DateTimeComboLinePointChart extends StatelessWidget {
-  final List<charts.Series> seriesList;
+  final List<charts.Series<dynamic, DateTime>> seriesList;
   final bool animate;
 
-  DateTimeComboLinePointChart(this.seriesList, {this.animate});
+  const DateTimeComboLinePointChart(this.seriesList, {this.animate = true});
 
   @override
   Widget build(BuildContext context) {
     return charts.TimeSeriesChart(
       seriesList,
       animate: animate,
-      defaultRenderer: charts.LineRendererConfig(),
-      customSeriesRenderers: [
-        charts.PointRendererConfig(customRendererId: 'customPoint')
+      defaultRenderer: charts.LineRendererConfig<DateTime>(),
+      customSeriesRenderers: <charts.SeriesRendererConfig<DateTime>>[
+        charts.PointRendererConfig<DateTime>(customRendererId: 'customPoint')
       ],
       dateTimeFactory: const charts.LocalDateTimeFactory(),
-      primaryMeasureAxis: charts.NumericAxisSpec(
-          tickProviderSpec:
-              charts.BasicNumericTickProviderSpec(zeroBound: false)),
-      domainAxis: charts.DateTimeAxisSpec(
+      primaryMeasureAxis: const charts.NumericAxisSpec(
+        tickProviderSpec: charts.BasicNumericTickProviderSpec(zeroBound: false),
+      ),
+      domainAxis: const charts.DateTimeAxisSpec(
         tickFormatterSpec: charts.AutoDateTimeTickFormatterSpec(
           minute:
               charts.TimeFormatterSpec(format: 'mm', transitionFormat: 'HH:mm'),

@@ -7,7 +7,7 @@ import 'package:count_me_down/utils/percent.dart';
 import 'package:count_me_down/utils/volume.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../test_utils.dart';
+import '../test_utils.dart' as test_utils;
 
 void main() {
   /*test('this is a test', () {
@@ -25,10 +25,10 @@ void main() {
   });
 
   group('fromMap', () {
-    Map<String, dynamic> _drinkMap;
+    late Map<String, dynamic> _drinkMap;
 
     setUp(() {
-      _drinkMap = {
+      _drinkMap = <String, dynamic>{
         'id': 1,
         'session_id': 1,
         'name': 'Drink',
@@ -37,7 +37,7 @@ void main() {
         'timestamp': '2021-01-30T11:55:49.291Z',
         'color': 4283215696,
         'drink_type': 'beer',
-        'session': {
+        'session': <String, dynamic>{
           'id': 1,
           'profile_id': 1,
           'name': 'Session',
@@ -53,13 +53,18 @@ void main() {
       expect(drink.id, _drinkMap['id']);
       expect(drink.sessionId, _drinkMap['session_id']);
       expect(drink.name, _drinkMap['name']);
-      expect(drink.volume, Volume(_drinkMap['volume']));
-      expect(drink.alcoholConcentration,
-          Percent(_drinkMap['alcohol_concentration']));
-      expect(drink.timestamp, DateTime.parse(_drinkMap['timestamp']));
-      expect(drink.color, Color(_drinkMap['color']));
+      expect(drink.volume, Volume(_drinkMap['volume'] as int));
+      expect(
+        drink.alcoholConcentration,
+        Percent(_drinkMap['alcohol_concentration'] as double),
+      );
+      expect(drink.timestamp, DateTime.parse(_drinkMap['timestamp'] as String));
+      expect(drink.color, Color(_drinkMap['color'] as int));
       expect(drink.drinkType, DrinkTypes.beer);
-      expect(drink.session.id, _drinkMap['session']['id']);
+      expect(
+        drink.session?.id,
+        (_drinkMap['session'] as Map<String, dynamic>)['id'],
+      );
     });
 
     test('date times can be integers', () {
@@ -67,7 +72,7 @@ void main() {
       final Drink drink = Drink.fromMap(_drinkMap);
 
       final DateTime timestamp = DateTime.fromMillisecondsSinceEpoch(
-        _drinkMap['timestamp'],
+        _drinkMap['timestamp'] as int,
         isUtc: true,
       );
 
@@ -79,7 +84,7 @@ void main() {
       final Drink drink = Drink.fromMap(_drinkMap);
 
       final DateTime timestamp = DateTime.fromMillisecondsSinceEpoch(
-        int.parse(_drinkMap['timestamp']),
+        int.parse(_drinkMap['timestamp'] as String),
         isUtc: true,
       );
 
@@ -101,7 +106,7 @@ void main() {
     });
 
     test('drink is parsed if values are null', () {
-      final Map<String, dynamic> drinkMap = {
+      final Map<String, dynamic> drinkMap = <String, dynamic>{
         'id': null,
         'session_id': null,
         'name': null,
@@ -128,7 +133,7 @@ void main() {
   });
 
   group('toMap', () {
-    Drink _drink;
+    late Drink _drink;
 
     setUp(() {
       _drink = Drink(
@@ -136,16 +141,16 @@ void main() {
         name: 'Drink',
         volume: Volume(500),
         alcoholConcentration: Percent(0.05),
-        timestamp: TestUtils.getDateTime(),
-        color: Color(4283215696),
+        timestamp: test_utils.getDateTime(),
+        color: const Color(0xff4caf50),
         drinkType: DrinkTypes.beer,
       )..id = 1;
 
       _drink.session = Session(
         profileId: 1,
         name: 'Session',
-        startedAt: TestUtils.getDateTime(),
-        endedAt: TestUtils.getDateTime(),
+        startedAt: test_utils.getDateTime(),
+        endedAt: test_utils.getDateTime(),
       )..id = 1;
     });
 
@@ -155,19 +160,24 @@ void main() {
       expect(drinkMap['id'], _drink.id);
       expect(drinkMap['session_id'], _drink.sessionId);
       expect(drinkMap['name'], _drink.name);
-      expect(drinkMap['volume'], _drink.volume.millilitres);
-      expect(drinkMap['alcohol_concentration'],
-          _drink.alcoholConcentration.fraction);
-      expect(drinkMap['timestamp'], _drink.timestamp.toIso8601String());
-      expect(drinkMap['color'], _drink.color.value);
+      expect(drinkMap['volume'], _drink.volume?.millilitres);
+      expect(
+        drinkMap['alcohol_concentration'],
+        _drink.alcoholConcentration?.fraction,
+      );
+      expect(drinkMap['timestamp'], _drink.timestamp?.toIso8601String());
+      expect(drinkMap['color'], _drink.color?.value);
       expect(drinkMap['drink_type'], 'beer');
-      expect(drinkMap['session']['id'], _drink.session.id);
+      expect(
+        (drinkMap['session'] as Map<String, dynamic>)['id'],
+        _drink.session?.id,
+      );
     });
 
     test('date times is integers if forQuery', () {
       final Map<String, dynamic> drinkMap = _drink.toMap(forQuery: true);
 
-      expect(drinkMap['timestamp'], _drink.timestamp.millisecondsSinceEpoch);
+      expect(drinkMap['timestamp'], _drink.timestamp?.millisecondsSinceEpoch);
     });
 
     test('drink is parsed if values are null', () {
@@ -192,7 +202,7 @@ void main() {
   });
 
   group('compare', () {
-    Drink _drink;
+    late Drink _drink;
 
     setUp(() {
       _drink = Drink(
@@ -200,16 +210,16 @@ void main() {
         name: 'Drink',
         volume: Volume(500),
         alcoholConcentration: Percent(0.05),
-        timestamp: TestUtils.getDateTime(),
-        color: Color(4283215696),
+        timestamp: test_utils.getDateTime(),
+        color: const Color(0xff4caf50),
         drinkType: DrinkTypes.beer,
       )..id = 1;
 
       _drink.session = Session(
         profileId: 1,
         name: 'Session',
-        startedAt: TestUtils.getDateTime(),
-        endedAt: TestUtils.getDateTime(),
+        startedAt: test_utils.getDateTime(),
+        endedAt: test_utils.getDateTime(),
       )..id = 1;
     });
 
@@ -221,7 +231,7 @@ void main() {
 
     test('objects are not equal if parameters are equal', () {
       final Drink drink = _drink.copy();
-      drink.id = drink.id + 1;
+      drink.id = drink.id! + 1;
 
       expect(false, _drink == drink);
     });
@@ -236,7 +246,7 @@ void main() {
       );
 
       final double actual = drink.alcoholContentInGrams;
-      final double expected = 320.0;
+      const double expected = 320.0;
 
       expect(actual, expected);
     });
@@ -251,7 +261,7 @@ void main() {
       );
 
       final double actual =
-          drink.currentlyAbsorbedAlcohol(Duration(minutes: 30));
+          drink.currentlyAbsorbedAlcohol(const Duration(minutes: 30));
 
       expect(actual >= 0 && actual < 1, true);
     });
@@ -260,12 +270,13 @@ void main() {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
         alcoholConcentration: Percent.fromPercent(40.0),
-        timestamp: MockableDateTime.current.subtract(Duration(minutes: 15)),
+        timestamp:
+            MockableDateTime.current.subtract(const Duration(minutes: 15)),
       );
 
       final double actual =
-          drink.currentlyAbsorbedAlcohol(Duration(minutes: 30));
-      final double expected = 160;
+          drink.currentlyAbsorbedAlcohol(const Duration(minutes: 30));
+      const double expected = 160;
 
       expect(actual, expected);
     });
@@ -274,12 +285,13 @@ void main() {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
         alcoholConcentration: Percent.fromPercent(40.0),
-        timestamp: MockableDateTime.current.subtract(Duration(minutes: 30)),
+        timestamp:
+            MockableDateTime.current.subtract(const Duration(minutes: 30)),
       );
 
       final double actual =
-          drink.currentlyAbsorbedAlcohol(Duration(minutes: 30));
-      final double expected = 320;
+          drink.currentlyAbsorbedAlcohol(const Duration(minutes: 30));
+      const double expected = 320;
 
       expect(actual, expected);
     });
@@ -288,12 +300,13 @@ void main() {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
         alcoholConcentration: Percent.fromPercent(40.0),
-        timestamp: MockableDateTime.current.subtract(Duration(minutes: 60)),
+        timestamp:
+            MockableDateTime.current.subtract(const Duration(minutes: 60)),
       );
 
       final double actual =
-          drink.currentlyAbsorbedAlcohol(Duration(minutes: 30));
-      final double expected = 320.0;
+          drink.currentlyAbsorbedAlcohol(const Duration(minutes: 30));
+      const double expected = 320.0;
 
       expect(actual, expected);
     });
@@ -302,12 +315,12 @@ void main() {
       final Drink drink = Drink(
         volume: Volume.exact(litres: 1),
         alcoholConcentration: Percent.fromPercent(40.0),
-        timestamp: MockableDateTime.current.add(Duration(minutes: 15)),
+        timestamp: MockableDateTime.current.add(const Duration(minutes: 15)),
       );
 
       final double actual =
-          drink.currentlyAbsorbedAlcohol(Duration(minutes: 30));
-      final double expected = 0;
+          drink.currentlyAbsorbedAlcohol(const Duration(minutes: 30));
+      const double expected = 0;
 
       expect(actual, expected);
     });
@@ -320,7 +333,7 @@ void main() {
       );
 
       final double actual = drink.currentlyAbsorbedAlcohol(Duration.zero);
-      final double expected = 320.0;
+      const double expected = 320.0;
 
       expect(actual, expected);
     });
