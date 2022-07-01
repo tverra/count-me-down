@@ -46,8 +46,7 @@ class _ScoreboardPageState extends State<ScoreboardPage> {
           BuildContext context,
           AsyncSnapshot<List<dynamic>> snapshot,
         ) {
-          final List<Map<String, dynamic>>? users =
-              snapshot.data as List<Map<String, dynamic>>?;
+          final List<dynamic>? users = snapshot.data;
 
           return SizedBox(
             width: double.infinity,
@@ -87,19 +86,20 @@ class _ScoreboardPageState extends State<ScoreboardPage> {
 }
 
 class _Scoreboard extends StatelessWidget {
-  final List<Map<String, dynamic>>? users;
+  final List<dynamic>? users;
 
   const _Scoreboard({required this.users});
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>>? users = this.users;
+    final List<dynamic>? users = this.users;
     final double screenWidth = MediaQuery.of(context).size.width;
     final double columnWidth =
         (screenWidth / 3) > 100 ? 100 : (screenWidth / 3);
 
     final List<Widget> rows = users != null
-        ? users.map((Map<String, dynamic> user) {
+        ? users.map((dynamic u) {
+            final Map<String, dynamic> user = u as Map<String, dynamic>;
             final StringBuffer buffer = StringBuffer();
             final Map<String, dynamic> units =
                 user['units'] as Map<String, dynamic>;
