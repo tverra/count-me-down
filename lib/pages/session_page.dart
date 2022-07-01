@@ -40,28 +40,30 @@ class _SessionPageState extends State<SessionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Session'),
+        title: Text(widget.template ? 'Template editor' : 'Session'),
       ),
       drawer: _Drawer(enabled: !widget.template),
-      body: Builder(builder: (BuildContext context) {
-        return Center(
-          child: FutureBuilder<Session?>(
-            future: widget.template
-                ? _getTemplateSession(context)
-                : _getActiveSession(context),
-            builder: (BuildContext context, AsyncSnapshot<Session?> snapshot) {
-              final Session? session = snapshot.data;
-              final List<Drink>? drinks = session?.drinks;
-              final List<Drink>? templates = _templates;
-              _session = snapshot.data;
+      body: Builder(
+        builder: (BuildContext context) {
+          return Center(
+            child: FutureBuilder<Session?>(
+              future: widget.template
+                  ? _getTemplateSession(context)
+                  : _getActiveSession(context),
+              builder:
+                  (BuildContext context, AsyncSnapshot<Session?> snapshot) {
+                final Session? session = snapshot.data;
+                final List<Drink>? drinks = session?.drinks;
+                final List<Drink>? templates = _templates;
+                _session = snapshot.data;
 
-              if (session == null || drinks == null) {
-                return const Center(child: CircularProgressIndicator());
-              }
+                if (session == null || drinks == null) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-              return Stack(
-                children: <Widget>[
-                  ListView.builder(
+                return Stack(
+                  children: <Widget>[
+                    ListView.builder(
                       padding: EdgeInsets.only(
                         bottom: 140.0 + MediaQuery.of(context).padding.bottom,
                       ),
@@ -92,20 +94,24 @@ class _SessionPageState extends State<SessionPage> {
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        if (widget.template) Text(
-                                                'vol: ${drink.volume.toString()}, alc: ${drink.alcoholConcentration.toString()}',
-                                                style: const TextStyle(
-                                                  color: Colors.black45,
-                                                ),
-                                              ) else timestamp != null
-                                                ? Text(
-                                                    utils.formatDatetime(
-                                                        timestamp,),
-                                                    style: const TextStyle(
-                                                      color: Colors.black45,
-                                                    ),
-                                                  )
-                                                : Container(),
+                                        if (widget.template)
+                                          Text(
+                                            'vol: ${drink.volume.toString()}, alc: ${drink.alcoholConcentration.toString()}',
+                                            style: const TextStyle(
+                                              color: Colors.black45,
+                                            ),
+                                          )
+                                        else
+                                          timestamp != null
+                                              ? Text(
+                                                  utils.formatDatetime(
+                                                    timestamp,
+                                                  ),
+                                                  style: const TextStyle(
+                                                    color: Colors.black45,
+                                                  ),
+                                                )
+                                              : Container(),
                                       ],
                                     ),
                                     const Spacer(),
@@ -120,98 +126,105 @@ class _SessionPageState extends State<SessionPage> {
                             ),
                           ),
                         );
-                      },),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: SafeArea(
-                      top: false,
-                      left: false,
-                      right: false,
-                      child: Container(
-                        height: 140.0,
-                        color: Colors.white.withOpacity(0.9),
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.all(20.0),
-                          itemCount:
-                              templates != null ? templates.length + 1 : 1,
-                          itemBuilder: (BuildContext context, int index) {
-                            if (index == 0) {
+                      },
+                    ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: SafeArea(
+                        top: false,
+                        left: false,
+                        right: false,
+                        child: Container(
+                          height: 140.0,
+                          color: Colors.white.withOpacity(0.9),
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.all(20.0),
+                            itemCount:
+                                templates != null ? templates.length + 1 : 1,
+                            itemBuilder: (BuildContext context, int index) {
+                              if (index == 0) {
+                                return GestureDetector(
+                                  onTap: () => _createDrink(context),
+                                  child: Container(
+                                    width: 100.0,
+                                    color: Theme.of(context)
+                                        .primaryColor
+                                        .withOpacity(0.25),
+                                    child: Icon(
+                                      Icons.add,
+                                      size: 40.0,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              final Drink? drink = templates?[index - 1];
+
+                              if (drink == null) return Container();
+
                               return GestureDetector(
-                                onTap: () => _createDrink(context),
-                                child: Container(
-                                  width: 100.0,
-                                  color: Theme.of(context)
-                                      .primaryColor
-                                      .withOpacity(0.25),
-                                  child: Icon(
-                                    Icons.add,
-                                    size: 40.0,
-                                    color: Theme.of(context).primaryColor,
+                                onTap: () => _addDrink(context, drink),
+                                child: SizedBox(
+                                  height: 100,
+                                  width: 100,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Icon(
+                                        drink.iconData,
+                                        color: drink.color,
+                                        size: 60.0,
+                                      ),
+                                      const Spacer(),
+                                      Text(drink.name ?? ''),
+                                    ],
                                   ),
                                 ),
                               );
-                            }
-
-                            final Drink? drink = templates?[index - 1];
-
-                            if (drink == null) return Container();
-
-                            return GestureDetector(
-                              onTap: () => _addDrink(context, drink),
-                              child: SizedBox(
-                                height: 100,
-                                width: 100,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Icon(
-                                      drink.iconData,
-                                      color: drink.color,
-                                      size: 60.0,
-                                    ),
-                                    const Spacer(),
-                                    Text(drink.name ?? ''),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
+                            },
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              );
-            },
-          ),
-        );
-      },),
+                  ],
+                );
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 
   void _editDrink(BuildContext context, Drink drink) {
     Navigator.of(context).push(
-      MaterialPageRoute<dynamic>(builder: (_) {
-        return EditDrinkPage(
-          drink: drink,
-          onEditDrink: () => setState(() {}),
-        );
-      },),
+      MaterialPageRoute<dynamic>(
+        builder: (_) {
+          return EditDrinkPage(
+            drink: drink,
+            onEditDrink: () => setState(() {}),
+          );
+        },
+      ),
     );
   }
 
   void _createDrink(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute<dynamic>(builder: (_) {
-        return CreateDrinkPage(
-          onCreateDrink: () => setState(() {
-            _getTemplates();
-          }),
-        );
-      },),
+      MaterialPageRoute<dynamic>(
+        builder: (_) {
+          return CreateDrinkPage(
+            onCreateDrink: () => setState(() {
+              _getTemplates();
+            }),
+          );
+        },
+      ),
     );
   }
 
@@ -238,8 +251,10 @@ class _SessionPageState extends State<SessionPage> {
   Future<Session?> _getActiveSession(BuildContext context) async {
     final Preferences preferences = context.watch<Preferences>();
 
-    return getSession(preferences.activeSessionId ?? 0,
-        preloadArgs: <String>[Session.relProfile, Session.relDrinks],);
+    return getSession(
+      preferences.activeSessionId ?? 0,
+      preloadArgs: <String>[Session.relProfile, Session.relDrinks],
+    );
   }
 
   Future<Session> _getTemplateSession(BuildContext context) async {
@@ -273,25 +288,26 @@ class _Drawer extends StatelessWidget {
           ),
           const Divider(height: 1.0, color: Color.fromRGBO(0, 0, 0, 0.4)),
           FutureBuilder<PackageInfo>(
-              future: PackageInfo.fromPlatform(),
-              builder:
-                  (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
-                final PackageInfo? data = snapshot.data;
-                final String version = data != null ? data.version : '';
+            future: PackageInfo.fromPlatform(),
+            builder:
+                (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
+              final PackageInfo? data = snapshot.data;
+              final String version = data != null ? data.version : '';
 
-                return Container(
-                  padding: const EdgeInsets.all(4.0),
-                  color: Colors.grey[200],
-                  child: Center(
-                    child: Text(
-                      'version: $version',
-                      style: const TextStyle(
-                        color: Colors.grey,
-                      ),
+              return Container(
+                padding: const EdgeInsets.all(4.0),
+                color: Colors.grey[200],
+                child: Center(
+                  child: Text(
+                    'version: $version',
+                    style: const TextStyle(
+                      color: Colors.grey,
                     ),
                   ),
-                );
-              },),
+                ),
+              );
+            },
+          ),
           ListTile(
             title: const Text('Back to start page'),
             onTap: () async {
@@ -299,7 +315,9 @@ class _Drawer extends StatelessWidget {
               preferences.activeSessionId = null;
               updatePreferences(preferences);
               Navigator.of(context).pushNamedAndRemoveUntil(
-                  StartPage.routeName, (Route<dynamic> route) => false,);
+                StartPage.routeName,
+                (Route<dynamic> route) => false,
+              );
             },
             leading: const Icon(Icons.arrow_back),
           ),
@@ -330,9 +348,11 @@ class _Drawer extends StatelessWidget {
             enabled: enabled,
             onTap: () async {
               Navigator.of(context).push(
-                MaterialPageRoute<dynamic>(builder: (_) {
-                  return const EditSessionPage();
-                },),
+                MaterialPageRoute<dynamic>(
+                  builder: (_) {
+                    return const EditSessionPage();
+                  },
+                ),
               );
             },
             leading: const Icon(Icons.edit),
@@ -343,9 +363,11 @@ class _Drawer extends StatelessWidget {
             enabled: enabled,
             onTap: () async {
               Navigator.of(context).push(
-                MaterialPageRoute<dynamic>(builder: (_) {
-                  return const SessionPage(template: true);
-                },),
+                MaterialPageRoute<dynamic>(
+                  builder: (_) {
+                    return const SessionPage(template: true);
+                  },
+                ),
               );
             },
             leading: const Icon(Icons.edit),
@@ -356,9 +378,11 @@ class _Drawer extends StatelessWidget {
             enabled: enabled,
             onTap: () async {
               Navigator.of(context).push(
-                MaterialPageRoute<dynamic>(builder: (_) {
-                  return const ScoreboardPage();
-                },),
+                MaterialPageRoute<dynamic>(
+                  builder: (_) {
+                    return const ScoreboardPage();
+                  },
+                ),
               );
             },
             leading: const Icon(Icons.leaderboard),
