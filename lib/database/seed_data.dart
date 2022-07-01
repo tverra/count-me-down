@@ -83,15 +83,35 @@ Future<void> _seedDataToSqf(sqf.Database db) async {
 }
 
 Future<void> _seedDataToIdb(idb.Database db) async {
+  final List<int> profileRes = <int>[];
+
   for (final Profile profile in _profiles) {
+    final Object? res = await db_utils.insertIntoIdb(
+      Profile.tableName,
+      profile.toMap(forQuery: true),
+      db: db,
+    );
+
+    profile.id = int.tryParse(res.toString());
+
     await db_utils.insertIntoIdb(
       Profile.tableName,
       profile.toMap(forQuery: true),
       key: profile.id,
       db: db,
     );
+
+    profileRes.add(int.tryParse(res.toString()) ?? 0);
   }
   for (final Drink drink in _drinks) {
+    final Object? res = await db_utils.insertIntoIdb(
+      Drink.tableName,
+      drink.toMap(forQuery: true),
+      db: db,
+    );
+
+    drink.id = int.tryParse(res.toString());
+
     await db_utils.insertIntoIdb(
       Drink.tableName,
       drink.toMap(forQuery: true),
@@ -99,4 +119,14 @@ Future<void> _seedDataToIdb(idb.Database db) async {
       db: db,
     );
   }
+
+  _preferences.activeProfileId = profileRes[0];
+  _preferences.id = 1;
+
+  await db_utils.insertIntoIdb(
+    Preferences.tableName,
+    _preferences.toMap(forQuery: true),
+    key: _preferences.id,
+    db: db,
+  );
 }

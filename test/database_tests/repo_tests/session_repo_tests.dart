@@ -477,10 +477,10 @@ void main() {
 
     test('updating non-existing row does nothing if insertMissing is false',
         () async {
-      final Session nonInserted = generator.getSession();
+      final Session nonInserted = generator.getSession(id: 1000);
       final Session? result = await updateSession(nonInserted);
 
-      final Session? updated = await getSession(nonInserted.id!);
+      final Session? updated = await getSession(1000);
       expect(result, null);
       expect(updated, null);
     });
@@ -572,7 +572,10 @@ void main() {
       final Session nonInserted = generator.getSession();
       _sessions.add(nonInserted);
 
-      await updateSessions(_sessions, insertMissing: true);
+      final List<Session> updated =
+          await updateSessions(_sessions, insertMissing: true);
+
+      _sessions.last.id = updated.last.id;
 
       final List<Session> sessions = await getSessions();
       expect(sessions, _sessions);
@@ -652,6 +655,7 @@ void main() {
       for (final Session session in _sessions) {
         final Session copy = session.copy();
         copy.name = 'updated';
+        toBeUpdated.add(copy);
       }
       await updateSessions(toBeUpdated, removeDeleted: true);
       final List<Session> sessions = await getSessions();

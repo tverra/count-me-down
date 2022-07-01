@@ -139,14 +139,17 @@ Future<List<Drink>> insertDrinks(List<Drink> drinks) async {
 }
 
 Future<Drink?> updateDrink(Drink drink, {bool insertMissing = false}) async {
+  final int? drinkId = drink.id;
+
+  if (drinkId != null && drinkId <= 0) return null;
+
   final Database db = await getIdb();
   final Transaction txn = db.transaction(Drink.tableName, idbModeReadWrite);
   final ObjectStore store = txn.objectStore(Drink.tableName);
-  Drink? res;
+  final Drink res = drink.copy();
 
   if (insertMissing) {
     final Object key = await store.put(drink.toMap(forQuery: true), drink.id);
-    final Drink res = drink.copy();
     res.id = key as int;
 
     if (drink.id == null) {
@@ -159,7 +162,9 @@ Future<Drink?> updateDrink(Drink drink, {bool insertMissing = false}) async {
       if (keys.contains(drink.id)) {
         final Object key =
             await store.put(drink.toMap(forQuery: true), drink.id);
-        res?.id = key as int;
+        res.id = key as int;
+      } else {
+        return null;
       }
     }
   }
@@ -189,17 +194,17 @@ Future<List<Drink>> updateDrinks(
       copy.id = key as int;
 
       if (drink.id == null) {
-        await store.put(drink.toMap(forQuery: true), drink.id);
+        await store.put(copy.toMap(forQuery: true), key);
       }
 
-      res.add(drink);
+      res.add(copy);
     } else {
       if (drink.id != null) {
         if (existing.where((Drink c) => c.id == drink.id).isNotEmpty) {
           final Object key =
               await store.put(drink.toMap(forQuery: true), drink.id);
           copy.id = key as int;
-          res.add(drink);
+          res.add(copy);
         }
       }
     }

@@ -1,6 +1,7 @@
 import 'package:count_me_down/database/repos/preferences_repo.dart';
 import 'package:count_me_down/models/preferences.dart';
 import 'package:count_me_down/pages/create_session_page.dart';
+import 'package:count_me_down/pages/graph_page.dart';
 import 'package:count_me_down/pages/profile_page.dart';
 import 'package:count_me_down/pages/scoreboard_page.dart';
 import 'package:count_me_down/pages/session_page.dart';
@@ -13,7 +14,13 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final Preferences preferences = await getPreferences();
+  Preferences preferences = await getPreferences();
+
+  while (preferences.id == null) {
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+
+    preferences = await getPreferences();
+  }
 
   runApp(
     Provider<Preferences>(

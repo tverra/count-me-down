@@ -4,8 +4,10 @@ import 'package:count_me_down/models/profile.dart';
 import 'package:count_me_down/models/session.dart';
 import 'package:idb_sqflite/idb_sqflite.dart';
 
-Future<Profile?> getLatestProfile({List<String>? preloadArgs}) {
-  throw UnimplementedError();
+Future<Profile?> getLatestProfile({List<String>? preloadArgs}) async {
+  final List<Profile> profiles = await getProfiles();
+
+  return profiles.isEmpty ? null : profiles.last;
 }
 
 Future<Profile?> getProfile(int id, {List<String>? preloadArgs}) async {
@@ -101,9 +103,8 @@ Future<Profile?> updateProfile(
   bool insertMissing = false,
 }) async {
   final int? profileId = profile.id;
-  if (profileId != null && profileId <= 0) {
-    return null;
-  }
+
+  if (profileId != null && profileId <= 0) return null;
 
   final Database db = await getIdb();
   final Transaction txn = db.transaction(Profile.tableName, idbModeReadWrite);
@@ -126,6 +127,8 @@ Future<Profile?> updateProfile(
         final Object key =
             await store.put(profile.toMap(forQuery: true), profile.id);
         res.id = key as int;
+      } else {
+        return null;
       }
     }
   }

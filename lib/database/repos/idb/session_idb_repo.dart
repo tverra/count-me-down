@@ -119,15 +119,18 @@ Future<Session?> updateSession(
   Session session, {
   bool insertMissing = false,
 }) async {
+  final int? sessionId = session.id;
+
+  if (sessionId != null && sessionId <= 0) return null;
+
   final Database db = await getIdb();
   final Transaction txn = db.transaction(Session.tableName, idbModeReadWrite);
   final ObjectStore store = txn.objectStore(Session.tableName);
-  Session? res;
+  final Session res = session.copy();
 
   if (insertMissing) {
     final Object key =
         await store.put(session.toMap(forQuery: true), session.id);
-    res = session.copy();
     res.id = key as int;
 
     if (session.id == null) {
@@ -140,7 +143,9 @@ Future<Session?> updateSession(
       if (keys.contains(session.id)) {
         final Object key =
             await store.put(session.toMap(forQuery: true), session.id);
-        res?.id = key as int;
+        res.id = key as int;
+      } else {
+        return null;
       }
     }
   }
@@ -174,7 +179,7 @@ Future<List<Session>> updateSessions(
         await store.put(copy.toMap(forQuery: true), key);
       }
 
-      res.add(session);
+      res.add(copy);
     } else {
       if (session.id != null) {
         if (existing.where((Session c) => c.id == session.id).isNotEmpty) {

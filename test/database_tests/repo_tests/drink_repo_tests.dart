@@ -418,10 +418,10 @@ void main() {
 
     test('updating non-existing row does nothing if insertMissing is false',
         () async {
-      final Drink nonInserted = generator.getDrink();
+      final Drink nonInserted = generator.getDrink(id: 1000);
       final Drink? result = await updateDrink(nonInserted);
 
-      final Drink? updated = await getDrink(nonInserted.id!);
+      final Drink? updated = await getDrink(1000);
       expect(result, null);
       expect(updated, null);
     });
@@ -512,7 +512,10 @@ void main() {
       final Drink nonInserted = generator.getDrink();
       _drinks.add(nonInserted);
 
-      await updateDrinks(_drinks, insertMissing: true);
+      final List<Drink> updated =
+          await updateDrinks(_drinks, insertMissing: true);
+
+      _drinks.last.id = updated.last.id;
 
       final List<Drink> drinks = await getDrinks();
       expect(drinks, _drinks);

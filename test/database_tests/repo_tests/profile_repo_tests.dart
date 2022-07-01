@@ -484,10 +484,10 @@ void main() {
       final Profile nonInserted = generator.getProfile();
       _profiles.add(nonInserted);
 
-      final Profile updated =
-          (await updateProfiles(_profiles, insertMissing: true)).single;
+      final List<Profile> updated =
+          await updateProfiles(_profiles, insertMissing: true);
 
-      _profiles.last.id = updated.id;
+      _profiles.last.id = updated.last.id;
 
       final List<Profile> profiles = await getProfiles();
       expect(profiles, _profiles);

@@ -51,7 +51,7 @@ Future<Drink?> updateDrink(Drink drink, {bool insertMissing = false}) {
   }
 }
 
-Future<List<Drink?>> updateDrinks(
+Future<List<Drink>> updateDrinks(
   List<Drink> drinks, {
   int? sessionId,
   bool insertMissing = false,

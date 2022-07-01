@@ -16,12 +16,21 @@ Future<Preferences> getPreferences({List<String>? preloadArgs}) async {
   await txn.completed;
 
   final List<Map<String, dynamic>> casted = castIdbResultList(res);
-  final Preferences? preferences =
-      casted.isEmpty ? null : Preferences.fromMap(casted.last);
+
+  Map<String, dynamic>? filtered;
+
+  for (final Map<String, dynamic> map in casted) {
+    if (map['id'] == 1) filtered = map;
+    break;
+  }
+
+  if (filtered == null) return Preferences();
+
+  final Preferences preferences = Preferences.fromMap(filtered);
   Session? activeSession;
   Profile? activeProfile;
 
-  if (preferences != null && preloadArgs != null) {
+  if (preloadArgs != null) {
     if (preloadArgs.contains(Preferences.relActiveSession)) {
       final int? activeSessionId = preferences.activeSessionId;
       if (activeSessionId != null) {
@@ -36,10 +45,10 @@ Future<Preferences> getPreferences({List<String>? preloadArgs}) async {
     }
   }
 
-  preferences?.activeSession = activeSession;
-  preferences?.activeProfile = activeProfile;
+  preferences.activeSession = activeSession;
+  preferences.activeProfile = activeProfile;
 
-  return preferences ?? Preferences();
+  return preferences;
 }
 
 Future<Preferences> updatePreferences(Preferences preferences) async {
@@ -54,10 +63,9 @@ Future<Preferences> updatePreferences(Preferences preferences) async {
     await store.delete(key);
   }
 
-  await store.put(
-    preferences.toMap(forQuery: true),
-    Preferences.tableName,
-  );
+  preferences.id = 1;
+
+  await store.put(preferences.toMap(forQuery: true), 1);
   await txn.completed;
 
   return preferences;

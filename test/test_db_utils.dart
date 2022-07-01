@@ -63,6 +63,16 @@ Future<int> insertDrink(Drink drink) async {
         db.transaction(Drink.tableName, idb.idbModeReadWrite);
     final idb.ObjectStore store = txn.objectStore(Drink.tableName);
     res = await store.put(drink.toMap(forQuery: true), drink.id) as int;
+
+    if (drink.id == null) {
+      drink.id = res;
+
+      await store.put(
+        drink.toMap(forQuery: true),
+        res,
+      );
+    }
+
     await txn.completed;
   }
 
@@ -270,6 +280,16 @@ Future<int> insertPreferences(Preferences preferences) async {
     final idb.ObjectStore store = txn.objectStore(Preferences.tableName);
     res = await store.put(preferences.toMap(forQuery: true), preferences.id)
         as int;
+
+    if (preferences.id == null) {
+      preferences.id = res;
+
+      await store.put(
+        preferences.toMap(forQuery: true),
+        res,
+      );
+    }
+
     await txn.completed;
   }
 
