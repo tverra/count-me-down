@@ -5,6 +5,7 @@ import 'package:count_me_down/models/session.dart';
 import 'package:count_me_down/pages/create_drink_page.dart';
 import 'package:count_me_down/pages/edit_drink_page.dart';
 import 'package:count_me_down/pages/edit_session_page.dart';
+import 'package:count_me_down/pages/graph_page.dart';
 import 'package:count_me_down/pages/scoreboard_page.dart';
 import 'package:count_me_down/pages/start_page.dart';
 import 'package:count_me_down/utils/snack_bar_helper.dart';
@@ -311,6 +312,8 @@ class _Drawer extends StatelessWidget {
           ListTile(
             title: const Text('Back to start page'),
             onTap: () async {
+              Navigator.of(context).pop();
+
               final Preferences preferences = context.read<Preferences>();
               preferences.activeSessionId = null;
               updatePreferences(preferences);
@@ -347,6 +350,8 @@ class _Drawer extends StatelessWidget {
             title: const Text('Edit session'),
             enabled: enabled,
             onTap: () async {
+              Navigator.of(context).pop();
+
               Navigator.of(context).push(
                 MaterialPageRoute<dynamic>(
                   builder: (_) {
@@ -362,6 +367,8 @@ class _Drawer extends StatelessWidget {
             title: const Text('Edit drink templates'),
             enabled: enabled,
             onTap: () async {
+              Navigator.of(context).pop();
+
               Navigator.of(context).push(
                 MaterialPageRoute<dynamic>(
                   builder: (_) {
@@ -377,10 +384,28 @@ class _Drawer extends StatelessWidget {
             title: const Text('Scoreboard'),
             enabled: enabled,
             onTap: () async {
+              Navigator.of(context).pop();
+
               Navigator.of(context).push(
                 MaterialPageRoute<dynamic>(
                   builder: (_) {
                     return const ScoreboardPage();
+                  },
+                ),
+              );
+            },
+            leading: const Icon(Icons.leaderboard),
+          ),
+          ListTile(
+            title: const Text('Graph'),
+            enabled: enabled,
+            onTap: () async {
+              Navigator.of(context).pop();
+
+              Navigator.of(context).push(
+                MaterialPageRoute<dynamic>(
+                  builder: (_) {
+                    return const GraphPage();
                   },
                 ),
               );
