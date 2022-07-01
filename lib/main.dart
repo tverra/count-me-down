@@ -7,6 +7,7 @@ import 'package:count_me_down/pages/session_page.dart';
 import 'package:count_me_down/pages/sessions_page.dart';
 import 'package:count_me_down/pages/settings_page.dart';
 import 'package:count_me_down/pages/start_page.dart';
+import 'package:count_me_down/styles.dart' as styles;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,10 +15,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final Preferences preferences = await getPreferences();
 
-  runApp(Provider<Preferences>(
-    create: (_) => preferences,
-    child: CountMeDownApp(),
-  ),);
+  runApp(
+    Provider<Preferences>(
+      create: (_) => preferences,
+      child: CountMeDownApp(),
+    ),
+  );
 }
 
 class CountMeDownApp extends StatelessWidget {
@@ -26,25 +29,24 @@ class CountMeDownApp extends StatelessWidget {
     final Preferences preferences = context.watch<Preferences>();
 
     return MaterialApp(
-        theme: ThemeData(
-          // Hot 'n Sweet blå
-          primaryColor: const Color.fromRGBO(1, 12, 142, 1),
-          // Jägermeister grønn
-          // primaryColor: Color.fromRGBO(11, 38, 16, 1),
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        initialRoute: preferences.activeSessionId == null ? '/' : 'session',
-        routes: <String, Widget Function(BuildContext)>{
-          '/': (_) => StartPage(),
-          '/settings': (_) => SettingsPage(),
-          '/sessions': (_) => SessionsPage(),
-          '/sessions/createSession': (_) => CreateSessionPage(),
-          '/scoreboard': (_) => const ScoreboardPage(),
-          '/profile': (_) => const ProfilePage(),
-          'session': (_) => const SessionPage(),
-        },
-        onGenerateRoute: (RouteSettings settings) {
-          return null;
-        },);
+      theme: ThemeData(
+        primarySwatch: styles.colorToMaterialColor(styles.hotNSweetBlue),
+        appBarTheme: const AppBarTheme(backgroundColor: styles.hotNSweetBlue),
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      initialRoute: preferences.activeSessionId == null ? '/' : 'session',
+      routes: <String, Widget Function(BuildContext)>{
+        '/': (_) => StartPage(),
+        '/settings': (_) => SettingsPage(),
+        '/sessions': (_) => SessionsPage(),
+        '/sessions/createSession': (_) => CreateSessionPage(),
+        '/scoreboard': (_) => const ScoreboardPage(),
+        '/profile': (_) => const ProfilePage(),
+        'session': (_) => const SessionPage(),
+      },
+      onGenerateRoute: (RouteSettings settings) {
+        return null;
+      },
+    );
   }
 }
