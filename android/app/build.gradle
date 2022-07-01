@@ -52,7 +52,7 @@ android {
         applicationId "no.tverra.count_me_down"
         minSdkVersion 16
         targetSdkVersion 32
-        versionCode buildNumber.toInteger()
+        versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
 
