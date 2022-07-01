@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 
 class SnackBarHelper {
   bool _isShown = false;
-  SnackBarData _lastSnackBar;
+  SnackBarData? _lastSnackBar;
 
   SnackBarHelper();
 
   void show(
     BuildContext context,
     String message, [
-    SnackBarType type,
-    Map<String, dynamic> extraInfo,
+    SnackBarType? type,
+    Map<String, dynamic>? extraInfo,
   ]) {
     if (_isShown && _lastSnackBar?.message == message) return;
 
-    _lastSnackBar = SnackBarData(message, type);
+    _lastSnackBar = SnackBarData(message, type ?? SnackBarType.neutral);
     _isShown = true;
 
-    Scaffold.of(context)
+    ScaffoldMessenger.of(context)
       ..removeCurrentSnackBar()
       ..showSnackBar(get(context, message, type, extraInfo))
           .closed
@@ -28,24 +28,24 @@ class SnackBarHelper {
 
   void hide(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Scaffold.of(context).removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
     });
   }
 
   SnackBar get(
     BuildContext context,
     String message, [
-    SnackBarType type,
-    Map<String, dynamic> extraInfo,
+    SnackBarType? type,
+    Map<String, dynamic>? extraInfo,
   ]) {
     return SnackBar(
-      backgroundColor: _getBackgroundColor(type),
+      backgroundColor: _getBackgroundColor(type ?? SnackBarType.neutral),
       content: Text(message),
       duration: const Duration(seconds: 10),
     );
   }
 
-  Color _getBackgroundColor(SnackBarType type) {
+  Color? _getBackgroundColor(SnackBarType type) {
     switch (type) {
       case SnackBarType.neutral:
         return null;

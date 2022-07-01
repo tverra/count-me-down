@@ -1,6 +1,7 @@
 import 'package:count_me_down/models/session.dart';
+import 'package:count_me_down/utils/data_parser.dart';
 import 'package:count_me_down/utils/mass.dart';
-import 'package:count_me_down/utils/percentage.dart';
+import 'package:count_me_down/utils/percent.dart';
 
 class Profile {
   static const String tableName = 'profiles';
@@ -13,14 +14,14 @@ class Profile {
       'per_mil_metabolized_per_hour';
   static const String relSessions = 'sessions';
 
-  int id;
-  String name;
-  Mass bodyWeight;
-  Percentage bodyWaterPercentage;
-  Duration absorptionTime;
-  double perMilMetabolizedPerHour;
+  int? id;
+  String? name;
+  Mass? bodyWeight;
+  Percent? bodyWaterPercentage;
+  Duration? absorptionTime;
+  double? perMilMetabolizedPerHour;
 
-  List<Session> sessions;
+  List<Session>? sessions;
 
   Profile({
     this.name,
@@ -31,16 +32,25 @@ class Profile {
   });
 
   Profile.fromMap(Map<String, dynamic> map) {
-    id = map[colId];
-    name = map[colName];
-    bodyWeight = map[colBodyWeight] != null ? Mass(map[colBodyWeight]) : null;
+    final DataParser p = DataParser();
+
+    id = p.tryParseInt(map[colId]);
+    name = p.tryParseString(map[colName]);
+    bodyWeight =
+        map[colBodyWeight] != null ? Mass(map[colBodyWeight] as int) : null;
     bodyWaterPercentage = map[colBodyWaterPercentage] != null
-        ? Percentage(map[colBodyWaterPercentage])
+        ? Percent(map[colBodyWaterPercentage] as double)
         : null;
     absorptionTime = map[colAbsorptionTime] != null
-        ? Duration(milliseconds: map[colAbsorptionTime])
+        ? Duration(milliseconds: map[colAbsorptionTime] as int)
         : null;
-    perMilMetabolizedPerHour = map[colPerMilMetabolizedPerHour];
+    perMilMetabolizedPerHour =
+        p.tryParseDouble(map[colPerMilMetabolizedPerHour]);
+    sessions = map[relSessions] != null
+        ? (map[relSessions] as List<Map<String, dynamic>>)
+            .map<Session>((Map<String, dynamic> s) => Session.fromMap(s))
+            .toList()
+        : null;
   }
 
   static List<String> get columns {
@@ -54,6 +64,14 @@ class Profile {
     ];
   }
 
+  static List<Profile>? fromMapList(dynamic list) {
+    return (list as List<dynamic>?)
+        ?.map<Profile>(
+          (dynamic profile) => Profile.fromMap(profile as Map<String, dynamic>),
+        )
+        .toList();
+  }
+
   static String getGender(double bodyWaterPercentage) {
     if (bodyWaterPercentage == 70.0) {
       return 'Male';
@@ -65,26 +83,34 @@ class Profile {
   }
 
   Map<String, dynamic> toMap({bool forQuery = false}) {
-    final Map<String, dynamic> map = <String, dynamic>{};
+    final DataParser p = DataParser(forQuery: forQuery);
+    final Map<String, dynamic> map = <String, dynamic>{
+      colId: p.serializeInt(id),
+      colName: p.serializeString(name),
+      colBodyWeight: bodyWeight?.grams,
+      colBodyWaterPercentage: bodyWaterPercentage?.fraction,
+      colAbsorptionTime: absorptionTime?.inMilliseconds,
+      colPerMilMetabolizedPerHour: perMilMetabolizedPerHour,
+    };
 
-    map[colId] = id;
-    map[colName] = name;
-    map[colBodyWeight] = bodyWeight != null ? bodyWeight.grams : null;
-    map[colBodyWaterPercentage] =
-        bodyWaterPercentage != null ? bodyWaterPercentage.fraction : null;
-    map[colAbsorptionTime] = absorptionTime.inMilliseconds;
-    map[colPerMilMetabolizedPerHour] = perMilMetabolizedPerHour;
+    if (!forQuery) {
+      map.putIfAbsent(
+        relSessions,
+        () =>
+            sessions?.map((Session s) => s.toMap(forQuery: forQuery)).toList(),
+      );
+    }
 
     return map;
   }
 
   Profile copyWith({
-    int sessionId,
-    String name,
-    double bodyWeight,
-    double bodyWaterPercentage,
-    Duration absorptionTime,
-    double perMilMetabolizedPerHour,
+    int? sessionId,
+    String? name,
+    Mass? bodyWeight,
+    Percent? bodyWaterPercentage,
+    Duration? absorptionTime,
+    double? perMilMetabolizedPerHour,
   }) {
     return Profile(
       name: name ?? this.name,
@@ -95,4 +121,33 @@ class Profile {
           perMilMetabolizedPerHour ?? this.perMilMetabolizedPerHour,
     );
   }
+
+  Profile copy() {
+    return Profile.fromMap(toMap());
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Profile &&
+          id == other.id &&
+          name == other.name &&
+          bodyWeight == other.bodyWeight &&
+          bodyWaterPercentage == other.bodyWaterPercentage &&
+          absorptionTime == other.absorptionTime &&
+          perMilMetabolizedPerHour == other.perMilMetabolizedPerHour;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      name.hashCode ^
+      bodyWeight.hashCode ^
+      bodyWaterPercentage.hashCode ^
+      absorptionTime.hashCode ^
+      perMilMetabolizedPerHour.hashCode;
 }
