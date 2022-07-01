@@ -42,9 +42,7 @@ final List<Drink> _drinks = <Drink>[
     drinkType: DrinkTypes.wineGlass,
   ),
 ];
-final Preferences _preferences = Preferences(
-  activeProfileId: _profiles[0].id,
-);
+final Preferences _preferences = Preferences();
 
 Future<void> insertSqfSeedData(sqf.Database db) async {
   try {
@@ -66,10 +64,8 @@ Future<void> insertIdbSeedData(idb.Database db) async {
 }
 
 Future<void> _seedDataToSqf(sqf.Database db) async {
-  db.transaction((sqf.Transaction txn) async {
+  final List<Object?> res = await db.transaction((sqf.Transaction txn) async {
     final sqf.Batch batch = txn.batch();
-
-    batch.insert(Preferences.tableName, _preferences.toMap(forQuery: true));
 
     for (final Profile profile in _profiles) {
       batch.insert(Profile.tableName, profile.toMap(forQuery: true));
@@ -78,11 +74,12 @@ Future<void> _seedDataToSqf(sqf.Database db) async {
       batch.insert(Drink.tableName, drink.toMap(forQuery: true));
     }
 
-    batch.insert(Preferences.tableName, _preferences.toMap(forQuery: true));
-
-    await batch.commit();
+    return batch.commit();
   });
 
+  _preferences.activeProfileId = int.tryParse(res[0].toString());
+
+  await db.insert(Preferences.tableName, _preferences.toMap(forQuery: true));
 }
 
 Future<void> _seedDataToIdb(idb.Database db) async {
