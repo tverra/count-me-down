@@ -565,7 +565,8 @@ void main() {
         _profiles,
         insertMissing: true,
         removeDeleted: true,
-      )).single;
+      ))
+          .single;
 
       _profiles.last.id = updated.id;
 

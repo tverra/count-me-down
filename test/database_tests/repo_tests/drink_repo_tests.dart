@@ -409,7 +409,8 @@ void main() {
     test('updating non-existing row inserts row if insertMissing is true',
         () async {
       final Drink nonInserted = generator.getDrink();
-      final Drink? updated = await updateDrink(nonInserted, insertMissing: true);
+      final Drink? updated =
+          await updateDrink(nonInserted, insertMissing: true);
 
       final Drink? inserted = await getDrink(updated!.id!);
       expect(inserted, nonInserted);

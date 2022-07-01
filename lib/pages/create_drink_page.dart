@@ -43,13 +43,14 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
                         TextFormField(
                           controller: _nameController,
                           decoration: const InputDecoration(
-                              hintText: 'Name',
-                              helperText: 'The name of the drink',),
+                            hintText: 'Name',
+                            helperText: 'The name of the drink',
+                          ),
                         ),
                         TextFormField(
                           controller: _volumeController,
-                          keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
                           decoration: const InputDecoration(
                             hintText: 'Volume',
                             helperText: 'Volume in centilitres',
@@ -57,8 +58,8 @@ class _CreateDrinkPageState extends State<CreateDrinkPage> {
                         ),
                         TextFormField(
                           controller: _alcoholConcentrationController,
-                          keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
                           decoration: const InputDecoration(
                             hintText: 'Alcohol content',
                             helperText: 'Alcohol content in percentage',

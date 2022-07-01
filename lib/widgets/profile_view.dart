@@ -36,14 +36,17 @@ class ProfileView extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                if (header) Text(
-                        'Current profile:',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: utils.getThemeTextColor(context),
-                        ),
-                      ) else Container(),
+                if (header)
+                  Text(
+                    'Current profile:',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: utils.getThemeTextColor(context),
+                    ),
+                  )
+                else
+                  Container(),
                 const SizedBox(
                   height: 10.0,
                 ),

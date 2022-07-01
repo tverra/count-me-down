@@ -23,49 +23,53 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
       appBar: AppBar(
         title: const Text('Start new session'),
       ),
-      body: Builder(builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(20.0),
-          child: Center(
+      body: Builder(
+        builder: (BuildContext context) {
+          return Container(
+            padding: const EdgeInsets.all(20.0),
+            child: Center(
               child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  TextFormField(
-                    controller: _nameController,
-                    autofocus: true,
-                    decoration: const InputDecoration(hintText: 'Session name'),
-                  ),
-                  const SizedBox(height: 40.0),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      TextFormField(
+                        controller: _nameController,
+                        autofocus: true,
+                        decoration:
+                            const InputDecoration(hintText: 'Session name'),
                       ),
-                      child: Container(
-                        padding: const EdgeInsets.all(
-                          15.0,
-                        ),
-                        child: Text(
-                          'Start session',
-                          style: TextStyle(
-                            color: utils.getThemeTextColor(context),
-                            fontSize: 17.0,
+                      const SizedBox(height: 40.0),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: Theme.of(context).primaryColor,
                           ),
+                          child: Container(
+                            padding: const EdgeInsets.all(
+                              15.0,
+                            ),
+                            child: Text(
+                              'Start session',
+                              style: TextStyle(
+                                color: utils.getThemeTextColor(context),
+                                fontSize: 17.0,
+                              ),
+                            ),
+                          ),
+                          onPressed: () => _createNewSession(context),
                         ),
-                      ),
-                      onPressed: () => _createNewSession(context),
-                    ),
-                  )
-                ],
+                      )
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),),
-        );
-      },),
+          );
+        },
+      ),
     );
   }
 

@@ -468,7 +468,8 @@ void main() {
     test('updating non-existing row inserts row if insertMissing is true',
         () async {
       final Session nonInserted = generator.getSession();
-      final Session? updated = await updateSession(nonInserted, insertMissing: true);
+      final Session? updated =
+          await updateSession(nonInserted, insertMissing: true);
 
       final Session? inserted = await getSession(updated!.id!);
       expect(inserted, nonInserted);

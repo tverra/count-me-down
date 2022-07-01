@@ -30,7 +30,9 @@ class EditDrinkPage extends StatelessWidget {
                 child: Text(
                   'Delete drink',
                   style: TextStyle(
-                      color: utils.getThemeTextColor(context), fontSize: 18.0,),
+                    color: utils.getThemeTextColor(context),
+                    fontSize: 18.0,
+                  ),
                 ),
               ),
             ),

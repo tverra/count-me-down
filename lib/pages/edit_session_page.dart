@@ -19,38 +19,39 @@ class EditSessionPage extends StatelessWidget {
         padding: const EdgeInsets.all(20.0),
         child: Center(
           child: FutureBuilder<Session?>(
-              future: _getSession(context),
-              builder:
-                  (BuildContext context, AsyncSnapshot<Session?> snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+            future: _getSession(context),
+            builder: (BuildContext context, AsyncSnapshot<Session?> snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
 
-                final Session? session = snapshot.data;
+              final Session? session = snapshot.data;
 
-                return SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Theme.of(context).primaryColor,
-                    ),
-                    onPressed: session != null
-                        ? () => _deleteSession(context, session)
-                        : null,
-                    child: Container(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Text(
-                        'Delete session',
-                        style: TextStyle(
-                            color: utils.getThemeTextColor(context),
-                            fontSize: 18.0,),
+              return SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: Theme.of(context).primaryColor,
+                  ),
+                  onPressed: session != null
+                      ? () => _deleteSession(context, session)
+                      : null,
+                  child: Container(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Text(
+                      'Delete session',
+                      style: TextStyle(
+                        color: utils.getThemeTextColor(context),
+                        fontSize: 18.0,
                       ),
                     ),
                   ),
-                );
-              },),
+                ),
+              );
+            },
+          ),
         ),
       ),
     );

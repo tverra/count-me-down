@@ -176,7 +176,8 @@ void main() {
       profile['drink_id'] = drinkId;
       await db_utils.insertInto('profiles', profile, profile['id']);
 
-      List<Map<String, dynamic>> profiles = await db_utils.queryFrom('profiles');
+      List<Map<String, dynamic>> profiles =
+          await db_utils.queryFrom('profiles');
       expect(profiles.length, 1);
 
       await db_utils.deleteFrom('drinks', drinkId);

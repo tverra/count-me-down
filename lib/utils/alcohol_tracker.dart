@@ -49,7 +49,7 @@ class AlcoholTracker {
 
     for (final Drink drink in relevantDrinks) {
       sum += drink
-        .currentlyAbsorbedAlcohol(profile.absorptionTime ?? Duration.zero);
+          .currentlyAbsorbedAlcohol(profile.absorptionTime ?? Duration.zero);
     }
 
     return sum;

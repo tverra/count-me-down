@@ -37,104 +37,105 @@ class _ProfilePageState extends State<ProfilePage> {
         title: const Text('Edit profile'),
       ),
       body: FutureBuilder<Profile?>(
-          future: _activeProfileFuture,
-          builder: (BuildContext context, AsyncSnapshot<Profile?> snapshot) {
-            final Profile? profile = snapshot.data;
+        future: _activeProfileFuture,
+        builder: (BuildContext context, AsyncSnapshot<Profile?> snapshot) {
+          final Profile? profile = snapshot.data;
 
-            return Container(
-              padding: const EdgeInsets.all(20.0),
-              width: double.infinity,
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: <Widget>[
-                    TextFormField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        hintText: 'Profile name',
-                        helperText: 'Profile name',
+          return Container(
+            padding: const EdgeInsets.all(20.0),
+            width: double.infinity,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: <Widget>[
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(
+                      hintText: 'Profile name',
+                      helperText: 'Profile name',
+                    ),
+                    textCapitalization: TextCapitalization.sentences,
+                    keyboardType: TextInputType.text,
+                    validator: (String? value) {
+                      final String? formatted = value?.trim();
+
+                      if (formatted == null || formatted == '') {
+                        return 'Invalid value';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20.0),
+                  TextFormField(
+                    controller: _weightController,
+                    decoration: const InputDecoration(
+                      hintText: 'Weight (in kilos)',
+                      helperText: 'Weight (in kilos)',
+                      counterText: '',
+                    ),
+                    keyboardType: TextInputType.number,
+                    maxLength: 4,
+                    validator: (String? value) {
+                      final String? formatted =
+                          value?.trim().replaceAll(',', '.');
+                      final double? parsed = double.tryParse(formatted ?? '');
+
+                      if (parsed == null || parsed < 0) {
+                        return 'Invalid value';
+                      }
+
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20.0),
+                  SizedBox(
+                    width: double.infinity,
+                    child: DropdownButton<double>(
+                      value: _genderValue,
+                      dropdownColor: Colors.white,
+                      underline: const Divider(
+                        thickness: 1,
+                        color: Colors.black38,
                       ),
-                      textCapitalization: TextCapitalization.sentences,
-                      keyboardType: TextInputType.text,
-                      validator: (String? value) {
-                        final String? formatted = value?.trim();
-
-                        if (formatted == null || formatted == '') {
-                          return 'Invalid value';
+                      itemHeight: 80.0,
+                      items: <double>[70.0, 60.0, 65.0]
+                          .map<DropdownMenuItem<double>>((double value) {
+                        return DropdownMenuItem<double>(
+                          value: value,
+                          child: Text(Profile.getGender(value)),
+                        );
+                      }).toList(),
+                      onChanged: (double? newValue) {
+                        if (newValue != null && mounted) {
+                          setState(() {
+                            _genderValue = newValue;
+                          });
                         }
-                        return null;
                       },
                     ),
-                    const SizedBox(height: 20.0),
-                    TextFormField(
-                      controller: _weightController,
-                      decoration: const InputDecoration(
-                        hintText: 'Weight (in kilos)',
-                        helperText: 'Weight (in kilos)',
-                        counterText: '',
-                      ),
-                      keyboardType: TextInputType.number,
-                      maxLength: 4,
-                      validator: (String? value) {
-                        final String? formatted =
-                            value?.trim().replaceAll(',', '.');
-                        final double? parsed = double.tryParse(formatted ?? '');
-
-                        if (parsed == null || parsed < 0) {
-                          return 'Invalid value';
-                        }
-
-                        return null;
-                      },
+                  ),
+                  const SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      'Gender',
+                      style: TextStyle(color: Colors.black54, fontSize: 12.0),
                     ),
-                    const SizedBox(height: 20.0),
-                    SizedBox(
-                      width: double.infinity,
-                      child: DropdownButton<double>(
-                        value: _genderValue,
-                        dropdownColor: Colors.white,
-                        underline: const Divider(
-                          thickness: 1,
-                          color: Colors.black38,
-                        ),
-                        itemHeight: 80.0,
-                        items: <double>[70.0, 60.0, 65.0]
-                            .map<DropdownMenuItem<double>>((double value) {
-                          return DropdownMenuItem<double>(
-                            value: value,
-                            child: Text(Profile.getGender(value)),
-                          );
-                        }).toList(),
-                        onChanged: (double? newValue) {
-                          if (newValue != null && mounted) {
-                            setState(() {
-                              _genderValue = newValue;
-                            });
-                          }
-                        },
-                      ),
+                  ),
+                  const SizedBox(height: 20.0),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed:
+                          profile != null ? () => _onSubmit(profile) : null,
+                      child: const Text('Save'),
                     ),
-                    const SizedBox(
-                      width: double.infinity,
-                      child: Text(
-                        'Gender',
-                        style: TextStyle(color: Colors.black54, fontSize: 12.0),
-                      ),
-                    ),
-                    const SizedBox(height: 20.0),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed:
-                            profile != null ? () => _onSubmit(profile) : null,
-                        child: const Text('Save'),
-                      ),
-                    )
-                  ],
-                ),
+                  )
+                ],
               ),
-            );
-          },),
+            ),
+          );
+        },
+      ),
     );
   }
 
